@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{760463D9-4DD6-9E58-FB6F-409F99847CCA}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "ActionAdventure",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
