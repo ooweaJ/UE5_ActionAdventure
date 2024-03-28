@@ -5,7 +5,7 @@
 #include "CWeatherEvent.generated.h"
 
 UENUM(BlueprintType)
-enum class FWeather : uint8
+enum class EWeather : uint8
 {
 	Sun,
 	Rain,
@@ -13,6 +13,16 @@ enum class FWeather : uint8
 	Fog,
 	Max
 };
+
+UENUM(BlueprintType)
+enum class EDayAndNight : uint8
+{
+	Day,
+	Dusk,
+	Night
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDayNightChangedDelegate, EDayAndNight, NewDayNight);
 
 UCLASS()
 class ACTIONADVENTURE_API ACWeatherEvent : public AActor
@@ -29,7 +39,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	FWeather GetWeather();
+	UPROPERTY(BlueprintAssignable)
+	FDayNightChangedDelegate OnDayNightChanged;
+	UFUNCTION(BlueprintCallable)
+	EDayAndNight GetDayAndNight() const { return DAN; }
+
+	EWeather GetWeather();
 
 private:
 	void UpdateDirectionalLightAngle();
@@ -40,11 +55,18 @@ private:
 	void SetSnowWeather();
 	void SetFogWeather();
 public:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
+	float DayTime = 2.f;
+
 	float GameTime;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	class ADirectionalLight* DirectionalLight;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	class AExponentialHeightFog* ExponentialHeightFog;
+
+	class ACSky* SKY;
+
+	EDayAndNight DAN;
+	bool bSwitchDAN = false;
 };
