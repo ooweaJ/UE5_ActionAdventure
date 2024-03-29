@@ -47,7 +47,6 @@ public:
 	EWeather GetWeather();
 
 private:
-	void UpdateDirectionalLightAngle();
 	void SetWeatherEvent();
 
 	void SetSunWeather();
@@ -62,6 +61,8 @@ public:
 
 	UPROPERTY()
 	class ADirectionalLight* DirectionalLight;
+	class AExponentialHeightFog* Fog;
+	class UDirectionalLightComponent* SunComp;
 	UPROPERTY()
 	class AExponentialHeightFog* ExponentialHeightFog;
 

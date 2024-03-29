@@ -11,27 +11,40 @@
 ACWeatherEvent::ACWeatherEvent()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	GameTime = 9.0f;
+	GameTime = 13.0f;
+    DAN = EDayAndNight::Dusk;
 }
 
 void ACWeatherEvent::BeginPlay()
 {
 	Super::BeginPlay();
-    TArray<AActor*> FoundActors;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADirectionalLight::StaticClass(), FoundActors);
 
-    TArray<AActor*> FoundActors2;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACSky::StaticClass(), FoundActors2);
-    if (FoundActors.Num() > 0)
     {
-        DirectionalLight = Cast<ADirectionalLight>(FoundActors[0]);
-        DirectionalLight->SetActorRotation(FRotator(0, 314, 0));
+        TArray<AActor*> FoundActors;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADirectionalLight::StaticClass(), FoundActors);
+        if (FoundActors.Num() > 0)
+        {
+            DirectionalLight = Cast<ADirectionalLight>(FoundActors[0]);
+            SunComp = DirectionalLight->GetComponent();
+            DirectionalLight->SetActorRotation(FRotator(0, 314, 0));
+        }
     }
 
-    if (FoundActors2.Num() > 0)
+
     {
-        SKY = Cast<ACSky>(FoundActors2[0]);
+        TArray<AActor*> FoundActors;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), AExponentialHeightFog::StaticClass(), FoundActors);
+        if (FoundActors.Num() > 0)
+           Fog = Cast<AExponentialHeightFog>(FoundActors[0]);
     }
+
+    {
+        TArray<AActor*> FoundActors2;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACSky::StaticClass(), FoundActors2);
+        if (FoundActors2.Num() > 0)
+            SKY = Cast<ACSky>(FoundActors2[0]);
+    }
+
 }
 
 void ACWeatherEvent::Tick(float DeltaTime)
@@ -46,67 +59,60 @@ void ACWeatherEvent::Tick(float DeltaTime)
         SetWeatherEvent();
     }
 
-    // 이전 상태 저장
-    EDayAndNight PreviousDAN = DAN;
-
-
     // 낮과 밤 상태 변경
-    if (GameTime <= 6.f || GameTime >= 21.f)
+    // 밤
+    if (GameTime <= 6.f || GameTime >= 23.f)
     {
-        DAN = EDayAndNight::Night;
-    }
-    else if (GameTime >= 6.f && GameTime <= 8.f)
-    {
-        // 노을
-       // UpdateDirectionalLightAngle();
-
-        DAN = EDayAndNight::Dusk;
-    }
-    else if (GameTime >= 8.f && GameTime <= 19.f)
-    {
-        DAN = EDayAndNight::Day;
-    }
-    else if (GameTime >= 19.f && GameTime <= 21.f)
-    {
-        // 노을
-       // UpdateDirectionalLightAngle();
-
-        DAN = EDayAndNight::Dusk;
-    }
-
-    // 낮 밤 상태가 변경되었을 때만 설정 적용
-    if (PreviousDAN != DAN)
-    {
-        UDirectionalLightComponent* comp = DirectionalLight->GetComponent();
-
-        if (DAN == EDayAndNight::Night)
+        if (DAN != EDayAndNight::Night)
         {
-            comp->SetIntensity(0.5f);
-            comp->SetLightColor(FLinearColor(0.26f, 0.27f, 0.54f));
-            DirectionalLight->SetActorRotation(FRotator(0.f, -46.f,0.f));
-            if(!!SKY)
-            SKY->SetNightSky();
-        }
-        else
-        {
-            comp->SetIntensity(0.7f);
-            comp->SetLightColor(FLinearColor(1, 1, 1));
-            DirectionalLight->SetActorRotation(FRotator(0.f, 146.f, 0.f));
-
-            if(!!SKY)
-            SKY->SetDefaultSky();
+            SunComp->SetIntensity(0.5f);
+            SunComp->SetLightColor(FLinearColor(0.26f, 0.27f, 0.54f));
+            DirectionalLight->SetActorRotation(FRotator(146.f, 0.f,  0.f));
+            if (!!SKY)
+                SKY->SetNightSky();
+            DAN = EDayAndNight::Night;
         }
     }
-}
+    // 노을
+    else if (GameTime >= 6.f && GameTime <= 12.f)
+    {
+        if (DAN != EDayAndNight::Dusk)
+        {
+            DirectionalLight->SetActorRotation(FRotator(180.f,0.f, 0.f));
+            SunComp->SetLightColor(FLinearColor(1, 1, 1));
+            if (!!SKY)
+                SKY->SetDefaultSky();
+            DAN = EDayAndNight::Dusk;
+        }
+        FRotator rotator(DeltaTime, 0, 0);
+        DirectionalLight->AddActorLocalRotation(rotator);
 
-void ACWeatherEvent::UpdateDirectionalLightAngle()
-{
-    FRotator LightRotation;
-    float alpha = (GameTime / 24.0f);
-    float Angle = FMath::Lerp(0.f, 360.f, alpha);
-    LightRotation.Pitch = Angle;
-    FQuat rotationQuat = LightRotation.Quaternion();
-    DirectionalLight->SetActorRotation(rotationQuat);
+    }
+    // 낮
+    else if (GameTime >= 12.f && GameTime <= 18.f)
+    {
+        if (DAN != EDayAndNight::Day)
+        {
+            SunComp->SetIntensity(0.7f);
+            SunComp->SetLightColor(FLinearColor(1, 1, 1));
+            DirectionalLight->SetActorRotation(FRotator(314.f ,0.f, 0.f));
+
+            if (!!SKY)
+                SKY->SetDefaultSky();
+            DAN = EDayAndNight::Day;
+        }
+    }
+    // 노을
+    else if (GameTime >= 18.f && GameTime <= 23.f)
+    {
+        if (DAN != EDayAndNight::Dusk)
+        {
+            DirectionalLight->SetActorRotation(FRotator(347.f, 0.f,  0.f));
+            DAN = EDayAndNight::Dusk;
+        }
+        FRotator rotator(DeltaTime, 0, 0);
+        DirectionalLight->AddActorLocalRotation(rotator);
+    }
 }
 
 EWeather ACWeatherEvent::GetWeather()
@@ -151,5 +157,8 @@ void ACWeatherEvent::SetSnowWeather()
 
 void ACWeatherEvent::SetFogWeather()
 {
+    UExponentialHeightFogComponent* fogcomp = Fog->GetComponent();
+    fogcomp->SetFogDensity(1.0f);
+    fogcomp->SetFogInscatteringColor(FLinearColor(1, 1, 1));
 }
 
