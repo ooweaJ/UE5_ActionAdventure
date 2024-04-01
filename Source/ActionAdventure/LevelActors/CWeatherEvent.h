@@ -39,15 +39,21 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable,BlueprintReadWrite)
 	FDayNightChangedDelegate OnDayNightChanged;
 	UFUNCTION(BlueprintCallable)
 	EDayAndNight GetDayAndNight() const { return DAN; }
 
 	EWeather GetWeather();
 
+public:
+	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
+	void SetMoring();
+	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
+	void SetNight();
 private:
 	void SetWeatherEvent();
+	void SetDefaultWeather();
 
 	void SetSunWeather();
 	void SetRainWeather();
@@ -63,10 +69,11 @@ public:
 	class ADirectionalLight* DirectionalLight;
 	class AExponentialHeightFog* Fog;
 	class UDirectionalLightComponent* SunComp;
+	class ASkyAtmosphere* Skysphere;
 	UPROPERTY()
 	class AExponentialHeightFog* ExponentialHeightFog;
 
-	class ACSky* SKY;
+	class ASky* SKY;
 
 	EDayAndNight DAN;
 	bool bSwitchDAN = false;

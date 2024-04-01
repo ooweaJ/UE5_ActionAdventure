@@ -5,8 +5,9 @@
 #include "Engine/ExponentialHeightFog.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/ExponentialHeightFogComponent.h"
+#include "Components/SkyAtmosphereComponent.h"
 
-#include "LevelActors/CSky.h"
+#include "LevelActors/Sky.h"
 
 ACWeatherEvent::ACWeatherEvent()
 {
@@ -40,11 +41,16 @@ void ACWeatherEvent::BeginPlay()
 
     {
         TArray<AActor*> FoundActors2;
-        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACSky::StaticClass(), FoundActors2);
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASky::StaticClass(), FoundActors2);
         if (FoundActors2.Num() > 0)
-            SKY = Cast<ACSky>(FoundActors2[0]);
+            SKY = Cast<ASky>(FoundActors2[0]);
     }
 
+    {
+        ASkyAtmosphere* actor = Cast<ASkyAtmosphere>(UGameplayStatics::GetActorOfClass(GetWorld(), ASkyAtmosphere::StaticClass()));
+        if (!!actor)
+            Skysphere = actor;
+    }
 }
 
 void ACWeatherEvent::Tick(float DeltaTime)
@@ -67,9 +73,6 @@ void ACWeatherEvent::Tick(float DeltaTime)
         {
             SunComp->SetIntensity(0.5f);
             SunComp->SetLightColor(FLinearColor(0.26f, 0.27f, 0.54f));
-            DirectionalLight->SetActorRotation(FRotator(146.f, 0.f,  0.f));
-            if (!!SKY)
-                SKY->SetNightSky();
             DAN = EDayAndNight::Night;
         }
     }
@@ -78,15 +81,9 @@ void ACWeatherEvent::Tick(float DeltaTime)
     {
         if (DAN != EDayAndNight::Dusk)
         {
-            DirectionalLight->SetActorRotation(FRotator(180.f,0.f, 0.f));
             SunComp->SetLightColor(FLinearColor(1, 1, 1));
-            if (!!SKY)
-                SKY->SetDefaultSky();
             DAN = EDayAndNight::Dusk;
         }
-        FRotator rotator(DeltaTime, 0, 0);
-        DirectionalLight->AddActorLocalRotation(rotator);
-
     }
     // 낮
     else if (GameTime >= 12.f && GameTime <= 18.f)
@@ -95,10 +92,6 @@ void ACWeatherEvent::Tick(float DeltaTime)
         {
             SunComp->SetIntensity(0.7f);
             SunComp->SetLightColor(FLinearColor(1, 1, 1));
-            DirectionalLight->SetActorRotation(FRotator(314.f ,0.f, 0.f));
-
-            if (!!SKY)
-                SKY->SetDefaultSky();
             DAN = EDayAndNight::Day;
         }
     }
@@ -107,11 +100,8 @@ void ACWeatherEvent::Tick(float DeltaTime)
     {
         if (DAN != EDayAndNight::Dusk)
         {
-            DirectionalLight->SetActorRotation(FRotator(347.f, 0.f,  0.f));
             DAN = EDayAndNight::Dusk;
         }
-        FRotator rotator(DeltaTime, 0, 0);
-        DirectionalLight->AddActorLocalRotation(rotator);
     }
 }
 
@@ -142,23 +132,56 @@ void ACWeatherEvent::SetWeatherEvent()
 
 }
 
+void ACWeatherEvent::SetDefaultWeather()
+{
+    SunComp->SetLightColor(FLinearColor(1, 1, 1));
+    SunComp->SetIntensity(0.7f);
+    Skysphere->GetComponent()->SetRayleighScattering(FLinearColor(0.17, 0.409, 1.0));
+    UExponentialHeightFogComponent* fogcomp = Fog->GetComponent();
+    FExponentialHeightFogData fogdata;
+    fogcomp->SetSecondFogData(fogdata);
+    fogcomp->SetFogInscatteringColor(FLinearColor(0, 0, 0));
+}
+
 void ACWeatherEvent::SetSunWeather()
 {
-
+    SetDefaultWeather();
+    if (!!SKY)
+        SKY->SetDefaultSky();
 }
 
 void ACWeatherEvent::SetRainWeather()
 {
+    Skysphere->GetComponent()->SetRayleighScattering(FLinearColor(0.23, 0.23, 0.23));
+    UExponentialHeightFogComponent* fogcomp = Fog->GetComponent();
+    FExponentialHeightFogData fogdata;
+    fogdata.FogDensity = 0.05f;
+    fogcomp->SetSecondFogData(fogdata);
+    fogcomp->SetFogDensity(0.02f);
+    fogcomp->SetFogInscatteringColor(FLinearColor(1, 1, 1));
+    if (!!SKY)
+        SKY->SetRainSky();
 }
 
 void ACWeatherEvent::SetSnowWeather()
 {
+    Skysphere->GetComponent()->SetRayleighScattering(FLinearColor(0.5, 0.95, 1));
+    UExponentialHeightFogComponent* fogcomp = Fog->GetComponent();
+    FExponentialHeightFogData fogdata;
+    fogcomp->SetSecondFogData(fogdata);
+    fogcomp->SetFogDensity(0.02f);
+    fogcomp->SetFogInscatteringColor(FLinearColor(0, 0, 0));
+    if (!!SKY)
+        SKY->SetSnowSky();
 }
 
 void ACWeatherEvent::SetFogWeather()
 {
+    if (SKY)
+        SKY->SetFogSky();
+    Skysphere->GetComponent()->SetRayleighScattering(FLinearColor(0.23, 0.23, 0.23));
     UExponentialHeightFogComponent* fogcomp = Fog->GetComponent();
-    fogcomp->SetFogDensity(1.0f);
+    fogcomp->SetFogDensity(0.5f);
     fogcomp->SetFogInscatteringColor(FLinearColor(1, 1, 1));
 }
 
