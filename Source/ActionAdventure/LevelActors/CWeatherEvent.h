@@ -77,4 +77,5 @@ public:
 
 	EDayAndNight DAN;
 	bool bSwitchDAN = false;
+	bool bWeather = false;
 };
