@@ -65,6 +65,8 @@ void ACWeatherEvent::Tick(float DeltaTime)
         if (!bWeather)
         {
             bWeather = true;
+            SetWeatherEvent();
+
         }
     }
 
@@ -80,7 +82,6 @@ void ACWeatherEvent::Tick(float DeltaTime)
             //SunComp->SetIntensity(0.5f);
             SunComp->SetLightColor(FLinearColor(0.26f, 0.27f, 0.54f));
             DAN = EDayAndNight::Night;
-            SetWeatherEvent();
 
         }
     }
