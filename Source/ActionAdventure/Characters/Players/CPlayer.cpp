@@ -20,6 +20,16 @@ ACPlayer::ACPlayer()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
+	{
+		USkeletalMeshComponent* mesh = GetMesh();
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Scanned3DPeoplePack/RP_Character/rp_manuel_rigged_001_ue4/rp_manuel_rigged_001_ue4.rp_manuel_rigged_001_ue4'"));
+		if (!Asset.Succeeded()) return;
+
+		mesh->SetSkeletalMesh(Asset.Object);
+		mesh->SetRelativeLocation(FVector(0, 0, -88));
+		mesh->SetRelativeRotation(FRotator(0, -90, 0));
+	}
+
 }
 
 void ACPlayer::BeginPlay()
