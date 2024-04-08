@@ -1,5 +1,6 @@
 #include "Characters/CAnimInstance.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void UCAnimInstance::NativeBeginPlay()
 {
@@ -14,6 +15,6 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	ACharacter* character = Cast<ACharacter>(TryGetPawnOwner());
 	if (!IsValid(character)) return;
 
-	Speed = character->GetVelocity().Size2D();
+	Speed = character->GetVelocity().Length();
 	Direction = CalculateDirection(character->GetVelocity(), character->GetControlRotation());
 }
