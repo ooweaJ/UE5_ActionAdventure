@@ -17,4 +17,5 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	Speed = character->GetVelocity().Length();
 	Direction = CalculateDirection(character->GetVelocity(), character->GetControlRotation());
+	IsFalling = character->GetCharacterMovement()->IsFalling();
 }

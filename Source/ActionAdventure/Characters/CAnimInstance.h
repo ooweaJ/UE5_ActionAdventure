@@ -16,6 +16,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float Direction;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	bool IsFalling;
 public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

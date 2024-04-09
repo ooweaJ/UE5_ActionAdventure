@@ -26,4 +26,12 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	void OnShift();
+	void OffShift();
+
+	float AimYawRate;
+	float PreviousAimYaw;
+	FRotator LastVelocity;
+	FRotator TargetRotation;
 };
