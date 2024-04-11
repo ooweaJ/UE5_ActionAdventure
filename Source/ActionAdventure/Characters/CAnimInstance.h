@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Characters/Players/CPlayer.h"
 #include "CAnimInstance.generated.h"
 
 UCLASS()
@@ -17,8 +18,19 @@ public:
 	float Direction;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	float Axis = 1.f;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	bool IsFalling;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	EMoveDirection MoveDirection;
+
 public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+private:
+	UFUNCTION()
+	void OnMoveDirectionChanged(EMoveDirection InMoveDirection);
 };

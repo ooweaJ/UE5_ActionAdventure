@@ -10,6 +10,8 @@
 #include "InputActionValue.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "Characters/CAnimInstance.h"
+
 ACPlayer::ACPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -29,28 +31,26 @@ ACPlayer::ACPlayer()
 		mesh->SetRelativeLocation(FVector(0, 0, -88));
 		mesh->SetRelativeRotation(FRotator(0, -90, 0));
 	}
+	RotationInterpSpeed = 10.0f;
+	MinWalkSpeed = 300.f;
+	MaxWalkSpeed = 1000.f;
 }
 
 void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 }
 
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AimYawRate = abs((GetControlRotation().Yaw - PreviousAimYaw) / DeltaTime);
-	PreviousAimYaw = GetControlRotation().Yaw;
+	RotateTowardsMovementDirection(DeltaTime);
 
-	if(GetVelocity().Size2D() >= 100.)
-	LastVelocity = GetVelocity().Rotation();
-	FRotator Target(0.0, LastVelocity.Yaw, 0.0);
-	float a = 20.f; // 0~ 20 을 0~3값에따라 만들어지는 float 변수 달리는 모드를 생각하면됨
-	float calculate = UKismetMathLibrary::MapRangeClamped(AimYawRate, 0.0, 300.0, 1.0, 3.0) * a;
-	TargetRotation = UKismetMathLibrary::RInterpTo_Constant(TargetRotation, Target, DeltaTime, 500.f);
-	SetActorRotation(UKismetMathLibrary::RInterpTo_Constant(GetActorRotation(), TargetRotation, DeltaTime, calculate));
-
+	FVector Forward = UKismetMathLibrary::LessLess_VectorRotator(GetVelocity(), GetActorRotation());
+	Forward = Forward / 350.0f;
+	LeanAxis = FMath::FInterpTo(LeanAxis, Forward.Y, DeltaTime, 4.f);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), LeanAxis);
 }
 
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -62,14 +62,26 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	}
 }
 
+void ACPlayer::RotateTowardsMovementDirection(float DeltaTime)
+{
+	FVector MovementDirection = GetVelocity();
+
+	if (!MovementDirection.IsNearlyZero())
+	{
+		FRotator DesiredRotation = MovementDirection.Rotation();
+		TargetRotation = FMath::RInterpTo(TargetRotation, DesiredRotation, DeltaTime, RotationInterpSpeed );
+		SetActorRotation(TargetRotation);
+	}
+}
+
 void ACPlayer::OnShift()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 900.f;
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
 }
 
 void ACPlayer::OffShift()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->MaxWalkSpeed = MinWalkSpeed;
 
 }
 
