@@ -10,14 +10,6 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
-UENUM(BlueprintType)
-enum class EMoveDirection : uint8
-{
-	None, Right, Left
-};
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveDirection, EMoveDirection, InMoveDirection);
-
 UCLASS()
 class ACTIONADVENTURE_API ACPlayer : public ACharacter
 {
@@ -34,35 +26,17 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-private:
-	// 입력 받아서 회전시키는 함수
-	void RotateTowardsMovementDirection(float DeltaTime);
-
 public:
 	void OnShift();
 	void OffShift();
 
-	// 현재 회전 방향
-	FRotator TargetRotation;
+public:
+	UPROPERTY(VisibleDefaultsOnly)
+	class UStatusComponent* StatusComponent;
 
-	float LeanAxis;
-	// 회전 보간 속도
-	UPROPERTY(EditAnywhere)
-	float RotationInterpSpeed;
+	UPROPERTY(VisibleDefaultsOnly)
+	class UStateComponent* StateComponent;
 
-	UPROPERTY(EditAnywhere)
-	float MinWalkSpeed;
-
-	UPROPERTY(EditAnywhere)
-	float MaxWalkSpeed;
-
-	UPROPERTY(EditAnywhere)
-	EMoveDirection MoveDirection ;
-
-	UPROPERTY(BlueprintAssignable)
-	FMoveDirection OnMoveDirection;
-
-	float AimYawRate;
-	float PreviousAimYaw;
-	FRotator LastVelocity;
+	UPROPERTY(VisibleDefaultsOnly)
+	class UMoveComponent* MoveComponent;
 };

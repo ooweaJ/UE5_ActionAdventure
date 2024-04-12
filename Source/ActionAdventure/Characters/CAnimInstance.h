@@ -9,7 +9,12 @@ UCLASS()
 class ACTIONADVENTURE_API UCAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
-	
+
+
+public:
+	virtual void NativeBeginPlay() override;
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float Speed;
@@ -18,19 +23,11 @@ public:
 	float Direction;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	float Axis = 1.f;
+	float Axis;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	bool IsFalling;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	EMoveDirection MoveDirection;
-
-public:
-	virtual void NativeBeginPlay() override;
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
 private:
-	UFUNCTION()
-	void OnMoveDirectionChanged(EMoveDirection InMoveDirection);
+	class UMoveComponent* MoveComp;
 };
