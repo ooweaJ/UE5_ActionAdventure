@@ -21,7 +21,7 @@ void UMoveComponent::BeginPlay()
 void UMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	RotateTowardsMovementDirection(DeltaTime);
+	//RotateTowardsMovementDirection(DeltaTime);
 }
 
 void UMoveComponent::RotateTowardsMovementDirection(float DeltaTime)
@@ -33,6 +33,7 @@ void UMoveComponent::RotateTowardsMovementDirection(float DeltaTime)
 	LeanAxis = FMath::FInterpTo(LeanAxis, Forward.Y, DeltaTime, 4.f);
 
 	FVector MovementDirection = Velocity;
+	MovementDirection.Z = 0.f;
 	if (!MovementDirection.IsNearlyZero())
 	{
 		FRotator DesiredRotation = MovementDirection.Rotation();
