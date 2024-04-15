@@ -15,6 +15,9 @@
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
 
+#include "Actors/Weapon/Weapon.h"
+#include "SubSystem/DataSubsystem.h"
+
 ACPlayer::ACPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -48,7 +51,11 @@ ACPlayer::ACPlayer()
 void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
+	AWeapon* weapon = GetWorld()->SpawnActorDeferred<AWeapon>(AWeapon::StaticClass(), GetActorTransform(), this, this, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	weapon->SetWeaponData(this, DataSubsystem->FindActionData(TEXT("NewRow")));
+	weapon->FinishSpawning(GetActorTransform(), true);
+	Weapon = weapon;
 }
 
 void ACPlayer::Tick(float DeltaTime)
@@ -73,5 +80,10 @@ void ACPlayer::OnShift()
 void ACPlayer::OffShift()
 {
 	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetWalkSpeed();
+}
+
+void ACPlayer::OnMouseL()
+{
+	Weapon->Attack();
 }
 

@@ -29,6 +29,7 @@ public:
 public:
 	void OnShift();
 	void OffShift();
+	void OnMouseL();
 
 public:
 	UPROPERTY(VisibleDefaultsOnly)
@@ -39,4 +40,6 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly)
 	class UMoveComponent* MoveComponent;
+
+	class AWeapon* Weapon;
 };

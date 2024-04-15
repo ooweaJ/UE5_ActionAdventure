@@ -7,7 +7,7 @@
 UENUM(BlueprintType)
 enum class EActionType : uint8
 {
-	Unarmed, Fist, Max
+	Unarmed, Fist, Assassin, Max
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )

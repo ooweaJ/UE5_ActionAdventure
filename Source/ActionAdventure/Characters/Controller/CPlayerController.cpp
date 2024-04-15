@@ -37,6 +37,12 @@ ACPlayerController::ACPlayerController()
 		check(Asset.Succeeded());
 		Shift = Asset.Object;
 	}
+	{
+		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
+		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_MouseL.IA_MouseL'") };
+		check(Asset.Succeeded());
+		MouseL = Asset.Object;
+	}
 }
 
 void ACPlayerController::BeginPlay()
@@ -61,6 +67,7 @@ void ACPlayerController::SetupInputComponent()
 			EnhancedInputComponent->BindAction(Shift, ETriggerEvent::Completed, this, &ThisClass::OffShift);
 			EnhancedInputComponent->BindAction(Jump, ETriggerEvent::Triggered, this, &ThisClass::OnJump);
 			EnhancedInputComponent->BindAction(Jump, ETriggerEvent::Completed, this, &ThisClass::OffJump);
+			EnhancedInputComponent->BindAction(MouseL, ETriggerEvent::Started, this, &ThisClass::OnMouseL);
 		}
 	}
 }
@@ -115,4 +122,11 @@ void ACPlayerController::OffJump(const FInputActionValue& InputActionValue)
 	ACPlayer* player = Cast<ACPlayer>(GetPawn());
 	if (!player) return;
 	player->StopJumping();
+}
+
+void ACPlayerController::OnMouseL(const FInputActionValue& InputActionValue)
+{
+	ACPlayer* player = Cast<ACPlayer>(GetPawn());
+	if (!player) return;
+	player->OnMouseL();
 }
