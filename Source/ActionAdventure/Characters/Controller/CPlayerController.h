@@ -29,6 +29,8 @@ protected:
 	void OnJump(const FInputActionValue& InputActionValue);
 	void OffJump(const FInputActionValue& InputActionValue);
 	void OnMouseL(const FInputActionValue& InputActionValue);
+	void OnNum1(const FInputActionValue& InputActionValue);
+	void OnNum2(const FInputActionValue& InputActionValue);
 
 public:
 	UInputMappingContext* InputMappingContext = nullptr;
@@ -38,4 +40,6 @@ public:
 	UInputAction* Jump = nullptr;
 	UInputAction* Shift = nullptr;
 	UInputAction* MouseL = nullptr;
+	UInputAction* Num1 = nullptr;
+	UInputAction* Num2 = nullptr;
 };

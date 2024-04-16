@@ -14,6 +14,7 @@
 #include "Components/StatusComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
+#include "Components/EquipComponent.h"
 
 #include "Actors/Weapon/Weapon.h"
 #include "SubSystem/DataSubsystem.h"
@@ -44,6 +45,8 @@ ACPlayer::ACPlayer()
 		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
 		StateComponent = CreateDefaultSubobject<UStateComponent>("StateComponent");
 		MoveComponent = CreateDefaultSubobject<UMoveComponent>("MoveComponent");
+		ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComponent");
+		EquipComponent = CreateDefaultSubobject<UEquipComponent>("EquipComponent");
 	}
 
 }
@@ -51,11 +54,7 @@ ACPlayer::ACPlayer()
 void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
-	AWeapon* weapon = GetWorld()->SpawnActorDeferred<AWeapon>(AWeapon::StaticClass(), GetActorTransform(), this, this, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-	weapon->SetWeaponData(this, DataSubsystem->FindActionData(TEXT("NewRow")));
-	weapon->FinishSpawning(GetActorTransform(), true);
-	Weapon = weapon;
+
 }
 
 void ACPlayer::Tick(float DeltaTime)
@@ -84,6 +83,17 @@ void ACPlayer::OffShift()
 
 void ACPlayer::OnMouseL()
 {
-	Weapon->Attack();
+	ActionComponent->MouseL();
+}
+
+void ACPlayer::OnNum1()
+{
+	ActionComponent->Num1();
+}
+
+void ACPlayer::OnNum2()
+{
+	ActionComponent->Num2();
+
 }
 

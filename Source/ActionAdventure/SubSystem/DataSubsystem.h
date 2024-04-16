@@ -19,8 +19,12 @@ public:
 	UDataSubsystem();
 
 	const FWeaponData* FindActionData(const FName& InKey);
+	const FWeaponDataTableRow* FindWeaponData(const FName& InKey);
 
 protected:
 	UPROPERTY()
 	UDataTable* ActionDataTable;
+	
+	UPROPERTY()
+	UDataTable* WeaponDataTable;
 };

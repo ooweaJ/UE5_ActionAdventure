@@ -30,7 +30,8 @@ public:
 	void OnShift();
 	void OffShift();
 	void OnMouseL();
-
+	void OnNum1();
+	void OnNum2();
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -41,5 +42,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UMoveComponent* MoveComponent;
 
-	class AWeapon* Weapon;
+	UPROPERTY(VisibleDefaultsOnly)
+	class UActionComponent* ActionComponent;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	class UEquipComponent* EquipComponent;
 };

@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 
 #include "Actors/Weapon/Attachment.h"
+#include "Components/ActionComponent.h"
 
 
 // Sets default values
@@ -19,15 +20,15 @@ void AWeapon::SetWeaponData(class ACharacter* InOnwerCharacter, const FWeaponDat
 {
 	if (!InData) return;
 	WeaponData = InData;
-
+	WeaponType = InData->ActionType;
 	{
 		FTransform DefaultTransform;
-		AAttachment* Actor= InOnwerCharacter->GetWorld()->SpawnActorDeferred<AAttachment>(InData->Attachment, DefaultTransform, InOnwerCharacter, InOnwerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		AAttachment* Actor = InOnwerCharacter->GetWorld()->SpawnActorDeferred<AAttachment>(InData->Attachment, DefaultTransform, InOnwerCharacter, InOnwerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		Actor->FinishSpawning(DefaultTransform, true);
 		Attachment = Actor;
 		Attachment->AttachToComponent(InOnwerCharacter->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), InData->SocketName);
 	}
-	
+
 }
 
 // Called when the game starts or when spawned
@@ -41,7 +42,6 @@ void AWeapon::BeginPlay()
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AWeapon::Attack()
@@ -50,5 +50,15 @@ void AWeapon::Attack()
 	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
 	int32 Randomint = FMath::RandRange(0, data->ActionDatas.Num() - 1);
 	OwnerCharacter->PlayAnimMontage(data->ActionDatas[Randomint].AnimMontage);
+}
+
+void AWeapon::EquipWeapon()
+{
+	Attachment->OnEquip();
+}
+
+void AWeapon::UnEquipWeapon()
+{
+	Attachment->OnUnequip();
 }
 

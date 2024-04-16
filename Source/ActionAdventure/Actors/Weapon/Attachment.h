@@ -22,7 +22,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnEquip();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUnequip();
 
 private:
 	TArray<class UShapeComponent*> ShapeComponents;

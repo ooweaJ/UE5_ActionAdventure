@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Data/ActionData/ActionDataTableRow.h"
+#include "Components/ActionComponent.h"
 #include "Weapon.generated.h"
 
 USTRUCT()
@@ -22,6 +23,9 @@ public:
 
 	UPROPERTY(EditAnywhere, category = "Attach")
 	FName SocketName;
+
+	UPROPERTY(EditAnywhere)
+	EActionType ActionType;
 };
 
 UCLASS()
@@ -42,10 +46,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void Attack();
-
+	virtual void EquipWeapon();
+	virtual void UnEquipWeapon();
 
 	const FWeaponData* WeaponData;
 
 	USceneComponent* Scene;
 	class AAttachment* Attachment;
+
+	FName KeyValue;
+
+private:
+	UPROPERTY(EditAnywhere)
+	EActionType WeaponType;
 };

@@ -62,3 +62,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FActionData> ActionDatas;
 };
+
+
+USTRUCT(BlueprintType)
+struct ACTIONADVENTURE_API FWeaponDataTableRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AWeapon> WeaponClass;
+};

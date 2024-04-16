@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "Characters/Players/CPlayer.h"
+#include "Components/ActionComponent.h"
 #include "CAnimInstance.generated.h"
 
 UCLASS()
@@ -14,6 +15,10 @@ class ACTIONADVENTURE_API UCAnimInstance : public UAnimInstance
 public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+private:
+	UFUNCTION()
+	void OnActionTypeChanged(EActionType InPrevType, EActionType InNewType);
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
@@ -28,6 +33,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	bool IsFalling;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	EActionType ActionType;
 private:
 	class UMoveComponent* MoveComp;
 };

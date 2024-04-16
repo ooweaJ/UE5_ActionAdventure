@@ -43,6 +43,18 @@ ACPlayerController::ACPlayerController()
 		check(Asset.Succeeded());
 		MouseL = Asset.Object;
 	}
+	{
+		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
+		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_1.IA_1'") };
+		check(Asset.Succeeded());
+		Num1 = Asset.Object;
+	}
+	{
+		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
+		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_2.IA_2'") };
+		check(Asset.Succeeded());
+		Num2 = Asset.Object;
+	}
 }
 
 void ACPlayerController::BeginPlay()
@@ -68,6 +80,8 @@ void ACPlayerController::SetupInputComponent()
 			EnhancedInputComponent->BindAction(Jump, ETriggerEvent::Triggered, this, &ThisClass::OnJump);
 			EnhancedInputComponent->BindAction(Jump, ETriggerEvent::Completed, this, &ThisClass::OffJump);
 			EnhancedInputComponent->BindAction(MouseL, ETriggerEvent::Started, this, &ThisClass::OnMouseL);
+			EnhancedInputComponent->BindAction(Num1, ETriggerEvent::Started, this, &ThisClass::OnNum1);
+			EnhancedInputComponent->BindAction(Num2, ETriggerEvent::Started, this, &ThisClass::OnNum2);
 		}
 	}
 }
@@ -129,4 +143,18 @@ void ACPlayerController::OnMouseL(const FInputActionValue& InputActionValue)
 	ACPlayer* player = Cast<ACPlayer>(GetPawn());
 	if (!player) return;
 	player->OnMouseL();
+}
+
+void ACPlayerController::OnNum1(const FInputActionValue& InputActionValue)
+{
+	ACPlayer* player = Cast<ACPlayer>(GetPawn());
+	if (!player) return;
+	player->OnNum1();
+}
+
+void ACPlayerController::OnNum2(const FInputActionValue& InputActionValue)
+{
+	ACPlayer* player = Cast<ACPlayer>(GetPawn());
+	if (!player) return;
+	player->OnNum2();
 }
