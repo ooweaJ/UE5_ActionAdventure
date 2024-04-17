@@ -2,7 +2,7 @@
 
 UStateComponent::UStateComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 }
 
@@ -17,3 +17,37 @@ void UStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+
+void UStateComponent::SetIdleMode()
+{
+	ChangeType(EStateType::Idle);
+}
+
+void UStateComponent::SetEquipMode()
+{
+	ChangeType(EStateType::Equip);
+}
+
+void UStateComponent::SetActionMode()
+{
+	ChangeType(EStateType::Action);
+}
+
+void UStateComponent::SetHittedMode()
+{
+	ChangeType(EStateType::Hitted);
+}
+
+void UStateComponent::SetDeadMode()
+{
+	ChangeType(EStateType::Dead);
+}
+
+void UStateComponent::ChangeType(EStateType InNewType)
+{
+	EStateType prevType = Type;
+	Type = InNewType;
+
+	if (OnStateTypeChanged.IsBound())
+		OnStateTypeChanged.Broadcast(prevType, Type);
+}

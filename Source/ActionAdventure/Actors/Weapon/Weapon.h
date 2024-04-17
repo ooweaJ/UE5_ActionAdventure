@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -26,6 +24,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	EActionType ActionType;
+
+	UPROPERTY(EditAnywhere)
+	FEquipmentData Equip;
 };
 
 UCLASS()
@@ -34,20 +35,21 @@ class ACTIONADVENTURE_API AWeapon : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AWeapon();
 
 	void SetWeaponData(class ACharacter* InOnwerCharacter, const FWeaponData* InData);
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void Attack();
 	virtual void EquipWeapon();
 	virtual void UnEquipWeapon();
+	virtual void EndAction();
+
+	FORCEINLINE class AAttachment* GetAttachment() { return Attachment; }
+	FORCEINLINE EActionType GetActiontype() { return WeaponType; }
 
 	const FWeaponData* WeaponData;
 
@@ -59,4 +61,8 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	EActionType WeaponType;
+
+	class ACharacter* OwnerCharacter;
+	class UStateComponent* State;
+	class UStatusComponent* Status;
 };

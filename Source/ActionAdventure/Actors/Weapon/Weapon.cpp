@@ -1,14 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Actors/Weapon/Weapon.h"
 #include "GameFramework/Character.h"
 
 #include "Actors/Weapon/Attachment.h"
 #include "Components/ActionComponent.h"
+#include "Components/StateComponent.h"
+#include "Components/StatusComponent.h"
 
-
-// Sets default values
 AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,6 +17,7 @@ void AWeapon::SetWeaponData(class ACharacter* InOnwerCharacter, const FWeaponDat
 {
 	if (!InData) return;
 	WeaponData = InData;
+	OwnerCharacter = InOnwerCharacter;
 	WeaponType = InData->ActionType;
 	{
 		FTransform DefaultTransform;
@@ -31,14 +29,13 @@ void AWeapon::SetWeaponData(class ACharacter* InOnwerCharacter, const FWeaponDat
 
 }
 
-// Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
+	Status = Cast<UStatusComponent>(OwnerCharacter->GetComponentByClass<UStatusComponent>());
 }
 
-// Called every frame
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -46,19 +43,29 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::Attack()
 {
+	if (!State->IsIdleMode()) return;
+	State->SetActionMode();
 	FActionDataTableRow* data = WeaponData->Data.GetRow<FActionDataTableRow>(TEXT(""));
-	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
 	int32 Randomint = FMath::RandRange(0, data->ActionDatas.Num() - 1);
+	data->ActionDatas[Randomint].bCanMove ? Status->SetMove() : Status->SetStop();
 	OwnerCharacter->PlayAnimMontage(data->ActionDatas[Randomint].AnimMontage);
 }
 
 void AWeapon::EquipWeapon()
 {
-	Attachment->OnEquip();
+	if (!State->IsIdleMode()) return;
+	State->SetEquipMode();
+	OwnerCharacter->PlayAnimMontage(WeaponData->Equip.AnimMontage);
 }
 
 void AWeapon::UnEquipWeapon()
 {
+	if (!State->IsIdleMode()) return;
 	Attachment->OnUnequip();
 }
 
+void AWeapon::EndAction()
+{
+	State->SetIdleMode();
+	Status->SetMove();
+}

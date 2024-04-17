@@ -3,65 +3,22 @@
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+
 #include "Characters/Players/CPlayer.h"
+#include "Data/Input/InPutDataConfig.h"
+#include "Components/StatusComponent.h"
 
 ACPlayerController::ACPlayerController()
 {
-	{
-		static ConstructorHelpers::FObjectFinder<UInputMappingContext> Asset
-		{ TEXT("/Script/EnhancedInput.InputMappingContext'/Game/_dev/Characters/Players/Input/IMC_PlayerInput.IMC_PlayerInput'") };
-		check(Asset.Succeeded());
-		InputMappingContext = Asset.Object;
-	}
-	{
-		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
-		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_Move.IA_Move'") };
-		check(Asset.Succeeded());
-		Move = Asset.Object;
-	}
-	{
-		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
-		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_Look.IA_Look'") };
-		check(Asset.Succeeded());
-		Look = Asset.Object;
-	}
-	{
-		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
-		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_SpaceBar.IA_SpaceBar'") };
-		check(Asset.Succeeded());
-		Jump = Asset.Object;
-	}
-	{
-		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
-		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_Shift.IA_Shift'") };
-		check(Asset.Succeeded());
-		Shift = Asset.Object;
-	}
-	{
-		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
-		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_MouseL.IA_MouseL'") };
-		check(Asset.Succeeded());
-		MouseL = Asset.Object;
-	}
-	{
-		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
-		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_1.IA_1'") };
-		check(Asset.Succeeded());
-		Num1 = Asset.Object;
-	}
-	{
-		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
-		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_2.IA_2'") };
-		check(Asset.Succeeded());
-		Num2 = Asset.Object;
-	}
 }
 
 void ACPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	Subsystem->AddMappingContext(InputMappingContext, 0);
+
+	const UInPutDataConfig* InPutDataConfig = GetDefault<UInPutDataConfig>();
+	Subsystem->AddMappingContext(InPutDataConfig->InputMappingContext, 0);
 }
 
 void ACPlayerController::SetupInputComponent()
@@ -69,19 +26,20 @@ void ACPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
+		const UInPutDataConfig* InPutDataConfig = GetDefault<UInPutDataConfig>();
 		{
-			EnhancedInputComponent->BindAction(Move, ETriggerEvent::Triggered, this, &ThisClass::OnMove);
-			EnhancedInputComponent->BindAction(Look, ETriggerEvent::Triggered, this, &ThisClass::OnLookMouse);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Move, ETriggerEvent::Triggered, this, &ThisClass::OnMove);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Look, ETriggerEvent::Triggered, this, &ThisClass::OnLookMouse);
 
 		}
 		{
-			EnhancedInputComponent->BindAction(Shift, ETriggerEvent::Triggered, this, &ThisClass::OnShift);
-			EnhancedInputComponent->BindAction(Shift, ETriggerEvent::Completed, this, &ThisClass::OffShift);
-			EnhancedInputComponent->BindAction(Jump, ETriggerEvent::Triggered, this, &ThisClass::OnJump);
-			EnhancedInputComponent->BindAction(Jump, ETriggerEvent::Completed, this, &ThisClass::OffJump);
-			EnhancedInputComponent->BindAction(MouseL, ETriggerEvent::Started, this, &ThisClass::OnMouseL);
-			EnhancedInputComponent->BindAction(Num1, ETriggerEvent::Started, this, &ThisClass::OnNum1);
-			EnhancedInputComponent->BindAction(Num2, ETriggerEvent::Started, this, &ThisClass::OnNum2);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Shift, ETriggerEvent::Triggered, this, &ThisClass::OnShift);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Shift, ETriggerEvent::Completed, this, &ThisClass::OffShift);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Jump, ETriggerEvent::Triggered, this, &ThisClass::OnJump);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Jump, ETriggerEvent::Completed, this, &ThisClass::OffJump);
+			EnhancedInputComponent->BindAction(InPutDataConfig->MouseL, ETriggerEvent::Started, this, &ThisClass::OnMouseL);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Num1, ETriggerEvent::Started, this, &ThisClass::OnNum1);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Num2, ETriggerEvent::Started, this, &ThisClass::OnNum2);
 		}
 	}
 }
@@ -90,6 +48,10 @@ void ACPlayerController::OnMove(const FInputActionValue& InputActionValue)
 {
 	FVector2D MovementVector = InputActionValue.Get<FVector2D>();
 	APawn* ControlledPawn = GetPawn();
+
+	UStatusComponent* Status = Cast<UStatusComponent>(ControlledPawn->GetComponentByClass<UStatusComponent>());
+	if (!Status) return;
+	if (!Status->IsCanMove()) return;
 
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);

@@ -33,13 +33,5 @@ protected:
 	void OnNum2(const FInputActionValue& InputActionValue);
 
 public:
-	UInputMappingContext* InputMappingContext = nullptr;
 
-	UInputAction* Move = nullptr;
-	UInputAction* Look = nullptr;
-	UInputAction* Jump = nullptr;
-	UInputAction* Shift = nullptr;
-	UInputAction* MouseL = nullptr;
-	UInputAction* Num1 = nullptr;
-	UInputAction* Num2 = nullptr;
 };

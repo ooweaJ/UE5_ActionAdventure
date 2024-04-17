@@ -13,10 +13,12 @@ void UStatusComponent::BeginPlay()
 
 void UStatusComponent::SetMove()
 {
+	bCanMove = true;
 }
 
 void UStatusComponent::SetStop()
 {
+	bCanMove = false;
 }
 
 void UStatusComponent::SetSpeed(EWalkSpeedTpye InType)

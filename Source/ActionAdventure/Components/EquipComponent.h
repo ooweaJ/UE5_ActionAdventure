@@ -31,6 +31,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TArray<AWeapon*> EquipWeapons;
 	AWeapon* CurrentWeapon;
+	AWeapon* DefaultWeapon;
+
+	class UStateComponent* State;
 
 	class ACharacter* OwnerCharacter;
 };

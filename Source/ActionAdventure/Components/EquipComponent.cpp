@@ -1,4 +1,5 @@
 #include "Components/EquipComponent.h"
+#include "Components/StateComponent.h"
 #include "SubSystem/DataSubsystem.h"
 #include "GameFramework/Character.h"
 #include "Data/ActionData/ActionDataTableRow.h"
@@ -14,6 +15,11 @@ void UEquipComponent::BeginPlay()
 	Super::BeginPlay();
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
+
+	{
+		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Fist"));
+		AddWeapons(Weaponclass->WeaponClass);
+	}
 	{
 		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Assassin"));
 		AddWeapons(Weaponclass->WeaponClass);
@@ -22,7 +28,9 @@ void UEquipComponent::BeginPlay()
 		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Kanata"));
 		AddWeapons(Weaponclass->WeaponClass);
 	}
-	
+	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
+
+	CurrentWeapon = DefaultWeapon;
 }
 
 void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -37,9 +45,21 @@ void UEquipComponent::WeaponL()
 
 void UEquipComponent::SelectWeapon(int32 WeaponNum)
 {
-	CurrentWeapon->UnEquipWeapon();
-	CurrentWeapon = EquipWeapons[WeaponNum];
-	CurrentWeapon->EquipWeapon();
+	if (!State->IsIdleMode()) return;
+	if (CurrentWeapon == EquipWeapons[WeaponNum])
+	{
+		CurrentWeapon->UnEquipWeapon();
+		CurrentWeapon = DefaultWeapon;
+		return;
+	}
+	else
+	{
+		if(CurrentWeapon != DefaultWeapon)
+			CurrentWeapon->UnEquipWeapon();
+
+		CurrentWeapon = EquipWeapons[WeaponNum];
+		CurrentWeapon->EquipWeapon();
+	}
 }
 
 void UEquipComponent::AddWeapons(TSubclassOf<AWeapon> EquipWeapon)
@@ -49,7 +69,10 @@ void UEquipComponent::AddWeapons(TSubclassOf<AWeapon> EquipWeapon)
 	AWeapon* weapon = OwnerCharacter->GetWorld()->SpawnActorDeferred<AWeapon>(EquipWeapon, OwnerCharacter->GetActorTransform(), OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	weapon->SetWeaponData(OwnerCharacter, DataSubsystem->FindActionData(weapon->KeyValue));
 	weapon->FinishSpawning(OwnerCharacter->GetActorTransform(), true);
-	EquipWeapons.Add(weapon);
-	CurrentWeapon = weapon;
+
+	if (weapon->GetActiontype() == EActionType::Unarmed)
+		DefaultWeapon = weapon;
+	else
+		EquipWeapons.Add(weapon);
 }
 
