@@ -11,6 +11,13 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "Characters/CAnimInstance.h"
+#include "Components/StatusComponent.h"
+#include "Components/StateComponent.h"
+#include "Components/MoveComponent.h"
+#include "Components/EquipComponent.h"
+
+#include "Actors/Weapon/Weapon.h"
+#include "SubSystem/DataSubsystem.h"
 
 ACPlayer::ACPlayer()
 {
@@ -22,6 +29,7 @@ ACPlayer::ACPlayer()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+
 	{
 		USkeletalMeshComponent* mesh = GetMesh();
 		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Scanned3DPeoplePack/RP_Character/rp_manuel_rigged_001_ue4/rp_manuel_rigged_001_ue4.rp_manuel_rigged_001_ue4'"));
@@ -31,26 +39,27 @@ ACPlayer::ACPlayer()
 		mesh->SetRelativeLocation(FVector(0, 0, -88));
 		mesh->SetRelativeRotation(FRotator(0, -90, 0));
 	}
-	RotationInterpSpeed = 10.0f;
-	MinWalkSpeed = 300.f;
-	MaxWalkSpeed = 1000.f;
+
+	// Create ActorComponents
+	{
+		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
+		StateComponent = CreateDefaultSubobject<UStateComponent>("StateComponent");
+		MoveComponent = CreateDefaultSubobject<UMoveComponent>("MoveComponent");
+		ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComponent");
+		EquipComponent = CreateDefaultSubobject<UEquipComponent>("EquipComponent");
+	}
+
 }
 
 void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	RotateTowardsMovementDirection(DeltaTime);
-
-	FVector Forward = UKismetMathLibrary::LessLess_VectorRotator(GetVelocity(), GetActorRotation());
-	Forward = Forward / 350.0f;
-	LeanAxis = FMath::FInterpTo(LeanAxis, Forward.Y, DeltaTime, 4.f);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), LeanAxis);
 }
 
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -62,26 +71,29 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	}
 }
 
-void ACPlayer::RotateTowardsMovementDirection(float DeltaTime)
-{
-	FVector MovementDirection = GetVelocity();
-
-	if (!MovementDirection.IsNearlyZero())
-	{
-		FRotator DesiredRotation = MovementDirection.Rotation();
-		TargetRotation = FMath::RInterpTo(TargetRotation, DesiredRotation, DeltaTime, RotationInterpSpeed );
-		SetActorRotation(TargetRotation);
-	}
-}
-
 void ACPlayer::OnShift()
 {
-	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetRunSpeed();
 }
 
 void ACPlayer::OffShift()
 {
-	GetCharacterMovement()->MaxWalkSpeed = MinWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetWalkSpeed();
+}
+
+void ACPlayer::OnMouseL()
+{
+	ActionComponent->MouseL();
+}
+
+void ACPlayer::OnNum1()
+{
+	ActionComponent->Num1();
+}
+
+void ACPlayer::OnNum2()
+{
+	ActionComponent->Num2();
 
 }
 

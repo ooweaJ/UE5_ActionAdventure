@@ -2,17 +2,18 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Components/MoveComponent.h"
+#include "Components/ActionComponent.h"
+
 void UCAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
+	MoveComp = Cast<UMoveComponent>(TryGetPawnOwner()->GetComponentByClass(UMoveComponent::StaticClass()));
 
 	ACharacter* character = Cast<ACharacter>(TryGetPawnOwner());
 	if (!IsValid(character)) return;
-
-	ACPlayer* Player = Cast<ACPlayer>(character);
-	if (!IsValid(Player)) return;
-
-	Player->OnMoveDirection.AddDynamic(this, &ThisClass::OnMoveDirectionChanged);
+	UActionComponent* Action = Cast<UActionComponent>(character->GetComponentByClass(UActionComponent::StaticClass()));
+	Action->OnActionTypeChanged.AddDynamic(this, &ThisClass::OnActionTypeChanged);
 }
 
 void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -26,14 +27,12 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Direction = CalculateDirection(character->GetVelocity(), character->GetControlRotation());
 	IsFalling = character->GetCharacterMovement()->IsFalling();
 
-	ACPlayer* Player = Cast<ACPlayer>(character);
-	if (!IsValid(Player)) return;
-	Axis = Player->LeanAxis;
+	if (!!MoveComp)
+		Axis = MoveComp->GetLeanAxis();
 }
 
-void UCAnimInstance::OnMoveDirectionChanged(EMoveDirection InMoveDirection)
+void UCAnimInstance::OnActionTypeChanged(EActionType InPrevType, EActionType InNewType)
 {
-	MoveDirection = InMoveDirection;
-
+	ActionType = InNewType;
 }
 

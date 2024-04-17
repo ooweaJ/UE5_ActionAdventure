@@ -28,12 +28,10 @@ protected:
 	void OffShift(const FInputActionValue& InputActionValue);
 	void OnJump(const FInputActionValue& InputActionValue);
 	void OffJump(const FInputActionValue& InputActionValue);
+	void OnMouseL(const FInputActionValue& InputActionValue);
+	void OnNum1(const FInputActionValue& InputActionValue);
+	void OnNum2(const FInputActionValue& InputActionValue);
 
 public:
-	UInputMappingContext* InputMappingContext = nullptr;
 
-	UInputAction* Move = nullptr;
-	UInputAction* Look = nullptr;
-	UInputAction* Jump = nullptr;
-	UInputAction* Shift = nullptr;
 };
