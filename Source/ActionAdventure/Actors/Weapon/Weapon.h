@@ -46,23 +46,31 @@ public:
 	virtual void Attack();
 	virtual void EquipWeapon();
 	virtual void UnEquipWeapon();
+
+	virtual void BeginAction();
 	virtual void EndAction();
+public:
+	UFUNCTION()
+	virtual void OnAttachmentBeginOverlap(class ACharacter* InAttacker, class AActor* InCauser, class ACharacter* InOtherCharacter) {};
+
+	UFUNCTION()
+	virtual void OnAttachmentEndOverlap(class ACharacter* InAttacker, class AActor* InCauser, class ACharacter* InOtherCharacter) {};
 
 	FORCEINLINE class AAttachment* GetAttachment() { return Attachment; }
 	FORCEINLINE EActionType GetActiontype() { return WeaponType; }
 
+public:
 	const FWeaponData* WeaponData;
-
-	USceneComponent* Scene;
 	class AAttachment* Attachment;
-
+	USceneComponent* Scene;
 	FName KeyValue;
-
-private:
-	UPROPERTY(EditAnywhere)
-	EActionType WeaponType;
 
 	class ACharacter* OwnerCharacter;
 	class UStateComponent* State;
 	class UStatusComponent* Status;
+
+	struct FActionDataTableRow* DefaultData;
+private:
+	UPROPERTY(EditAnywhere)
+	EActionType WeaponType;
 };

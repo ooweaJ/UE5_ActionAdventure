@@ -6,6 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "Attachment.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttachmentBeginOverlap, class ACharacter*, InAttacker, class AActor*, InCauser, class ACharacter*, InOtherCharacter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttachmentEndOverlap, class ACharacter*, InAttacker, class AActor*, InCauser, class ACharacter*, InOtherCharacter);
+
+
 UCLASS()
 class ACTIONADVENTURE_API AAttachment : public AActor
 {
@@ -28,6 +32,23 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnUnequip();
 
+	void OnCollisions(FString InCollisionName);
+	void OffCollisions();
+private:
+	UFUNCTION()
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FAttachmentBeginOverlap OnAttachmentBeginOverlap;
+
+	UPROPERTY(BlueprintAssignable)
+	FAttachmentEndOverlap OnAttachmentEndOverlap;
 private:
 	TArray<class UShapeComponent*> ShapeComponents;
+	USceneComponent* Scene;
+	class ACharacter* OwnerCharacter;
 };

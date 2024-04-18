@@ -7,3 +7,11 @@ AKanataWeapon::AKanataWeapon()
 {
 	KeyValue = TEXT("Kanata");
 }
+
+void AKanataWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
+{
+}
+
+void AKanataWeapon::OnAttachmentEndOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
+{
+}
