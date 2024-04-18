@@ -15,5 +15,5 @@ void UBeginActionNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;
 
-	Equip->GetCurrentWeapon()->EndAction();
+	Equip->GetCurrentWeapon()->BeginAction();
 }

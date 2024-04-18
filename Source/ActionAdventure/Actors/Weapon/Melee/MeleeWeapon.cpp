@@ -10,6 +10,33 @@
 void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
 {
 	Super::OnAttachmentBeginOverlap(InAttacker, InCauser, InOtherCharacter);
+
+	TArray<FActionData> Datas = DefaultData->ActionDatas;
+
+	//Effect
+	UParticleSystem* hitEffect = Datas[ComboCount].Effect;
+	if (!!hitEffect)
+	{
+		FTransform transform = Datas[ComboCount].EffectTransform;
+		transform.AddToTranslation(InOtherCharacter->GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitEffect, transform);
+	}
+
+	//Camera Shake
+	TSubclassOf<UCameraShakeBase> shake = Datas[ComboCount].ShakeClass;
+	if (!!shake)
+	{
+		APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		controller->PlayerCameraManager->StartCameraShake(shake);
+	}
+
+	//HitStop
+	float hitStop = Datas[ComboCount].HitStop;
+	if (FMath::IsNearlyZero(hitStop) == false)
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.01f);
+		UKismetSystemLibrary::K2_SetTimer(this, "RestoreGlobalTimeDilation", hitStop , false);
+	}
 }
 
 void AMeleeWeapon::OnAttachmentEndOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
@@ -56,4 +83,10 @@ void AMeleeWeapon::BeginAction()
 void AMeleeWeapon::EndAction()
 {
 	Super::EndAction();
+	ComboCount = 0;
+}
+
+void AMeleeWeapon::RestoreGlobalTimeDilation()
+{
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
 }

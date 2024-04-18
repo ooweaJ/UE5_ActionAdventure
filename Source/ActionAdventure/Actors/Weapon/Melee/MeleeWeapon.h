@@ -19,6 +19,9 @@ public:
 	FORCEINLINE void OnCanCombo() { bCanCombo = true; }
 	FORCEINLINE void OffCanCombo() { bCanCombo = false; }
 	FORCEINLINE FString GetSpecificCollisionName() { return DefaultData->ActionDatas[ComboCount].SpecificCollisionName; }
+
+	UFUNCTION()
+	void RestoreGlobalTimeDilation();
 private:
 	int32 ComboCount;
 	bool bCanCombo;

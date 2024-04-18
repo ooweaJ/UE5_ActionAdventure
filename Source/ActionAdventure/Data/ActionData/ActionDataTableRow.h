@@ -46,8 +46,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	FTransform EffectTransform;
 
-	//UPROPERTY(EditAnywhere)
-	//TSubclassOf<class UCameraShake> ShakeClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UCameraShakeBase> ShakeClass;
 
 	UPROPERTY(EditAnywhere)
 	FString SpecificCollisionName = "None";

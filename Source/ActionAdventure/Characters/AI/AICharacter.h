@@ -24,4 +24,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	TArray<USkeletalMesh*> Meshs;
+
+public:
+	UPROPERTY(VisibleDefaultsOnly)
+	class UStatusComponent* StatusComponent;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	class UStateComponent* StateComponent;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	class UMoveComponent* MoveComponent;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	class UActionComponent* ActionComponent;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	class UEquipComponent* EquipComponent;
 };
