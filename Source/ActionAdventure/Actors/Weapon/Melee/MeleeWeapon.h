@@ -26,4 +26,6 @@ private:
 	int32 ComboCount;
 	bool bCanCombo;
 	bool bSucceed;
+
+	TArray<class ACharacter*> HittedCharacters;
 };

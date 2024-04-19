@@ -1,6 +1,7 @@
 #include "Characters/AI/AICharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "Components/CapsuleComponent.h"
+#include "Engine.h"
 
 #include "Characters/CAnimInstance.h"
 #include "Components/StatusComponent.h"
@@ -85,5 +86,37 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Attacker = Cast<ACharacter>(EventInstigator->GetPawn());
+	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, FString::SanitizeFloat(Damage));
+
+	StatusComponent->DecreaseHealth(Damage);
+
+	if (StatusComponent->GetHealth() <= 0.f)
+	{
+		StateComponent->SetDeadMode();
+		Dead();
+		return Damage;
+	}
+	return Damage;
+}
+
+void AAICharacter::Dead()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->GlobalAnimRateScale = 0.f;
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	FVector start = GetActorLocation();
+	FVector target = Attacker->GetActorLocation();
+	FVector direction = start - target;
+	direction.Normalize();
+
+	GetMesh()->AddImpulse(direction * Damage * 1000);
 }
 

@@ -35,8 +35,9 @@ void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCa
 	if (FMath::IsNearlyZero(hitStop) == false)
 	{
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.01f);
-		UKismetSystemLibrary::K2_SetTimer(this, "RestoreGlobalTimeDilation", hitStop , false);
+		UKismetSystemLibrary::K2_SetTimer(this, "RestoreGlobalTimeDilation", hitStop * 0.01f , false);
 	}
+	UGameplayStatics::ApplyDamage(InOtherCharacter, Datas[ComboCount].Power, InAttacker->GetController(), InCauser, nullptr);
 }
 
 void AMeleeWeapon::OnAttachmentEndOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)

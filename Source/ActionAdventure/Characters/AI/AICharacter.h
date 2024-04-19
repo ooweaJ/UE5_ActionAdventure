@@ -10,22 +10,24 @@ class ACTIONADVENTURE_API AAICharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AAICharacter();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	TArray<USkeletalMesh*> Meshs;
+	void Dead();
 
+	FORCEINLINE class UBehaviorTree* GetBehaviorTree() { return BehaviorTree; }
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	class UBehaviorTree* BehaviorTree;
+		
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -41,4 +43,11 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly)
 	class UEquipComponent* EquipComponent;
+
+public:
+	TArray<USkeletalMesh*> Meshs;
+
+	class ACharacter* Attacker;
+
+	float Damage;
 };
