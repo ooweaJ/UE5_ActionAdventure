@@ -10,7 +10,7 @@ class ACTIONADVENTURE_API ACAIController : public AAIController
 	GENERATED_BODY()
 public:
 	ACAIController();
-
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

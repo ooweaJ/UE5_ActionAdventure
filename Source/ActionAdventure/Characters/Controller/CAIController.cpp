@@ -12,7 +12,7 @@
 
 ACAIController::ACAIController()
 {
-	//Blackboard = CreateDefaultSubobject<UBlackboardComponent>("BlackBoard");
+	Blackboard = CreateDefaultSubobject<UBlackboardComponent>("BlackBoard");
 	Behavior = CreateDefaultSubobject<UBehaviorComponent>("Behavior");
 	Perception = CreateDefaultSubobject<UAIPerceptionComponent>("Perception");
 	
@@ -39,12 +39,12 @@ ACAIController::ACAIController()
 
 void ACAIController::BeginPlay()
 {
-
+	Super::BeginPlay();
 }
 
 void ACAIController::Tick(float DeltaTime)
 {
-
+	Super::Tick(DeltaTime);
 }
 
 void ACAIController::OnPossess(APawn* InPawn)
@@ -52,19 +52,16 @@ void ACAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 
+	OwnerAI = Cast<AAICharacter>(InPawn);
+	if (!OwnerAI) return;
+	UBlackboardComponent* BlackboardPtr = Blackboard;
+
+	UseBlackboard(BBAsset, BlackboardPtr);
+
+	Perception->OnPerceptionUpdated.AddDynamic(this, &ACAIController::OnPerceptionUpdated);
+
+	Behavior->SetBlackBoard(Blackboard);
 	RunBehaviorTree(BTAsset);
-
-	//OwnerAI = Cast<AAICharacter>(InPawn);
-	//if (!OwnerAI) return;
-	//UBlackboardComponent* BlackboardPtr = Blackboard;
-
-	//UseBlackboard(OwnerAI->GetBehaviorTree()->BlackboardAsset, BlackboardPtr);
-
-	//Perception->OnPerceptionUpdated.AddDynamic(this, &ACAIController::OnPerceptionUpdated);
-
-	//Behavior->SetBlackBoard(Blackboard);
-	//RunBehaviorTree(OwnerAI->GetBehaviorTree());
-	//GEngine->AddOnScreenDebugMessage(0, 1, FColor::Black, "Hi");
 }
 
 void ACAIController::OnUnPossess()
