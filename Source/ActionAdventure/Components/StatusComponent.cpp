@@ -3,13 +3,13 @@
 
 UStatusComponent::UStatusComponent()
 {
-	Health = MaxHealth;
+	
 }
 
 void UStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	Health = MaxHealth;
 }
 
 void UStatusComponent::SetMove()

@@ -11,8 +11,7 @@ enum class EBehaviorType : uint8
 	Wait, patrol, Approach, Action, Hitted
 };
 
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBehaviorTypeChanged, EBehaviorType, InPrevType, EBehaviorType, ChangeType);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBehaviorTypeChanged, EBehaviorType, ChangeType);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONADVENTURE_API UBehaviorComponent : public UActorComponent
@@ -27,6 +26,14 @@ protected:
 
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+
+public:
+	UFUNCTION(BlueprintPure) bool IsWaitMode();
+	UFUNCTION(BlueprintPure) bool IsApproachMode();
+	UFUNCTION(BlueprintPure) bool IsActionMode();
+	UFUNCTION(BlueprintPure) bool IsPatrolMode();
+	UFUNCTION(BlueprintPure) bool IsHittedMode();
 
 public:
 	FORCEINLINE void SetBlackBoard(class UBlackboardComponent* InBlackboard) { Blackboard = InBlackboard; }
@@ -46,8 +53,8 @@ private:
 	EBehaviorType GetType();
 
 public:
-	//UPROPERTY(BlueprintAssignable)
-	//FBehaviorTypeChanged OnBehaviorTypeChanged;
+	UPROPERTY(BlueprintAssignable)
+	FBehaviorTypeChanged OnBehaviorTypeChanged;
 private:
 	UPROPERTY(EditAnywhere) FName BehaviorKey = "Behavior";
 	UPROPERTY(EditAnywhere) FName TargetKey = "Target";

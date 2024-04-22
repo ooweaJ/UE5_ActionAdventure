@@ -16,6 +16,7 @@ public:
 	virtual void Attack() override;
 	virtual void BeginAction() override;
 	virtual void EndAction() override;
+	FORCEINLINE bool IsCanCombo() { return bCanCombo; }
 	FORCEINLINE void OnCanCombo() { bCanCombo = true; }
 	FORCEINLINE void OffCanCombo() { bCanCombo = false; }
 	FORCEINLINE FString GetSpecificCollisionName() { return DefaultData->ActionDatas[ComboCount].SpecificCollisionName; }

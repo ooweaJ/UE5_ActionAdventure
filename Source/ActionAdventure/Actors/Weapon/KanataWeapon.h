@@ -12,6 +12,4 @@ class ACTIONADVENTURE_API AKanataWeapon : public AMeleeWeapon
 public:
 	AKanataWeapon();
 
-	virtual void OnAttachmentBeginOverlap(class ACharacter* InAttacker, class AActor* InCauser, class ACharacter* InOtherCharacter) override;
-	virtual void OnAttachmentEndOverlap(class ACharacter* InAttacker, class AActor* InCauser, class ACharacter* InOtherCharacter) override;
 };

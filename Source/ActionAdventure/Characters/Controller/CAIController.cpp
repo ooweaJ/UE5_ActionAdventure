@@ -19,7 +19,7 @@ ACAIController::ACAIController()
 	Sight = CreateDefaultSubobject<UAISenseConfig_Sight>("Sight");
 	Sight->SightRadius = 1000.f;
 	Sight->LoseSightRadius = 1000.f;
-	Sight->PeripheralVisionAngleDegrees = 180.0f;
+	Sight->PeripheralVisionAngleDegrees = 360.0f;
 	Sight->SetMaxAge(2.f);
 
 	Perception->ConfigureSense(*Sight);
@@ -35,6 +35,16 @@ ACAIController::ACAIController()
 	{
 		BTAsset = BTObject.Object;
 	}
+}
+
+void ACAIController::SetLoactionKey(FVector InLoaction)
+{
+	Blackboard->SetValueAsVector("Location", InLoaction);
+}
+
+void ACAIController::SetTargetKey(ACharacter* InCharacter)
+{
+	Blackboard->SetValueAsObject("Target", InCharacter);
 }
 
 void ACAIController::BeginPlay()

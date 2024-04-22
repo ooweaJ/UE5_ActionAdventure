@@ -14,4 +14,9 @@ class ACTIONADVENTURE_API UBTService_AI : public UBTService
 {
 	GENERATED_BODY()
 	
+public:
+	UBTService_AI();
+
+protected:
+	void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

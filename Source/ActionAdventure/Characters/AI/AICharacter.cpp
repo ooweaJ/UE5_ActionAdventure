@@ -4,6 +4,7 @@
 #include "Engine.h"
 
 #include "Characters/CAnimInstance.h"
+#include "Characters/Controller/CAIController.h"
 #include "Components/StatusComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
@@ -65,13 +66,13 @@ AAICharacter::AAICharacter()
 		ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComponent");
 		EquipComponent = CreateDefaultSubobject<UEquipComponent>("Equip");
 	}
-
+	
 }
 
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	EquipComponent->SelectWeapon(0);
 }
 
 // Called every frame
@@ -102,6 +103,8 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		Dead();
 		return Damage;
 	}
+	Hitted();
+
 	return Damage;
 }
 
@@ -118,5 +121,12 @@ void AAICharacter::Dead()
 	direction.Normalize();
 
 	GetMesh()->AddImpulse(direction * Damage * 1000);
+}
+
+void AAICharacter::Hitted()
+{
+	ACAIController* controller = Cast<ACAIController>(GetController());
+	if (!!controller)
+		controller->SetTargetKey(Attacker);
 }
 

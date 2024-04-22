@@ -23,6 +23,12 @@ void UBehaviorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 }
 
+bool UBehaviorComponent::IsWaitMode() { return GetType() == EBehaviorType::Wait; }
+bool UBehaviorComponent::IsApproachMode() { return GetType() == EBehaviorType::Approach; }
+bool UBehaviorComponent::IsActionMode() { return GetType() == EBehaviorType::Action; }
+bool UBehaviorComponent::IsPatrolMode() { return GetType() == EBehaviorType::patrol; }
+bool UBehaviorComponent::IsHittedMode() { return GetType() == EBehaviorType::Hitted; }
+
 ACharacter* UBehaviorComponent::GetTarget()
 {
 	ACharacter* character = Cast<ACharacter>(Blackboard->GetValueAsObject(TargetKey));
@@ -47,8 +53,8 @@ void UBehaviorComponent::ChangeType(EBehaviorType InType)
 	EBehaviorType type = GetType();
 	Blackboard->SetValueAsEnum(BehaviorKey, (uint8)InType);
 
-	/*if (OnBehaviorTypeChanged.IsBound())
-		OnBehaviorTypeChanged.Broadcast(type, InType);*/
+	if(OnBehaviorTypeChanged.IsBound())
+		OnBehaviorTypeChanged.Broadcast(InType);
 }
 
 EBehaviorType UBehaviorComponent::GetType()
