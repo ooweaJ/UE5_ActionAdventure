@@ -3,6 +3,8 @@
 #include "Components/TextRenderComponent.h"
 #include "Characters/AI/AICharacter.h"
 #include "Characters/Controller/CAIController.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Engine.h"
 
 ASidewalk::ASidewalk()
 {
@@ -18,7 +20,7 @@ ASidewalk::ASidewalk()
 
 	Box->SetBoxExtent(FVector(500, 500, 300));
 	Box->SetRelativeLocation(FVector(0, 0, 290));
-
+	
 	TextRender->TextRenderColor = FColor::Red;
 	TextRender->HorizontalAlignment = EHorizTextAligment::EHTA_Center;
 	TextRender->WorldSize = 100.f;
@@ -35,12 +37,14 @@ void ASidewalk::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	Box->UpdateOverlaps();
+
 }
 
 FVector ASidewalk::SetNextWalkPoint()
 {
 	int32 randomint = FMath::RandRange(0, Point.Num() - 1);
-	return Point[randomint];
+	FVector randomPoint = UKismetMathLibrary::RandomPointInBoundingBox(Point[randomint], FVector(500, 500, 0));
+	return randomPoint;
 }
 
 void ASidewalk::GetWalkPoint()
@@ -68,5 +72,6 @@ void ASidewalk::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent
 	{
 		aicontoller->SetLoactionKey(SetNextWalkPoint());
 	}
+	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Green, "Hi");
 }
 

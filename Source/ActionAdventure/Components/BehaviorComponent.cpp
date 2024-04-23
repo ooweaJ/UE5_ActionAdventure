@@ -44,7 +44,11 @@ FVector UBehaviorComponent::GetLocation()
 
 void UBehaviorComponent::SetWaitMode() { ChangeType(EBehaviorType::Wait); }
 void UBehaviorComponent::SetApproachMode() { ChangeType(EBehaviorType::Approach); }
-void UBehaviorComponent::SetActionMode(){ ChangeType(EBehaviorType::Action); }
+void UBehaviorComponent::SetActionMode()
+{ 
+	ChangeType(EBehaviorType::Action);
+
+}
 void UBehaviorComponent::SetPatrolMode(){ ChangeType(EBehaviorType::patrol); }
 void UBehaviorComponent::SetHittedMode(){ ChangeType(EBehaviorType::Hitted); }
 

@@ -1,6 +1,8 @@
 #include "Components/StateComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/EquipComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 #include "Actors/Weapon/Melee/MeleeWeapon.h"
 
 UStateComponent::UStateComponent()
@@ -55,6 +57,18 @@ void UStateComponent::SetHittedMode()
 void UStateComponent::SetDeadMode()
 {
 	ChangeType(EStateType::Dead);
+}
+
+void UStateComponent::SetOnOrient()
+{
+	OwnerCharacter->bUseControllerRotationYaw = false;
+	OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = true;
+}
+
+void UStateComponent::SetOffOrient()
+{
+	OwnerCharacter->bUseControllerRotationYaw = true;
+	OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 void UStateComponent::ChangeType(EStateType InNewType)

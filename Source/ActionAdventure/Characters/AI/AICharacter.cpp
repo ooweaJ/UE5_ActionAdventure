@@ -2,6 +2,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine.h"
+#include "Engine/DamageEvents.h"
+
 
 #include "Characters/CAnimInstance.h"
 #include "Characters/Controller/CAIController.h"
@@ -66,7 +68,9 @@ AAICharacter::AAICharacter()
 		ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComponent");
 		EquipComponent = CreateDefaultSubobject<UEquipComponent>("Equip");
 	}
-	
+
+	AIControllerClass = ACAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void AAICharacter::BeginPlay()
@@ -103,7 +107,8 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		Dead();
 		return Damage;
 	}
-	Hitted();
+	
+	Hitted(DamageEvent.DamageTypeClass);
 
 	return Damage;
 }
@@ -121,12 +126,22 @@ void AAICharacter::Dead()
 	direction.Normalize();
 
 	GetMesh()->AddImpulse(direction * Damage * 1000);
+	UKismetSystemLibrary::K2_SetTimer(this, "End_Dead", 2.f, false);
 }
 
-void AAICharacter::Hitted()
+void AAICharacter::Hitted(TSubclassOf<UDamageType> Type)
 {
 	ACAIController* controller = Cast<ACAIController>(GetController());
 	if (!!controller)
 		controller->SetTargetKey(Attacker);
+
+	UWeaponDamageType* type = Cast<UWeaponDamageType>(Type);
+
+}
+
+void AAICharacter::End_Dead()
+{
+	ActionComponent->EndDead();
+	Destroy();
 }
 

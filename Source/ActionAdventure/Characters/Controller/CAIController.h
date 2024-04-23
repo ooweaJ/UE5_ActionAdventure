@@ -14,6 +14,7 @@ public:
 public:
 	void SetLoactionKey(FVector InLoaction);
 	void SetTargetKey(class ACharacter* InCharacter);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

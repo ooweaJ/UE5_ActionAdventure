@@ -3,6 +3,7 @@
 #include "SubSystem/DataSubsystem.h"
 #include "GameFramework/Character.h"
 #include "Data/ActionData/ActionDataTableRow.h"
+#include "Actors/Weapon/Attachment.h"
 
 UEquipComponent::UEquipComponent()
 {
@@ -74,5 +75,16 @@ void UEquipComponent::AddWeapons(TSubclassOf<AWeapon> EquipWeapon)
 		DefaultWeapon = weapon;
 	else
 		EquipWeapons.Add(weapon);
+}
+
+void UEquipComponent::EndDead()
+{
+	DefaultWeapon->Attachment->Destroy();
+	DefaultWeapon->Destroy();
+	for (AWeapon* Actor : EquipWeapons)
+	{
+		Actor->Attachment->Destroy();
+		Actor->Destroy();
+	}
 }
 

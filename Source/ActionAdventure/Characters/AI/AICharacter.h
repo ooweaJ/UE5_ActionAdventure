@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/CharacterInterface.h"
 #include "AICharacter.generated.h"
 
 UCLASS()
-class ACTIONADVENTURE_API AAICharacter : public ACharacter
+class ACTIONADVENTURE_API AAICharacter : public ACharacter , public ICharacterInterface
 {
 	GENERATED_BODY()
 
@@ -21,8 +22,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	void Dead();
-	void Hitted();
+	void Dead() override;
+	void Hitted(TSubclassOf<UDamageType> Type) override;
+
+	UFUNCTION()
+	void End_Dead() override;
 
 	FORCEINLINE class UBehaviorTree* GetBehaviorTree() { return BehaviorTree; }
 

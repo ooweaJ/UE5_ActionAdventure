@@ -38,6 +38,7 @@ public:
 	void SetAssassin();
 	void SetKanata();
 
+	void EndDead();
 public:
 	UPROPERTY(BlueprintAssignable)
 	FActionTypeChanged OnActionTypeChanged;

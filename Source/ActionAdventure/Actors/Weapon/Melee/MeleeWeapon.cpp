@@ -1,6 +1,8 @@
 #include "Actors/Weapon/Melee/MeleeWeapon.h"
 #include "GameFramework/Character.h"
 #include "Engine.h"
+#include "AIController.h"
+#include "Engine/DamageEvents.h"
 
 #include "Actors/Weapon/Attachment.h"
 #include "Components/ActionComponent.h"
@@ -21,6 +23,10 @@ void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCa
 		transform.AddToTranslation(InOtherCharacter->GetActorLocation());
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitEffect, transform);
 	}
+	FDamageEvent de;
+	de.DamageTypeClass = Datas[ComboCount].DamageType;
+	InOtherCharacter->TakeDamage(Datas[ComboCount].Power, de, InAttacker->GetController(), InCauser);
+	if (Cast<AAIController>(InAttacker->GetController()) && Cast<AAIController>(InOtherCharacter->GetController())) return;
 
 	//Camera Shake
 	TSubclassOf<UCameraShakeBase> shake = Datas[ComboCount].ShakeClass;
@@ -30,6 +36,7 @@ void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCa
 		controller->PlayerCameraManager->StartCameraShake(shake);
 	}
 
+	if(!Cast<APlayerController>(InAttacker->GetController())) return;
 	//HitStop
 	float hitStop = Datas[ComboCount].HitStop;
 	if (FMath::IsNearlyZero(hitStop) == false)
@@ -37,7 +44,6 @@ void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCa
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.01f);
 		UKismetSystemLibrary::K2_SetTimer(this, "RestoreGlobalTimeDilation", hitStop * 0.01f , false);
 	}
-	UGameplayStatics::ApplyDamage(InOtherCharacter, Datas[ComboCount].Power, InAttacker->GetController(), InCauser, nullptr);
 }
 
 void AMeleeWeapon::OnAttachmentEndOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)

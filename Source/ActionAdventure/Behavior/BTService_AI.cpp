@@ -37,6 +37,7 @@ void UBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
 	if (distance < 100.f)
 	{
+		state->SetOffOrient();
 		FVector TargetLocation = target->GetActorLocation();
 		FVector AILocation = aiPawn->GetActorLocation();
 
@@ -47,6 +48,7 @@ void UBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
 		if (DotProduct > 0.8f)
 		{
+			state->SetOnOrient();
 			behavior->SetActionMode();
 			return;
 		}

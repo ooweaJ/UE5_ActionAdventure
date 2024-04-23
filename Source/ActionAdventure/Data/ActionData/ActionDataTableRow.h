@@ -50,6 +50,9 @@ public:
 	TSubclassOf<class UCameraShakeBase> ShakeClass;
 
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UDamageType> DamageType;
+
+	UPROPERTY(EditAnywhere)
 	FString SpecificCollisionName = "None";
 };
 

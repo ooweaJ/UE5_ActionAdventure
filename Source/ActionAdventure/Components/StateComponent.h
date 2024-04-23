@@ -41,6 +41,8 @@ public:
 	void SetHittedMode();
 	void SetDeadMode();
 
+	void SetOnOrient();
+	void SetOffOrient();
 private:
 	void ChangeType(EStateType InNewType);
 
