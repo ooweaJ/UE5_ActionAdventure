@@ -26,7 +26,7 @@ public:
 	void WeaponL();
 	void SelectWeapon(int32 WeaponNum);
 	void AddWeapons(TSubclassOf<AWeapon> EquipWeapon);
-
+	void EndDead();
 private:
 	UPROPERTY(EditAnywhere)
 	TArray<AWeapon*> EquipWeapons;

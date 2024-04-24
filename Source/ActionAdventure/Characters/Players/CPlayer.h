@@ -47,4 +47,7 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly)
 	class UEquipComponent* EquipComponent;
+
+	UPROPERTY(EditAnywhere)
+	class UPaperSpriteComponent* PaperComponent;
 };

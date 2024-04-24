@@ -35,7 +35,8 @@ public:
 
 	void SetSpeed(EWalkSpeedTpye InType);
 
-
+	void IncreaseHealth(float InAmount);
+	void DecreaseHealth(float InAmount);
 private:
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float MaxHealth = 100.f;

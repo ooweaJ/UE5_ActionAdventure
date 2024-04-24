@@ -27,6 +27,8 @@ void AWeapon::SetWeaponData(class ACharacter* InOnwerCharacter, const FWeaponDat
 		Attachment->AttachToComponent(InOnwerCharacter->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), InData->SocketName);
 	}
 
+	DefaultData = WeaponData->Data.GetRow<FActionDataTableRow>(TEXT(""));
+
 }
 
 void AWeapon::BeginPlay()
@@ -34,6 +36,7 @@ void AWeapon::BeginPlay()
 	Super::BeginPlay();
 	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
 	Status = Cast<UStatusComponent>(OwnerCharacter->GetComponentByClass<UStatusComponent>());
+	Attachment->OnAttachmentBeginOverlap.AddDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
 }
 
 void AWeapon::Tick(float DeltaTime)
@@ -43,12 +46,7 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::Attack()
 {
-	if (!State->IsIdleMode()) return;
-	State->SetActionMode();
-	FActionDataTableRow* data = WeaponData->Data.GetRow<FActionDataTableRow>(TEXT(""));
-	int32 Randomint = FMath::RandRange(0, data->ActionDatas.Num() - 1);
-	data->ActionDatas[Randomint].bCanMove ? Status->SetMove() : Status->SetStop();
-	OwnerCharacter->PlayAnimMontage(data->ActionDatas[Randomint].AnimMontage);
+
 }
 
 void AWeapon::EquipWeapon()
@@ -62,6 +60,10 @@ void AWeapon::UnEquipWeapon()
 {
 	if (!State->IsIdleMode()) return;
 	Attachment->OnUnequip();
+}
+
+void AWeapon::BeginAction()
+{
 }
 
 void AWeapon::EndAction()

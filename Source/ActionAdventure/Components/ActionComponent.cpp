@@ -70,3 +70,10 @@ void UActionComponent::SetKanata()
 	SetActionMode(EActionType::Kanata);
 }
 
+void UActionComponent::EndDead()
+{
+	UEquipComponent* Equip = OwnerCharacter->GetComponentByClass<UEquipComponent>();
+	if (!Equip) return;
+	Equip->EndDead();
+}
+

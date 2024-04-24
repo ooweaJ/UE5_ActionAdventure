@@ -9,6 +9,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
 
 #include "Characters/CAnimInstance.h"
 #include "Components/StatusComponent.h"
@@ -32,7 +34,7 @@ ACPlayer::ACPlayer()
 
 	{
 		USkeletalMeshComponent* mesh = GetMesh();
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Scanned3DPeoplePack/RP_Character/rp_manuel_rigged_001_ue4/rp_manuel_rigged_001_ue4.rp_manuel_rigged_001_ue4'"));
+		static ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Scanned3DPeoplePack/RP_Character/rp_manuel_rigged_001_ue4/rp_manuel_rigged_001_ue4.rp_manuel_rigged_001_ue4'"));
 		if (!Asset.Succeeded()) return;
 
 		mesh->SetSkeletalMesh(Asset.Object);
@@ -47,8 +49,20 @@ ACPlayer::ACPlayer()
 		MoveComponent = CreateDefaultSubobject<UMoveComponent>("MoveComponent");
 		ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComponent");
 		EquipComponent = CreateDefaultSubobject<UEquipComponent>("EquipComponent");
+		PaperComponent = CreateDefaultSubobject<UPaperSpriteComponent>("Paper");
 	}
 
+	PaperComponent->SetupAttachment(RootComponent);
+	PaperComponent->SetRelativeLocation(FVector(0., 0., 240.));
+	PaperComponent->SetRelativeRotation(FRotator(0., 90.0, -90.0));
+	PaperComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+	PaperComponent->bVisibleInSceneCaptureOnly = true;
+
+	{
+		static ConstructorHelpers::FObjectFinder<UPaperSprite> Asset(TEXT("/Script/Paper2D.PaperSprite'/Game/_dev/Characters/Players/Player_Sprite.Player_Sprite'"));
+		if (!Asset.Succeeded()) return;
+		PaperComponent->SetSprite(Asset.Object);
+	}
 }
 
 void ACPlayer::BeginPlay()

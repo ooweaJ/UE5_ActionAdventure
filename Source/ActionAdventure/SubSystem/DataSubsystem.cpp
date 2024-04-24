@@ -6,13 +6,13 @@
 UDataSubsystem::UDataSubsystem()
 {
 	{
-		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Characters/Players/WeaponData.WeaponData'") };
+		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/WeaponData.WeaponData'") };
 		ensure(Asset.Object);
 		ActionDataTable = Asset.Object;
 	}
 
 	{
-		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Characters/Players/WeaponClassData.WeaponClassData'") };
+		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/WeaponClassData.WeaponClassData'") };
 		ensure(Asset.Object);
 		WeaponDataTable = Asset.Object;
 	}

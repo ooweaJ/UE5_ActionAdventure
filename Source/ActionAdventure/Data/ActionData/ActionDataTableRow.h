@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Actors/Weapon/DamageType/WeaponDamageType.h"
 #include "ActionDataTableRow.generated.h"
 
 USTRUCT(BlueprintType)
@@ -46,8 +47,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	FTransform EffectTransform;
 
-	//UPROPERTY(EditAnywhere)
-	//TSubclassOf<class UCameraShake> ShakeClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UCameraShakeBase> ShakeClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UDamageType> DamageType = UWeaponDamageType::StaticClass();
 
 	UPROPERTY(EditAnywhere)
 	FString SpecificCollisionName = "None";
