@@ -2,15 +2,20 @@
 
 
 #include "Components/MontagesComponent.h"
+#include "GameFramework/Character.h"
+#include "Components/StatusComponent.h"
+#include "Engine.h"
 
-// Sets default values for this component's properties
 UMontagesComponent::UMontagesComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	{
+		ConstructorHelpers::FObjectFinder<UDataTable> Asset(TEXT("/Script/Engine.DataTable'/Game/_dev/Data/DT_Montage.DT_Montage'"));
+		if (Asset.Succeeded())
+		{
+			DataTable = Asset.Object;
+		}
+	}
 }
 
 
@@ -20,7 +25,6 @@ void UMontagesComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
 }
 
 
@@ -30,5 +34,26 @@ void UMontagesComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UMontagesComponent::PlayKnockBack()
+{
+	PlayAnimMontage("KnockBack");
+}
+
+void UMontagesComponent::PlayAnimMontage(FName Key)
+{
+	ACharacter* character = Cast<ACharacter>(GetOwner());
+	FMontageData* data = DataTable->FindRow<FMontageData>(Key, "");
+	if (!data) return;
+
+	UStateComponent* state = character->GetComponentByClass<UStateComponent>();
+	UStatusComponent* status = character->GetComponentByClass<UStatusComponent>();
+
+	if (!data->AnimMontage) return;
+	character->StopAnimMontage();
+	state->ChangeType(data->Type);
+	data->bCanMove ? status->SetMove() : status->SetStop();
+	character->PlayAnimMontage(data->AnimMontage, data->PlayRate, data->StartSection);
 }
 

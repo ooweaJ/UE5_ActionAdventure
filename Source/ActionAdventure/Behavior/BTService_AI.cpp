@@ -26,6 +26,12 @@ void UBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
 	ACharacter* target = behavior->GetTarget();
 
+	if (state->IsKnockBackMode())
+	{
+		behavior->SetKnockBackMode();
+		return;
+	}
+
 	if (target == nullptr)
 	{
 		behavior->SetPatrolMode();

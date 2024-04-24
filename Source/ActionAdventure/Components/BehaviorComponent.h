@@ -8,7 +8,7 @@
 UENUM(BlueprintType)
 enum class EBehaviorType : uint8
 {
-	Wait, patrol, Approach, Action, Hitted
+	Wait, patrol, Approach, Action, Hitted, KnockBack
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBehaviorTypeChanged, EBehaviorType, ChangeType);
@@ -34,6 +34,7 @@ public:
 	UFUNCTION(BlueprintPure) bool IsActionMode();
 	UFUNCTION(BlueprintPure) bool IsPatrolMode();
 	UFUNCTION(BlueprintPure) bool IsHittedMode();
+	UFUNCTION(BlueprintPure) bool IsKnockBackMode();
 
 public:
 	FORCEINLINE void SetBlackBoard(class UBlackboardComponent* InBlackboard) { Blackboard = InBlackboard; }
@@ -46,6 +47,7 @@ public:
 	void SetActionMode();
 	void SetPatrolMode();
 	void SetHittedMode();
+	void SetKnockBackMode();
 
 
 private:

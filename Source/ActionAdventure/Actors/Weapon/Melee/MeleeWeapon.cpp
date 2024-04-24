@@ -8,6 +8,7 @@
 #include "Components/ActionComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/StatusComponent.h"
+#include "Actors/Weapon/DamageType/WeaponDamageType.h"
 
 void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
 {
@@ -25,8 +26,10 @@ void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCa
 	}
 	FDamageEvent de;
 	de.DamageTypeClass = Datas[ComboCount].DamageType;
+	//de.DamageTypeClass = UWeaponDamageType::StaticClass();
 	InOtherCharacter->TakeDamage(Datas[ComboCount].Power, de, InAttacker->GetController(), InCauser);
-	if (Cast<AAIController>(InAttacker->GetController()) && Cast<AAIController>(InOtherCharacter->GetController())) return;
+
+	if (!Cast<APlayerController>(InAttacker->GetController())) return;
 
 	//Camera Shake
 	TSubclassOf<UCameraShakeBase> shake = Datas[ComboCount].ShakeClass;
@@ -36,7 +39,6 @@ void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCa
 		controller->PlayerCameraManager->StartCameraShake(shake);
 	}
 
-	if(!Cast<APlayerController>(InAttacker->GetController())) return;
 	//HitStop
 	float hitStop = Datas[ComboCount].HitStop;
 	if (FMath::IsNearlyZero(hitStop) == false)

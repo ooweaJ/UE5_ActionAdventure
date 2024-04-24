@@ -72,6 +72,5 @@ void ASidewalk::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent
 	{
 		aicontoller->SetLoactionKey(SetNextWalkPoint());
 	}
-	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Green, "Hi");
 }
 

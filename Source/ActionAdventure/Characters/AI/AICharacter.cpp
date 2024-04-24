@@ -4,13 +4,17 @@
 #include "Engine.h"
 #include "Engine/DamageEvents.h"
 
-
 #include "Characters/CAnimInstance.h"
 #include "Characters/Controller/CAIController.h"
 #include "Components/StatusComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
 #include "Components/EquipComponent.h"
+#include "Components/MontagesComponent.h"
+#include "Actors/Weapon/DamageType/WeaponDamageType.h"
+
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
 
 AAICharacter::AAICharacter()
 {
@@ -48,14 +52,13 @@ AAICharacter::AAICharacter()
 		if (!Asset.Succeeded()) return;
 		Meshs.Add(Asset.Object);
 	}
-
-	USkeletalMeshComponent* mesh = GetMesh();
-	mesh->SetRelativeLocation(FVector(0, 0, -88));
-	mesh->SetRelativeRotation(FRotator(0, -90, 0));
-
-	int32 Random = FMath::RandRange(0, Meshs.Num() - 1);
-	mesh->SetSkeletalMesh(Meshs[Random]);
 	{
+		USkeletalMeshComponent* mesh = GetMesh();
+		mesh->SetRelativeLocation(FVector(0, 0, -88));
+		mesh->SetRelativeRotation(FRotator(0, -90, 0));
+
+		int32 Random = FMath::RandRange(0, Meshs.Num() - 1);
+		mesh->SetSkeletalMesh(Meshs[Random]);
 		ConstructorHelpers::FClassFinder<UAnimInstance> AnimAsset{ TEXT("/Script/Engine.AnimBlueprint'/Game/_dev/Characters/Players/ABP_AI.ABP_AI_C'") };
 		check(AnimAsset.Class);
 		mesh->SetAnimInstanceClass(AnimAsset.Class);
@@ -67,7 +70,21 @@ AAICharacter::AAICharacter()
 		MoveComponent = CreateDefaultSubobject<UMoveComponent>("MoveComponent");
 		ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComponent");
 		EquipComponent = CreateDefaultSubobject<UEquipComponent>("Equip");
+		MontagesComponent = CreateDefaultSubobject<UMontagesComponent>("Montage");
+		PaperComponent = CreateDefaultSubobject<UPaperSpriteComponent>("Paper");
 	}
+
+	{
+		static ConstructorHelpers::FObjectFinder<UPaperSprite> Asset(TEXT("/Script/Paper2D.PaperSprite'/Game/_dev/Texture/Enemy_Sprite.Enemy_Sprite'"));
+		if (!Asset.Succeeded()) return;
+		PaperComponent->SetSprite(Asset.Object);
+	}
+
+	PaperComponent->SetupAttachment(RootComponent);
+	PaperComponent->SetRelativeLocation(FVector(0., 0., 240.));
+	PaperComponent->SetRelativeRotation(FRotator(0., 90.0, -90.0));
+	PaperComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+	PaperComponent->bVisibleInSceneCaptureOnly = true;
 
 	AIControllerClass = ACAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -79,14 +96,12 @@ void AAICharacter::BeginPlay()
 	EquipComponent->SelectWeapon(0);
 }
 
-// Called every frame
 void AAICharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called to bind functionality to input
 void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -97,7 +112,6 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 {
 	Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	Attacker = Cast<ACharacter>(EventInstigator->GetPawn());
-	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, FString::SanitizeFloat(Damage));
 
 	StatusComponent->DecreaseHealth(Damage);
 
@@ -134,9 +148,24 @@ void AAICharacter::Hitted(TSubclassOf<UDamageType> Type)
 	ACAIController* controller = Cast<ACAIController>(GetController());
 	if (!!controller)
 		controller->SetTargetKey(Attacker);
-
-	UWeaponDamageType* type = Cast<UWeaponDamageType>(Type);
-
+	
+	if (!Type) return;
+	UWeaponDamageType* type = Cast<UWeaponDamageType>(Type->GetDefaultObject());
+	if (!type) return;
+	switch (type->Type)
+	{
+	case EWeaponDamageType::Default:
+		break;
+	case EWeaponDamageType::Stiffness:
+		break;
+	case EWeaponDamageType::KnockBack:
+	{
+		MontagesComponent->PlayKnockBack();
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 void AAICharacter::End_Dead()

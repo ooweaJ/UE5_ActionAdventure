@@ -28,6 +28,7 @@ bool UBehaviorComponent::IsApproachMode() { return GetType() == EBehaviorType::A
 bool UBehaviorComponent::IsActionMode() { return GetType() == EBehaviorType::Action; }
 bool UBehaviorComponent::IsPatrolMode() { return GetType() == EBehaviorType::patrol; }
 bool UBehaviorComponent::IsHittedMode() { return GetType() == EBehaviorType::Hitted; }
+bool UBehaviorComponent::IsKnockBackMode(){	return GetType() == EBehaviorType::KnockBack;}
 
 ACharacter* UBehaviorComponent::GetTarget()
 {
@@ -44,13 +45,10 @@ FVector UBehaviorComponent::GetLocation()
 
 void UBehaviorComponent::SetWaitMode() { ChangeType(EBehaviorType::Wait); }
 void UBehaviorComponent::SetApproachMode() { ChangeType(EBehaviorType::Approach); }
-void UBehaviorComponent::SetActionMode()
-{ 
-	ChangeType(EBehaviorType::Action);
-
-}
+void UBehaviorComponent::SetActionMode() { ChangeType(EBehaviorType::Action); }
 void UBehaviorComponent::SetPatrolMode(){ ChangeType(EBehaviorType::patrol); }
 void UBehaviorComponent::SetHittedMode(){ ChangeType(EBehaviorType::Hitted); }
+void UBehaviorComponent::SetKnockBackMode(){ ChangeType(EBehaviorType::KnockBack); }
 
 void UBehaviorComponent::ChangeType(EBehaviorType InType)
 {

@@ -49,6 +49,12 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UEquipComponent* EquipComponent;
 
+	UPROPERTY(VisibleDefaultsOnly)
+
+	class UPaperSpriteComponent* PaperComponent;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	class UMontagesComponent* MontagesComponent;
 public:
 	TArray<USkeletalMesh*> Meshs;
 
