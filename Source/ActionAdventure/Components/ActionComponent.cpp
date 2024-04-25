@@ -30,6 +30,16 @@ void UActionComponent::MouseL()
 
 void UActionComponent::MouseR()
 {
+	UEquipComponent* Equip = OwnerCharacter->GetComponentByClass<UEquipComponent>();
+	if (!Equip) return;
+	Equip->WeaponR();
+}
+
+void UActionComponent::OffMouseR()
+{
+	UEquipComponent* Equip = OwnerCharacter->GetComponentByClass<UEquipComponent>();
+	if (!Equip) return;
+	Equip->OffWeaponR();
 }
 
 void UActionComponent::Num1()
@@ -44,6 +54,13 @@ void UActionComponent::Num2()
 	UEquipComponent* Equip = OwnerCharacter->GetComponentByClass<UEquipComponent>();
 	if (!Equip) return;
 	Equip->SelectWeapon(1);
+}
+
+void UActionComponent::Num3()
+{
+	UEquipComponent* Equip = OwnerCharacter->GetComponentByClass<UEquipComponent>();
+	if (!Equip) return;
+	Equip->SelectWeapon(2);
 }
 
 void UActionComponent::SetActionMode(EActionType InNewType)

@@ -29,8 +29,12 @@ protected:
 	void OnJump(const FInputActionValue& InputActionValue);
 	void OffJump(const FInputActionValue& InputActionValue);
 	void OnMouseL(const FInputActionValue& InputActionValue);
+	void OnMouseR(const FInputActionValue& InputActionValue);
+	void OffMouseR(const FInputActionValue& InputActionValue);
 	void OnNum1(const FInputActionValue& InputActionValue);
 	void OnNum2(const FInputActionValue& InputActionValue);
+	void OnNum3(const FInputActionValue& InputActionValue);
+	void OnG(const FInputActionValue& InputActionValue);
 
 public:
 

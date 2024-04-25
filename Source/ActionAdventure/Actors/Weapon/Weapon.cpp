@@ -36,6 +36,7 @@ void AWeapon::BeginPlay()
 	Super::BeginPlay();
 	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
 	Status = Cast<UStatusComponent>(OwnerCharacter->GetComponentByClass<UStatusComponent>());
+	Action = Cast<UActionComponent>(OwnerCharacter->GetComponentByClass<UActionComponent>());
 	Attachment->OnAttachmentBeginOverlap.AddDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
 }
 
@@ -60,6 +61,14 @@ void AWeapon::UnEquipWeapon()
 {
 	if (!State->IsIdleMode()) return;
 	Attachment->OnUnequip();
+}
+
+void AWeapon::MouseR()
+{
+}
+
+void AWeapon::OffMouseR()
+{
 }
 
 void AWeapon::BeginAction()

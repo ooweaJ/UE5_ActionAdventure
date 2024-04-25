@@ -29,6 +29,11 @@ void UEquipComponent::BeginPlay()
 		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Kanata"));
 		AddWeapons(Weaponclass->WeaponClass);
 	}
+	{
+		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Rifle"));
+		AddWeapons(Weaponclass->WeaponClass);
+	}
+
 	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
 
 	CurrentWeapon = DefaultWeapon;
@@ -42,6 +47,16 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 void UEquipComponent::WeaponL()
 {
 	CurrentWeapon->Attack();
+}
+
+void UEquipComponent::WeaponR()
+{
+	CurrentWeapon->MouseR();
+}
+
+void UEquipComponent::OffWeaponR()
+{
+	CurrentWeapon->OffMouseR();
 }
 
 void UEquipComponent::SelectWeapon(int32 WeaponNum)

@@ -19,4 +19,5 @@ public:
 	virtual void Hitted(TSubclassOf<UDamageType> Type) = 0;
 	virtual void Dead() = 0;
 	virtual void End_Dead() = 0;
+	
 };

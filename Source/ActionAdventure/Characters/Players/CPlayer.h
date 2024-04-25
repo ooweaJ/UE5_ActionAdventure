@@ -25,13 +25,24 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	FVector GetAimInfo();
+
+private:
+	UFUNCTION()
+	void OffFlying();
 
 public:
 	void OnShift();
 	void OffShift();
 	void OnMouseL();
+	void OnMouseR();
+	void OffMouseR();
 	void OnNum1();
 	void OnNum2();
+	void OnNum3();
+	void Parkour();
+
+	void OnOrient();
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -50,4 +61,14 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UPaperSpriteComponent* PaperComponent;
+	
+	UPROPERTY(EditAnywhere)
+	class UMontagesComponent* MontagesComponent;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	class USpringArmComponent* SpringArm;
+
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	class UCameraComponent* Camera;
+
 };

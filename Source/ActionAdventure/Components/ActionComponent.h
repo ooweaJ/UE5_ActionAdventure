@@ -7,7 +7,7 @@
 UENUM(BlueprintType)
 enum class EActionType : uint8
 {
-	Unarmed, Assassin, Kanata, Max
+	Unarmed, Assassin, Kanata, Rifle, Max
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActionTypeChanged, EActionType, InPrevType, EActionType, InNewType);
@@ -27,16 +27,22 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	
+	FORCEINLINE bool IsAiming() { return bAiming; }
 public:
 	void MouseL();
 	void MouseR();
+	void OffMouseR();
 	void Num1();
 	void Num2();
+	void Num3();
 
 	void SetActionMode(EActionType InNewType);
 	void SetUnarmed();
 	void SetAssassin();
 	void SetKanata();
+
+	void OnAim() { bAiming = true; }
+	void OffAim() { bAiming = false; }
 
 	void EndDead();
 public:
@@ -47,4 +53,6 @@ private:
 	EActionType Type;
 
 	class ACharacter* OwnerCharacter;
+
+	bool bAiming = false;
 };

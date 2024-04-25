@@ -42,6 +42,12 @@ UInPutDataConfig::UInPutDataConfig()
 	}
 	{
 		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
+		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_MouseR.IA_MouseR'") };
+		check(Asset.Succeeded());
+		MouseR = Asset.Object;
+	}
+	{
+		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
 		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_1.IA_1'") };
 		check(Asset.Succeeded());
 		Num1 = Asset.Object;
@@ -51,5 +57,17 @@ UInPutDataConfig::UInPutDataConfig()
 		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_2.IA_2'") };
 		check(Asset.Succeeded());
 		Num2 = Asset.Object;
+	}
+	{
+		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
+		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_3.IA_3'") };
+		check(Asset.Succeeded());
+		Num3 = Asset.Object;
+	}
+	{
+		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
+		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_G.IA_G'") };
+		check(Asset.Succeeded());
+		G = Asset.Object;
 	}
 }

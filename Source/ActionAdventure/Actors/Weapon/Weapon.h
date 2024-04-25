@@ -46,6 +46,8 @@ public:
 	virtual void Attack();
 	virtual void EquipWeapon();
 	virtual void UnEquipWeapon();
+	virtual void MouseR();
+	virtual void OffMouseR();
 
 	virtual void BeginAction();
 	virtual void EndAction();
@@ -68,6 +70,7 @@ public:
 	class ACharacter* OwnerCharacter;
 	class UStateComponent* State;
 	class UStatusComponent* Status;
+	class UActionComponent* Action;
 
 	struct FActionDataTableRow* DefaultData;
 private:

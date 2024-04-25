@@ -31,10 +31,17 @@ public:
 	float Axis;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	float Pitch;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	bool IsFalling;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	bool IsAiming;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	EActionType ActionType;
 private:
 	class UMoveComponent* MoveComp;
+	class UActionComponent* Action;
 };

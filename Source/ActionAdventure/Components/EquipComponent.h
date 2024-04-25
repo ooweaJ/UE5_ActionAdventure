@@ -24,6 +24,8 @@ public:
 	FORCEINLINE AWeapon* GetCurrentWeapon() { return CurrentWeapon; }
 	
 	void WeaponL();
+	void WeaponR();
+	void OffWeaponR();
 	void SelectWeapon(int32 WeaponNum);
 	void AddWeapons(TSubclassOf<AWeapon> EquipWeapon);
 	void EndDead();
