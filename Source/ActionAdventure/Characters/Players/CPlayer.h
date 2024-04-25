@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/CharacterInterface.h"
 #include "CPlayer.generated.h"
 
 class USpringArmComponent;
@@ -11,7 +12,7 @@ class UInputAction;
 struct FInputActionValue;
 
 UCLASS()
-class ACTIONADVENTURE_API ACPlayer : public ACharacter
+class ACTIONADVENTURE_API ACPlayer : public ACharacter , public ICharacterInterface
 {
 	GENERATED_BODY()
 
@@ -25,7 +26,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	FVector GetAimInfo();
+	virtual void GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection);
+	virtual void Hitted(TSubclassOf<UDamageType> Type) {}
+	virtual void Dead() {}
+	virtual void End_Dead() {}
 
 private:
 	UFUNCTION()

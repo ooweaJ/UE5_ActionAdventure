@@ -104,6 +104,19 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	}
 }
 
+void ACPlayer::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection)
+{
+	OutAimDriection = Camera->GetForwardVector();
+
+	FTransform transform = Camera->GetComponentToWorld();
+	FVector cameraLocation = transform.GetLocation();
+	OutAimStart = cameraLocation + OutAimDriection * SpringArm->TargetArmLength;
+
+	FVector recoilCone = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OutAimDriection, 0.2f);
+
+	OutAimEnd = cameraLocation + recoilCone * 3000;
+}
+
 void ACPlayer::OffFlying()
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);

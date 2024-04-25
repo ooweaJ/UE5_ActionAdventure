@@ -23,4 +23,24 @@ public:
 	virtual void MouseR();
 	virtual void OffMouseR();
 
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "CameraShake")
+	TSubclassOf<class UCameraShakeBase> CameraShakeClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	class UParticleSystem* FlashParticle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	class UParticleSystem* EjectParticle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	class UParticleSystem* ImpactParticle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	class USoundBase* FireSoundCue;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	class UMaterialInstanceConstant* DecalMaterial;
+private:
+	float CurrentPitch;
 };

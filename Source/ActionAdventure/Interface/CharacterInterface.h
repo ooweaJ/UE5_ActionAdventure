@@ -19,5 +19,5 @@ public:
 	virtual void Hitted(TSubclassOf<UDamageType> Type) = 0;
 	virtual void Dead() = 0;
 	virtual void End_Dead() = 0;
-	
+	virtual void GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection) {};
 };
