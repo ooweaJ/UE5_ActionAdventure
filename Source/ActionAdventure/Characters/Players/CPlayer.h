@@ -46,7 +46,8 @@ public:
 	void OnNum3();
 	void Parkour();
 
-	void OnOrient();
+	void OnAim();
+	void OffAim();
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;

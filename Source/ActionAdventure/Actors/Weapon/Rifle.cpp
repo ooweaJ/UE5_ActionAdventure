@@ -2,14 +2,18 @@
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/ActionComponent.h"
 #include "Engine/StaticMeshActor.h"
 #include "Components/DecalComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Interface/CharacterInterface.h"
+#include "Engine.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #include "Actors/Weapon/Attachment.h"
+#include "Components/ActionComponent.h"
+#include "Components/StateComponent.h"
+#include "Characters/Players/CPlayer.h"
 
 ARifle::ARifle()
 {
@@ -41,9 +45,14 @@ ARifle::ARifle()
 	}
 	{
 
-		ConstructorHelpers::FClassFinder<UCameraShakeBase> Asset(TEXT("/Script/Engine.Blueprint'/Game/_dev/CameraShake.CameraShake_C'"));
+		ConstructorHelpers::FClassFinder<UCameraShakeBase> Asset(TEXT("/Script/Engine.Blueprint'/Game/_dev/RifleShake.RifleShake_C'"));
 		if (Asset.Succeeded())
 			CameraShakeClass = Asset.Class;
+	}
+	{
+		ConstructorHelpers::FClassFinder<AActor> Asset(TEXT("/Script/Engine.Blueprint'/Game/_dev/Actors/Bullet.Bullet_C'"));
+		if (Asset.Succeeded())
+			Bullet = Asset.Class;
 	}
 }
 
@@ -54,11 +63,16 @@ void ARifle::BeginPlay()
 
 void ARifle::Attack()
 {
+	if (!Action->IsAiming()) return;
+	if (bFiring == true) return;
+
+	bFiring = true;
+
 	ICharacterInterface* CharacterInterface = Cast<ICharacterInterface>(OwnerCharacter);
 	if (CharacterInterface == nullptr) return;
 
-	FVector strat, end, direction;
-	CharacterInterface->GetAimInfo(strat, end, direction);
+	FVector start, end, direction;
+	CharacterInterface->GetAimInfo(start, end, direction);
 
 	APlayerController* controller = OwnerCharacter->GetController<APlayerController>();
 
@@ -68,51 +82,79 @@ void ARifle::Attack()
 	USkeletalMeshComponent* Mesh = Attachment->GetComponentByClass<USkeletalMeshComponent>();
 
 	FVector muzzleLocation = Mesh->GetSocketLocation("Muzzle");
-	//if (!!BulletClass)
-	//	GetWorld()->SpawnActor<ACBullet>(BulletClass, muzzleLocation, direction.Rotation());
+	
+	GetWorld()->SpawnActor<AActor>(Bullet, muzzleLocation, direction.Rotation());
 
 	//Play Effect
 	UGameplayStatics::SpawnEmitterAttached(FlashParticle, Mesh, "Muzzle", FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset);
 	UGameplayStatics::SpawnEmitterAttached(EjectParticle, Mesh, "EjectBullet", FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset);
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSoundCue, muzzleLocation);
 
-	//Raising Pitch
-	CurrentPitch -= 0.5f * GetWorld()->GetDeltaSeconds();
 	OwnerCharacter->AddControllerPitchInput(CurrentPitch);
-
-	//LineTarce
+	
 	FHitResult hitResult;
-	FCollisionQueryParams collisionQueryParams;
-	collisionQueryParams.AddIgnoredActor(this);
-	collisionQueryParams.AddIgnoredActor(OwnerCharacter);
+	
+	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes;
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
-	if (GetWorld()->LineTraceSingleByChannel(hitResult, strat, end, ECollisionChannel::ECC_Visibility, collisionQueryParams))
+	TArray<AActor*> ignore;
+	ignore.Add(OwnerCharacter);
+
+	TArray<FActionData> Datas = DefaultData->ActionDatas;
+	OwnerCharacter->PlayAnimMontage(Datas[0].AnimMontage, Datas[0].PlayRate, Datas[0].StartSection);
+
+	UKismetSystemLibrary::K2_SetTimer(this, "EndAction", 0.15f, false);
+	if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), start,end, objectTypes,true, ignore, EDrawDebugTrace::None, hitResult, true))
 	{
-		AStaticMeshActor* staticMeshActor = Cast<AStaticMeshActor>(hitResult.GetActor());
-		if (!!staticMeshActor)
+		ACharacter* character = Cast<ACharacter>(hitResult.GetActor());
+		if (!!character)
 		{
-			UStaticMeshComponent* staticMeshComp = Cast<UStaticMeshComponent>(staticMeshActor->GetRootComponent());
-			if (!!staticMeshComp)
+			UParticleSystem* hitEffect = Datas[0].Effect;
+			if (!!hitEffect)
 			{
-				// Spanw Decal & Impact Particle
-				FRotator decalRotator = hitResult.ImpactNormal.Rotation();
-				UDecalComponent* decalComp = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalMaterial, FVector(5), hitResult.Location, decalRotator, 10.f);
-				decalComp->SetFadeScreenSize(0);
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, hitResult.Location, decalRotator, true);
-
-			
+				FTransform transform = Datas[0].EffectTransform;
+				transform.AddToTranslation(hitResult.Location);
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitEffect, transform);
 			}
+			FDamageEvent de;
+			de.DamageTypeClass = Datas[0].DamageType;
+			character->TakeDamage(Datas[0].Power, de, OwnerCharacter->GetController(), this);
+			return;
+		}
+		{
+			FRotator decalRotator = hitResult.ImpactNormal.Rotation();
+			UDecalComponent* decalComp = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalMaterial, FVector(5), hitResult.Location, decalRotator, 10.f);
+			decalComp->SetFadeScreenSize(0);
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, hitResult.Location, decalRotator, true);
 		}
 	}
-
 }
+
+
 
 void ARifle::MouseR()
 {
 	Action->OnAim();
+	State->SetOffOrient();
+	if (ACPlayer* player = Cast<ACPlayer>(OwnerCharacter))
+		player->OnAim();
 }
 
 void ARifle::OffMouseR()
 {
 	Action->OffAim();
+	State->SetOnOrient();
+	if (ACPlayer* player = Cast<ACPlayer>(OwnerCharacter))
+		player->OffAim();
+}
+
+void ARifle::BeginAction()
+{
+
+}
+
+void ARifle::EndAction()
+{
+	bFiring = false;
 }

@@ -22,7 +22,10 @@ public:
 	virtual void Attack();
 	virtual void MouseR();
 	virtual void OffMouseR();
-
+	virtual void BeginAction() override;
+	UFUNCTION()
+	virtual void EndAction() override;
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "CameraShake")
 	TSubclassOf<class UCameraShakeBase> CameraShakeClass;
@@ -41,6 +44,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	class UMaterialInstanceConstant* DecalMaterial;
+
+	TSubclassOf<AActor> Bullet;
 private:
-	float CurrentPitch;
+	float CurrentPitch = -0.1f;
+	bool bFiring;
 };

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Data/ActionData/ActionDataTableRow.h"
+#include "Engine/DamageEvents.h"
 #include "Components/ActionComponent.h"
 #include "Weapon.generated.h"
 

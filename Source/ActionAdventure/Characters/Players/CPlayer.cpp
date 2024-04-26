@@ -77,11 +77,11 @@ ACPlayer::ACPlayer()
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
 
-	SpringArm->SetRelativeLocation(FVector(0, 0, 60));
-	SpringArm->TargetArmLength = 500.f;
+	SpringArm->SetRelativeLocation(FVector(0, 0, 90));
+	SpringArm->TargetArmLength = 300.f;
 	SpringArm->bDoCollisionTest = true;
 	SpringArm->bUsePawnControlRotation = true;
-	SpringArm->SocketOffset = FVector(0, 60, 0);
+	
 }
 
 void ACPlayer::BeginPlay()
@@ -114,7 +114,7 @@ void ACPlayer::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& Out
 
 	FVector recoilCone = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OutAimDriection, 0.2f);
 
-	OutAimEnd = cameraLocation + recoilCone * 3000;
+	OutAimEnd = cameraLocation + recoilCone * 10000;
 }
 
 void ACPlayer::OffFlying()
@@ -169,7 +169,16 @@ void ACPlayer::Parkour()
 
 }
 
-void ACPlayer::OnOrient()
+void ACPlayer::OnAim()
 {
+	SpringArm->TargetArmLength = 0.f;
+	Camera->FieldOfView = 60.f;
+	Camera->SetRelativeLocation(FVector(20, 0, -20));
 }
 
+void ACPlayer::OffAim()
+{
+	SpringArm->TargetArmLength = 300.f;
+	Camera->FieldOfView = 90.f;
+	Camera->SetRelativeLocation(FVector(-20, 0, 20));
+}

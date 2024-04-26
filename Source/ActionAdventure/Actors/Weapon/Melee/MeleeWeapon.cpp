@@ -2,7 +2,6 @@
 #include "GameFramework/Character.h"
 #include "Engine.h"
 #include "AIController.h"
-#include "Engine/DamageEvents.h"
 
 #include "Actors/Weapon/Attachment.h"
 #include "Components/ActionComponent.h"
