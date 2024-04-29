@@ -18,5 +18,5 @@ void UEquipNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* A
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;
-	Equip->GetCurrentWeapon()->GetAttachment()->OnEquip();
+	Equip->GetCurrentItem()->GetAttachment()->OnEquip();
 }

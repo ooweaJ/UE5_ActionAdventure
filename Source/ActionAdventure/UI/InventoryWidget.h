@@ -33,4 +33,12 @@ protected:
 	UUniformGridPanel* InventoryPanel;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* ItemDesc;
+
+	int32 InvenSize = 0;
+
+	UInventorySubsystem* InventorySubsystem;
+
+	UPROPERTY()
+	TArray<class UItemWidget*> Items;
+;
 };

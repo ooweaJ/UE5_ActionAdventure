@@ -8,7 +8,7 @@
 UEquipComponent::UEquipComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
+	EquipItems.SetNum(10, false);
 }
 
 void UEquipComponent::BeginPlay()
@@ -17,26 +17,26 @@ void UEquipComponent::BeginPlay()
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
 
-	{
-		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Fist"));
-		AddWeapons(Weaponclass->WeaponClass);
-	}
-	{
-		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Assassin"));
-		AddWeapons(Weaponclass->WeaponClass);
-	}
-	{
-		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Kanata"));
-		AddWeapons(Weaponclass->WeaponClass);
-	}
-	{
-		const FWeaponDataTableRow* Weaponclass = DataSubsystem->FindWeaponData(TEXT("Rifle"));
-		AddWeapons(Weaponclass->WeaponClass);
-	}
+	//{
+	//	const FItemData* ItemData = DataSubsystem->FindItemData(TEXT("Fist"));
+	//	AddItem(ItemData->ItemClass);
+	//}
+	//{
+	//	const FItemData* ItemData = DataSubsystem->FindItemData(TEXT("Assassin"));
+	//	AddItem(ItemData->ItemClass);
+	//}
+	//{
+	//	const FItemData* ItemData = DataSubsystem->FindItemData(TEXT("Katana"));
+	//	AddItem(ItemData->ItemClass);
+	//}
+	//{
+	//	const FItemData* ItemData = DataSubsystem->FindItemData(TEXT("Rifle"));
+	//	AddItem(ItemData->ItemClass);
+	//}
 
-	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
+	//State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
 
-	CurrentWeapon = DefaultWeapon;
+	//CurrentItem = DefaultWeapon;
 }
 
 void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -46,7 +46,7 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UEquipComponent::WeaponL()
 {
-	CurrentWeapon->Attack();
+	CurrentWeapon->MouseL();
 }
 
 void UEquipComponent::WeaponR()
@@ -64,32 +64,32 @@ void UEquipComponent::SelectWeapon(int32 WeaponNum)
 	if (!State->IsIdleMode()) return;
 	if (CurrentWeapon == EquipWeapons[WeaponNum])
 	{
-		CurrentWeapon->UnEquipWeapon();
+		CurrentWeapon->UnEquipItem();
 		CurrentWeapon = DefaultWeapon;
 		return;
 	}
 	else
 	{
 		if(CurrentWeapon != DefaultWeapon)
-			CurrentWeapon->UnEquipWeapon();
+			CurrentWeapon->UnEquipItem();
 
 		CurrentWeapon = EquipWeapons[WeaponNum];
-		CurrentWeapon->EquipWeapon();
+		CurrentWeapon->EquipItem();
 	}
 }
 
-void UEquipComponent::AddWeapons(TSubclassOf<AWeapon> EquipWeapon)
+void UEquipComponent::AddItem(TSubclassOf<AItem> EquipItem)
 {
-	if (EquipWeapons.Num() >= 8) return;
+	/*if (EquipWeapons.Num() >= 8) return;
 	UDataSubsystem* DataSubsystem = OwnerCharacter->GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
-	AWeapon* weapon = OwnerCharacter->GetWorld()->SpawnActorDeferred<AWeapon>(EquipWeapon, OwnerCharacter->GetActorTransform(), OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	AWeapon* weapon = Cast<AWeapon>(OwnerCharacter->GetWorld()->SpawnActorDeferred<AItem>(EquipItem, OwnerCharacter->GetActorTransform(), OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	weapon->SetWeaponData(OwnerCharacter, DataSubsystem->FindActionData(weapon->KeyValue));
 	weapon->FinishSpawning(OwnerCharacter->GetActorTransform(), true);
 
 	if (weapon->GetActiontype() == EActionType::Unarmed)
 		DefaultWeapon = weapon;
 	else
-		EquipWeapons.Add(weapon);
+		EquipWeapons.Add(weapon);*/
 }
 
 void UEquipComponent::EndDead()

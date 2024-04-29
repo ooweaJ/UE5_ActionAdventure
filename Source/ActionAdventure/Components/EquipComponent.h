@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Actors/Weapon/Weapon.h"
+#include "Actors/Item.h"
 #include "EquipComponent.generated.h"
 
 
@@ -21,19 +21,20 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	FORCEINLINE AWeapon* GetCurrentWeapon() { return CurrentWeapon; }
+	FORCEINLINE AItem* GetCurrentItem() { return CurrentItem; }
 	
 	void WeaponL();
 	void WeaponR();
 	void OffWeaponR();
 	void SelectWeapon(int32 WeaponNum);
-	void AddWeapons(TSubclassOf<AWeapon> EquipWeapon);
+	void AddItem(TSubclassOf<AItem> EquipWeapon);
 	void EndDead();
+
 private:
 	UPROPERTY(EditAnywhere)
-	TArray<AWeapon*> EquipWeapons;
-	AWeapon* CurrentWeapon;
-	AWeapon* DefaultWeapon;
+	TArray<AItem*> EquipItems;
+	AItem* CurrentItem;
+	AItem* DefaultWeapon;
 
 	class UStateComponent* State;
 

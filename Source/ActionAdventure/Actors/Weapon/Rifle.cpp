@@ -61,7 +61,7 @@ void ARifle::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ARifle::Attack()
+void ARifle::MouseL()
 {
 	if (!Action->IsAiming()) return;
 	if (bFiring == true) return;

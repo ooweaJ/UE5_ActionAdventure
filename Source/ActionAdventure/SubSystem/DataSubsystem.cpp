@@ -12,22 +12,23 @@ UDataSubsystem::UDataSubsystem()
 	}
 
 	{
-		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/WeaponClassData.WeaponClassData'") };
+	/*	static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/WeaponClassData.WeaponClassData'") };
 		ensure(Asset.Object);
-		WeaponDataTable = Asset.Object;
+		ItemDataTable = Asset.Object;*/
 	}
 }
 
-const FWeaponData* UDataSubsystem::FindActionData(const FName& InKey)
+const FActionData* UDataSubsystem::FindActionData(const FName& InKey)
 {
-	FWeaponData* Row = ActionDataTable->FindRow<FWeaponData>(InKey, TEXT(""));
+	FActionData* Row = ActionDataTable->FindRow<FActionData>(InKey, TEXT(""));
 	ensure(Row);
 	return Row;
 }
 
-const FWeaponDataTableRow* UDataSubsystem::FindWeaponData(const FName& InKey)
+const FItemData* UDataSubsystem::FindItemData(const FName& InKey)
 {
-	FWeaponDataTableRow* Row = WeaponDataTable->FindRow<FWeaponDataTableRow>(InKey, TEXT(""));
+	FItemData* Row = ItemDataTable->FindRow<FItemData>(InKey, TEXT(""));
 	ensure(Row);
 	return Row;
 }
+

@@ -13,7 +13,7 @@ public:
 	virtual void OnAttachmentBeginOverlap(class ACharacter* InAttacker, class AActor* InCauser, class ACharacter* InOtherCharacter) override;
 	virtual void OnAttachmentEndOverlap(class ACharacter* InAttacker, class AActor* InCauser, class ACharacter* InOtherCharacter) override;
 
-	virtual void Attack() override;
+	virtual void MouseL() override;
 	virtual void BeginAction() override;
 	virtual void EndAction() override;
 	FORCEINLINE bool IsCanCombo() { return bCanCombo; }

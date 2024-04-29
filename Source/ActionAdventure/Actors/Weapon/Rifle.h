@@ -19,7 +19,7 @@ public:
 protected:
 	virtual void BeginPlay();
 public:
-	virtual void Attack();
+	virtual void MouseL();
 	virtual void MouseR();
 	virtual void OffMouseR();
 	virtual void BeginAction() override;

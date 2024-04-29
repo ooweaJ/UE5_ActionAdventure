@@ -1,7 +1,9 @@
 #include "SubSystem/InventorySubsystem.h"
+#include "SubSystem/DataSubsystem.h"
 
 void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
+
 }
 
 void UInventorySubsystem::Deinitialize()
@@ -18,10 +20,13 @@ void UInventorySubsystem::Load(ARPGPlayerController* Controller, URPGSaveGame* S
 
 void UInventorySubsystem::MakeInventory()
 {
+	DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
+	Inventory.SetNum(MaxInvenSize, false);
 }
 
 void UInventorySubsystem::ClearInventory()
 {
+	Inventory.Empty();
 }
 
 void UInventorySubsystem::UnEquipWeapon(UInventoryUserWidget* Widget)

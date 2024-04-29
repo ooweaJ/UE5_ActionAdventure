@@ -52,7 +52,7 @@ void AMeleeWeapon::OnAttachmentEndOverlap(ACharacter* InAttacker, AActor* InCaus
 	Super::OnAttachmentEndOverlap(InAttacker, InCauser, InOtherCharacter);
 }
 
-void AMeleeWeapon::Attack()
+void AMeleeWeapon::MouseL()
 {
 	if (!(DefaultData->ActionDatas.Num() > 0)) return;
 

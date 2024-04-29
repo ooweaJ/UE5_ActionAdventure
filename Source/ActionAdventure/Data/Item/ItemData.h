@@ -19,7 +19,6 @@ public:
 	UPROPERTY()
 	uint32 CurrentBundleCount = 0;
 
-public:
 	UPROPERTY(EditAnywhere)
 	UTexture2D* ItemImage;
 
@@ -29,4 +28,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	uint32 MaxBundleCount = 1;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AItem> ItemClass;
 };
