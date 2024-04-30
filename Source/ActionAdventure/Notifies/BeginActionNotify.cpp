@@ -7,7 +7,7 @@ FString UBeginActionNotify::GetNotifyName_Implementation() const
 	return "Begin";
 }
 
-void UBeginActionNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UBeginActionNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation);
 	if (MeshComp == nullptr) return;

@@ -13,10 +13,10 @@ struct ACTIONADVENTURE_API FItemData : public FTableRowBase
 
 
 public:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FName ItemName;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	uint32 CurrentBundleCount = 0;
 
 	UPROPERTY(EditAnywhere)

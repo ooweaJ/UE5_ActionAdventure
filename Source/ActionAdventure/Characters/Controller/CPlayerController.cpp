@@ -7,6 +7,7 @@
 #include "Characters/Players/CPlayer.h"
 #include "Data/Input/InPutDataConfig.h"
 #include "Components/StatusComponent.h"
+#include "SubSystem/InventorySubsystem.h"
 
 ACPlayerController::ACPlayerController()
 {
@@ -46,6 +47,24 @@ void ACPlayerController::SetupInputComponent()
 			EnhancedInputComponent->BindAction(InPutDataConfig->G, ETriggerEvent::Started, this, &ThisClass::OnG);
 		}
 	}
+}
+
+void ACPlayerController::OnPossess(APawn* aPawn)
+{
+	UInventorySubsystem* InventorySubsystem = ULocalPlayer::GetSubsystem<UInventorySubsystem>(GetLocalPlayer());
+	InventorySubsystem->MakeInventory();
+
+	Super::OnPossess(aPawn);
+
+	LoadClass<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_PlayerMain.UI_PlayerMain_C'"),
+		nullptr, LOAD_None, nullptr);
+	UClass* WidgetClass = FindObject<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_PlayerMain.UI_PlayerMain_C'"));
+	MainWidget = CreateWidget<UPlayerMainWidget>(GetWorld(), WidgetClass);
+	MainWidget->AddToViewport();
+}
+
+void ACPlayerController::OnUnPossess()
+{
 }
 
 void ACPlayerController::OnMove(const FInputActionValue& InputActionValue)

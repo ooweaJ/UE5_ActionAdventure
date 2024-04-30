@@ -18,8 +18,8 @@ class ACTIONADVENTURE_API UDataSubsystem : public UGameInstanceSubsystem
 public:
 	UDataSubsystem();
 
-	const FActionData* FindActionData(const FName& InKey);
-	const FItemData* FindItemData(const FName& InKey);
+	const FItemActionData* FindActionData(const FName& InKey);
+	FItemData* FindItemData(const FName& InKey);
 
 protected:
 	UPROPERTY()

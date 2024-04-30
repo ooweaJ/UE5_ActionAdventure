@@ -1,5 +1,9 @@
 #include "SubSystem/InventorySubsystem.h"
 #include "SubSystem/DataSubsystem.h"
+#include "UI/InventoryWidget.h"
+#include "UI/EquipWindowWidget.h"
+#include "Characters/Controller/CPlayerController.h"
+#include "Components/EquipComponent.h"
 
 void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -14,14 +18,28 @@ void UInventorySubsystem::Save(URPGSaveGame* SaveGame)
 {
 }
 
-void UInventorySubsystem::Load(ARPGPlayerController* Controller, URPGSaveGame* SaveGame)
+void UInventorySubsystem::Load(ACPlayerController* Controller, URPGSaveGame* SaveGame)
 {
+}
+
+void UInventorySubsystem::SetInventory(UInventoryWidget* Widget)
+{
+	InvenWidget = Widget;
+
+}
+
+void UInventorySubsystem::SetEquipWindow(UEquipWindowWidget* Widget)
+{
+	EquipWidget = Widget;
 }
 
 void UInventorySubsystem::MakeInventory()
 {
 	DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
 	Inventory.SetNum(MaxInvenSize, false);
+
+	for(int i = 0; i < 10; i++)
+	AddItem(TEXT("Assassin"));
 }
 
 void UInventorySubsystem::ClearInventory()
@@ -29,20 +47,108 @@ void UInventorySubsystem::ClearInventory()
 	Inventory.Empty();
 }
 
-void UInventorySubsystem::UnEquipWeapon(UInventoryUserWidget* Widget)
-{
-}
-
 bool UInventorySubsystem::AddItem(const FName& InKey)
 {
-	return false;
+	FItemData* Data = DataSubsystem->FindItemData(InKey);
+	if (!Data)
+	{
+		return false;
+	}
+
+	return MoveItemToInventory(Data);
 }
 
-bool UInventorySubsystem::MoveItemToInventory(TSharedPtr<FItemData>& InItem)
+bool UInventorySubsystem::AddItem(FItemData* InData)
 {
-	return false;
+	return MoveItemToInventory(InData);
 }
 
-void UInventorySubsystem::UseItem(UInventoryUserWidget* Widget, uint32 InIndex)
+bool UInventorySubsystem::MoveItemToInventory(FItemData* InItem)
 {
+	for (uint32 i = 0; i < MaxInvenSize; ++i)
+	{
+		FItemData* ItemData = Inventory[i];
+		if (ItemData == nullptr) { continue; }
+
+		if (ItemData->MaxBundleCount > ItemData->CurrentBundleCount)
+		{
+			++ItemData->CurrentBundleCount;
+			return true;
+		}
+	}
+
+	bool bAdded = false;
+	for (uint32 i = 0; i < MaxInvenSize; ++i)
+	{
+		if (Inventory[i] == nullptr)
+		{
+			Inventory[i] = InItem;
+			bAdded = true;
+			break;
+		}
+	}
+
+	InItem = nullptr;
+
+
+	return bAdded;
+}
+
+void UInventorySubsystem::UseItem(UInventoryWidget* Widget, uint32 InIndex)
+{
+	FItemData* ItemData = Inventory[InIndex];
+	if (!ItemData) { return; }
+
+	ACPlayerController* PlayerController = Cast<ACPlayerController>(Widget->GetOwningPlayer());
+	if (!PlayerController) return;
+
+	UEquipComponent* equip = PlayerController->GetPawn()->GetComponentByClass<UEquipComponent>();
+	if (!equip) return;
+
+	bool bcanUse = equip->AddItem(ItemData);
+	if (bcanUse)
+		Inventory[InIndex] = nullptr;
+	
+
+	Widget->FlushInven();
+	EquipWidget->FlushEquip();
+
+}
+
+bool UInventorySubsystem::MoveItemToEquip(TSharedPtr<FItemData>& InItem)
+{
+	for (uint32 i = 0; i < MaxEquipSize; ++i)
+	{
+		TSharedPtr<FItemData> ItemData = Equipment[i];
+		if (ItemData == nullptr) { continue; }
+		if (ItemData->ItemName != InItem->ItemName) { continue; }
+
+		if (ItemData->MaxBundleCount > ItemData->CurrentBundleCount)
+		{
+			++ItemData->CurrentBundleCount;
+			return true;
+		}
+	}
+
+	bool bAdded = false;
+	for (uint32 i = 0; i < MaxEquipSize; ++i)
+	{
+		if (Equipment[i] == nullptr)
+		{
+			Equipment[i] = InItem;
+			bAdded = true;
+			break;
+		}
+	}
+
+	InItem = nullptr;
+
+
+	return bAdded;
+}
+
+void UInventorySubsystem::UseItemEquip(UEquipWindowWidget* Widget, FItemData* InData)
+{
+	AddItem(InData);
+	InvenWidget->FlushInven();
 }

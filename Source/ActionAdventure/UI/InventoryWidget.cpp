@@ -9,6 +9,7 @@ void UInventoryWidget::NativeConstruct()
 
 	ULocalPlayer* LocalPlayer = GetOwningLocalPlayer();
 	InventorySubsystem = ULocalPlayer::GetSubsystem<UInventorySubsystem>(LocalPlayer);
+	InventorySubsystem->SetInventory(this);
 	InvenSize = InventorySubsystem->Inventory.Num();
 
 	// 게임에서 참조된 적이 없어서 로드가 안됨
@@ -26,11 +27,13 @@ void UInventoryWidget::NativeConstruct()
 			UItemWidget* Widget = Cast<UItemWidget>(CreateWidget(this, InventoryItemWidgetClass));
 			ensure(Widget);
 
+			Widget->ItemBtnClicked.BindUFunction(this, TEXT("OnItemBtnClicked"));
 			Widget->ItemIndex = k + i * Col;
 			Items.Add(Widget);
 			InventoryPanel->AddChildToUniformGrid(Widget, i, k);
 		}
 	}
+	FlushInven();
 }
 
 void UInventoryWidget::NativeDestruct()
@@ -54,12 +57,10 @@ void UInventoryWidget::FlushInven()
 
 void UInventoryWidget::OnItemBtnClicked(UItemWidget* InWidget)
 {
-}
-
-void UInventoryWidget::OnWeaponBtnClicked(UItemWidget* InWidget)
-{
-}
-
-void UInventoryWidget::OnWeaponBtnHovered(UItemWidget* InWidget)
-{
+	const uint32 Index = InWidget->ItemIndex;
+	FItemData* ItemData = InventorySubsystem->Inventory[Index];
+	if (ItemData)
+	{
+		InventorySubsystem->UseItem(this, Index);
+	}
 }

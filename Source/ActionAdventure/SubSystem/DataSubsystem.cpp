@@ -6,26 +6,26 @@
 UDataSubsystem::UDataSubsystem()
 {
 	{
-		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/WeaponData.WeaponData'") };
+		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/DT_ItmeActionData.DT_ItmeActionData'") };
 		ensure(Asset.Object);
 		ActionDataTable = Asset.Object;
 	}
 
 	{
-	/*	static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/WeaponClassData.WeaponClassData'") };
+		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/DT_ItemData.DT_ItemData'") };
 		ensure(Asset.Object);
-		ItemDataTable = Asset.Object;*/
+		ItemDataTable = Asset.Object;
 	}
 }
 
-const FActionData* UDataSubsystem::FindActionData(const FName& InKey)
+const FItemActionData* UDataSubsystem::FindActionData(const FName& InKey)
 {
-	FActionData* Row = ActionDataTable->FindRow<FActionData>(InKey, TEXT(""));
+	FItemActionData* Row = ActionDataTable->FindRow<FItemActionData>(InKey, TEXT(""));
 	ensure(Row);
 	return Row;
 }
 
-const FItemData* UDataSubsystem::FindItemData(const FName& InKey)
+FItemData* UDataSubsystem::FindItemData(const FName& InKey)
 {
 	FItemData* Row = ItemDataTable->FindRow<FItemData>(InKey, TEXT(""));
 	ensure(Row);

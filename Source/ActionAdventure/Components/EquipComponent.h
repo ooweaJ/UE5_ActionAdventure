@@ -10,7 +10,7 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONADVENTURE_API UEquipComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
+	friend class UEquipWindowWidget;
 public:	
 	UEquipComponent();
 
@@ -26,13 +26,26 @@ public:
 	void WeaponL();
 	void WeaponR();
 	void OffWeaponR();
+
 	void SelectWeapon(int32 WeaponNum);
-	void AddItem(TSubclassOf<AItem> EquipWeapon);
+
+	bool AddItem(FItemData* ItemData);
+	void AddData(FItemData* InData);
+
+	void EquipItem(TSubclassOf<AItem> EquipItem);
+	void UnEquipItem(int32 index);
+
 	void EndDead();
+	
+private:
+	bool CanIsPool();
 
 private:
 	UPROPERTY(EditAnywhere)
 	TArray<AItem*> EquipItems;
+	TArray<FItemData*> ItemDatas;
+
+
 	AItem* CurrentItem;
 	AItem* DefaultWeapon;
 

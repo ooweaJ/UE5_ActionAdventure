@@ -93,7 +93,7 @@ AAICharacter::AAICharacter()
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	EquipComponent->SelectWeapon(0);
+	//EquipComponent->SelectWeapon(0);
 }
 
 void AAICharacter::Tick(float DeltaTime)

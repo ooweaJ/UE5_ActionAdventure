@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/Item/ItemData.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -19,5 +20,5 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	TArray<FItemData> Inventory;
 };

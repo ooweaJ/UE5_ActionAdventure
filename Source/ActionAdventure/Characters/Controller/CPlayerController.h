@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
+#include "UI/PlayerMainWidget.h"
 #include "CPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -20,6 +21,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
+	virtual void OnPossess(APawn* aPawn) override;
+	virtual void OnUnPossess();
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
 	void OnLookMouse(const FInputActionValue& InputActionValue);
@@ -36,6 +39,12 @@ protected:
 	void OnNum3(const FInputActionValue& InputActionValue);
 	void OnG(const FInputActionValue& InputActionValue);
 
+
 public:
 
+	UPROPERTY(BlueprintReadWrite)
+	UPlayerMainWidget* MainWidget = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	class UEquipWindowWidget* EquipWidget = nullptr;
 };

@@ -8,33 +8,16 @@
 UEquipComponent::UEquipComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	EquipItems.SetNum(10, false);
+	ItemDatas.SetNum(8, false);
+	EquipItems.SetNum(8, false);
 }
 
 void UEquipComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
+	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
 	UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
-
-	//{
-	//	const FItemData* ItemData = DataSubsystem->FindItemData(TEXT("Fist"));
-	//	AddItem(ItemData->ItemClass);
-	//}
-	//{
-	//	const FItemData* ItemData = DataSubsystem->FindItemData(TEXT("Assassin"));
-	//	AddItem(ItemData->ItemClass);
-	//}
-	//{
-	//	const FItemData* ItemData = DataSubsystem->FindItemData(TEXT("Katana"));
-	//	AddItem(ItemData->ItemClass);
-	//}
-	//{
-	//	const FItemData* ItemData = DataSubsystem->FindItemData(TEXT("Rifle"));
-	//	AddItem(ItemData->ItemClass);
-	//}
-
-	//State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
 
 	//CurrentItem = DefaultWeapon;
 }
@@ -46,60 +29,106 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UEquipComponent::WeaponL()
 {
-	CurrentWeapon->MouseL();
+	CurrentItem->MouseL();
 }
 
 void UEquipComponent::WeaponR()
 {
-	CurrentWeapon->MouseR();
+	//CurrentItem->MouseR();
 }
 
 void UEquipComponent::OffWeaponR()
 {
-	CurrentWeapon->OffMouseR();
+	//CurrentItem->OffMouseR();
 }
 
 void UEquipComponent::SelectWeapon(int32 WeaponNum)
 {
 	if (!State->IsIdleMode()) return;
-	if (CurrentWeapon == EquipWeapons[WeaponNum])
+	if (EquipItems[WeaponNum] == nullptr) return;
+	if (CurrentItem == EquipItems[WeaponNum])
 	{
-		CurrentWeapon->UnEquipItem();
-		CurrentWeapon = DefaultWeapon;
+		CurrentItem->UnEquipItem();
+		CurrentItem = DefaultWeapon;
 		return;
 	}
 	else
 	{
-		if(CurrentWeapon != DefaultWeapon)
-			CurrentWeapon->UnEquipItem();
+		if(CurrentItem != DefaultWeapon)
+			CurrentItem->UnEquipItem();
 
-		CurrentWeapon = EquipWeapons[WeaponNum];
-		CurrentWeapon->EquipItem();
+		CurrentItem = EquipItems[WeaponNum];
+		CurrentItem->EquipItem();
 	}
 }
 
-void UEquipComponent::AddItem(TSubclassOf<AItem> EquipItem)
+bool UEquipComponent::AddItem(FItemData* ItemData)
 {
-	/*if (EquipWeapons.Num() >= 8) return;
-	UDataSubsystem* DataSubsystem = OwnerCharacter->GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
-	AWeapon* weapon = Cast<AWeapon>(OwnerCharacter->GetWorld()->SpawnActorDeferred<AItem>(EquipItem, OwnerCharacter->GetActorTransform(), OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
-	weapon->SetWeaponData(OwnerCharacter, DataSubsystem->FindActionData(weapon->KeyValue));
-	weapon->FinishSpawning(OwnerCharacter->GetActorTransform(), true);
+	if (!CanIsPool()) return false;
+	AddData(ItemData);
 
-	if (weapon->GetActiontype() == EActionType::Unarmed)
-		DefaultWeapon = weapon;
-	else
-		EquipWeapons.Add(weapon);*/
+	EquipItem(ItemData->ItemClass);
+	return true;
+}
+
+void UEquipComponent::EquipItem(TSubclassOf<AItem> EquipItem)
+{
+	UDataSubsystem* DataSubsystem = OwnerCharacter->GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
+	AItem* Item = Cast<AItem>(OwnerCharacter->GetWorld()->SpawnActorDeferred<AItem>(EquipItem, OwnerCharacter->GetActorTransform(), OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
+
+	Item->SetItemData(OwnerCharacter, DataSubsystem->FindActionData(Item->KeyValue));
+	Item->FinishSpawning(OwnerCharacter->GetActorTransform(), true);
+
+
+	for (int32 i = 0; i < EquipItems.Num(); ++i)
+	{
+		if (EquipItems[i] == nullptr)
+		{
+			EquipItems[i] = Item;
+			break;
+		}
+	}
+}
+
+void UEquipComponent::UnEquipItem(int32 index)
+{
+	EquipItems[index]->Attachment->Destroy();
+	EquipItems[index]->Destroy();
+	EquipItems[index] = nullptr;
 }
 
 void UEquipComponent::EndDead()
 {
-	DefaultWeapon->Attachment->Destroy();
-	DefaultWeapon->Destroy();
-	for (AWeapon* Actor : EquipWeapons)
+	//DefaultWeapon->Attachment->Destroy();
+	//DefaultWeapon->Destroy();
+	//for (AWeapon* Actor : EquipItems)
+	//{
+	//	Actor->Attachment->Destroy();
+	//	Actor->Destroy();
+	//}
+}
+
+void UEquipComponent::AddData(FItemData* InData)
+{
+	for (int32 i = 0; i < ItemDatas.Num(); ++i)
 	{
-		Actor->Attachment->Destroy();
-		Actor->Destroy();
+		if (ItemDatas[i] == nullptr)
+		{
+			ItemDatas[i] = InData;
+			break;
+		}
 	}
+}
+
+bool UEquipComponent::CanIsPool()
+{
+	bool bCanispool = false;
+	for (int32 i = 0; i < ItemDatas.Num(); ++i)
+	{
+		if (ItemDatas[i] == nullptr)
+			bCanispool = true;
+	}
+	
+	return bCanispool;
 }
 

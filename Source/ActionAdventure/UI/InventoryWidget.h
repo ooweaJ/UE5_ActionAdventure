@@ -22,12 +22,6 @@ protected:
 	UFUNCTION()
 	void OnItemBtnClicked(UItemWidget* InWidget);
 
-	UFUNCTION()
-	void OnWeaponBtnClicked(UItemWidget* InWidget);
-
-	UFUNCTION()
-	void OnWeaponBtnHovered(UItemWidget* InWidget);
-
 protected:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UUniformGridPanel* InventoryPanel;
