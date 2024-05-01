@@ -18,6 +18,9 @@ class ACTIONADVENTURE_API UDataSubsystem : public UGameInstanceSubsystem
 public:
 	UDataSubsystem();
 
+public:
+	FORCEINLINE UDataTable* GetItemData() { return ItemDataTable; }
+
 	const FItemActionData* FindActionData(const FName& InKey);
 	FItemData* FindItemData(const FName& InKey);
 

@@ -13,6 +13,9 @@ class ACTIONADVENTURE_API UInventoryWidget : public UUserWidget
 
 	friend class UInventorySubsystem;
 
+public:
+	UInventoryWidget(const FObjectInitializer& ObjectInitializer);
+
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
@@ -25,8 +28,6 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UUniformGridPanel* InventoryPanel;
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UTextBlock* ItemDesc;
 
 	int32 InvenSize = 0;
 
@@ -34,5 +35,7 @@ protected:
 
 	UPROPERTY()
 	TArray<class UItemWidget*> Items;
-;
+
+; private:
+	TSubclassOf<class UUserWidget> ItemSlot;
 };

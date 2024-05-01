@@ -19,7 +19,7 @@ void UEquipComponent::BeginPlay()
 	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
 	UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
 
-	//CurrentItem = DefaultWeapon;
+	CurrentItem = DefaultWeapon;
 }
 
 void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -29,6 +29,7 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UEquipComponent::WeaponL()
 {
+	if(CurrentItem != nullptr)
 	CurrentItem->MouseL();
 }
 

@@ -11,6 +11,12 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
+UENUM(BlueprintType)
+enum class EInteraction : uint8
+{
+	Default, Store , Max
+};
+
 UCLASS()
 class ACTIONADVENTURE_API ACPlayer : public ACharacter , public ICharacterInterface
 {
@@ -48,6 +54,11 @@ public:
 
 	void OnAim();
 	void OffAim();
+
+public:
+	void SetDefault();
+	void SetStore();
+
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -76,4 +87,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
 	class UCameraComponent* Camera;
 
+public:
+	UPROPERTY(BlueprintReadOnly)
+	EInteraction Interaction;
 };

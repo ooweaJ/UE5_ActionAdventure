@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "ItemWidget.generated.h"
 
 DECLARE_DELEGATE_OneParam(FOnInvenButtonEvent, UItemWidget* /*Widget*/);
@@ -27,6 +28,9 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* ItemImage;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Amount;
 
 	uint32 ItemIndex = (uint32)-1;
 

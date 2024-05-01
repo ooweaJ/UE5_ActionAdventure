@@ -182,3 +182,13 @@ void ACPlayer::OffAim()
 	Camera->FieldOfView = 90.f;
 	Camera->SetRelativeLocation(FVector(-20, 0, 20));
 }
+
+void ACPlayer::SetDefault()
+{
+	Interaction = EInteraction::Default;
+}
+
+void ACPlayer::SetStore()
+{
+	Interaction = EInteraction::Store;
+}

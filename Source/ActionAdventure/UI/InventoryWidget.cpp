@@ -3,6 +3,13 @@
 #include "UI/ItemWidget.h"
 #include "Components/GridPanel.h"
 
+UInventoryWidget::UInventoryWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	ConstructorHelpers::FClassFinder<UUserWidget> findclass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_ItemSlot.UI_ItemSlot_C'"));
+		if (findclass.Succeeded())
+			ItemSlot = findclass.Class;
+}
+
 void UInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -12,11 +19,6 @@ void UInventoryWidget::NativeConstruct()
 	InventorySubsystem->SetInventory(this);
 	InvenSize = InventorySubsystem->Inventory.Num();
 
-	// 게임에서 참조된 적이 없어서 로드가 안됨
-	LoadClass<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_Item.UI_Item_C'"),
-		nullptr, LOAD_None, nullptr);
-	UClass* InventoryItemWidgetClass = FindObject<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_Item.UI_Item_C'"));
-
 	int32 Col = 6;
 	int32 Row = InvenSize / Col;
 
@@ -24,7 +26,7 @@ void UInventoryWidget::NativeConstruct()
 	{
 		for (int32 k = 0; k < Col; ++k)
 		{
-			UItemWidget* Widget = Cast<UItemWidget>(CreateWidget(this, InventoryItemWidgetClass));
+			UItemWidget* Widget = CreateWidget<UItemWidget>(this, ItemSlot);
 			ensure(Widget);
 
 			Widget->ItemBtnClicked.BindUFunction(this, TEXT("OnItemBtnClicked"));
@@ -46,12 +48,13 @@ void UInventoryWidget::FlushInven()
 	{
 		if (InventorySubsystem->Inventory[i] == nullptr)
 		{
-			Items[i]->ItemImage->SetBrushFromTexture(nullptr, false);
+			Items[i]->Amount->SetText(FText::FromString(""));
 			continue;
 		}
 
 		UTexture2D* Texture = InventorySubsystem->Inventory[i]->ItemImage;
 		Items[i]->ItemImage->SetBrushFromTexture(Texture, false);
+		Items[i]->Amount->SetText();
 	}
 }
 

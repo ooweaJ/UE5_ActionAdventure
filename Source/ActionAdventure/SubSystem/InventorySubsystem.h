@@ -18,7 +18,7 @@ class ACTIONADVENTURE_API UInventorySubsystem : public ULocalPlayerSubsystem
 	friend class UInventoryWidget;
 	friend class ACPlayerController;
 	friend class UEquipWindowWidget;
-
+	friend class UUI_Store;
 protected:
 	/** Implement this for initialization of instances of the system */
 	virtual void Initialize(FSubsystemCollectionBase& Collection);
