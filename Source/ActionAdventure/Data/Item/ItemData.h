@@ -11,7 +11,10 @@ struct ACTIONADVENTURE_API FItemData : public FTableRowBase
 
 	FItemData() {}
 
+	//FItemData(const FItemData& InOther)
+	//{
 
+	//}
 public:
 	UPROPERTY(EditAnywhere)
 	FName ItemName;

@@ -15,18 +15,20 @@ class ACTIONADVENTURE_API UUI_Store : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
-
-	void FlushInven();
+	UUI_Store(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION()
-	void OnItemBtnClicked(UItemWidget* InWidget);
+	void OnItemBtnClicked(class UStoreItemWidget* InWidget);
+
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UUniformGridPanel* StorePanel;
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UTextBlock* ItemInfo;
+	UPanelWidget* StoreBox;
 
 	TArray<struct FItemData*> ItemDatas;
+
 	UPROPERTY()
-	TArray<class UItemWidget*> Items;
+	TArray<class UStoreItemWidget*> Items;
+
+private:
+	TSubclassOf<class UUserWidget> ItemSlot;
 };

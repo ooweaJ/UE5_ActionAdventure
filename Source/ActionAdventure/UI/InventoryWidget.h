@@ -12,7 +12,7 @@ class ACTIONADVENTURE_API UInventoryWidget : public UUserWidget
 	GENERATED_BODY()
 
 	friend class UInventorySubsystem;
-
+	friend class UUI_Store;
 public:
 	UInventoryWidget(const FObjectInitializer& ObjectInitializer);
 
@@ -36,6 +36,8 @@ protected:
 	UPROPERTY()
 	TArray<class UItemWidget*> Items;
 
-; private:
+ private:
 	TSubclassOf<class UUserWidget> ItemSlot;
+
+	UTexture2D* DefaultTexture;
 };

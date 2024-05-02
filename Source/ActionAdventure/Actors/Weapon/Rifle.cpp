@@ -135,6 +135,8 @@ void ARifle::MouseL()
 
 void ARifle::MouseR()
 {
+	Super::MouseR();
+
 	Action->OnAim();
 	State->SetOffOrient();
 	if (ACPlayer* player = Cast<ACPlayer>(OwnerCharacter))
@@ -143,6 +145,8 @@ void ARifle::MouseR()
 
 void ARifle::OffMouseR()
 {
+	Super::OffMouseR();
+
 	Action->OffAim();
 	State->SetOnOrient();
 	if (ACPlayer* player = Cast<ACPlayer>(OwnerCharacter))
@@ -151,10 +155,12 @@ void ARifle::OffMouseR()
 
 void ARifle::BeginAction()
 {
-
+	Super::BeginPlay();
 }
 
 void ARifle::EndAction()
 {
+	Super::EndAction();
+
 	bFiring = false;
 }

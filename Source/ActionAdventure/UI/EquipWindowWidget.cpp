@@ -1,7 +1,19 @@
 #include "UI/EquipWindowWidget.h"
+#include "UI/EquipItemWidget.h"
 #include "UI/ItemWidget.h"
 #include "Components/EquipComponent.h"
 #include "SubSystem/InventorySubsystem.h"
+
+UEquipWindowWidget::UEquipWindowWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	ConstructorHelpers::FClassFinder<UUserWidget> findclass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_EquipItem.UI_EquipItem_C'"));
+	if (findclass.Succeeded())
+		EquipItem = findclass.Class;
+
+	ConstructorHelpers::FObjectFinder<UTexture2D> object(TEXT("/Script/Engine.Texture2D'/Game/GUI_Parts/Gui_parts/Mini_background.Mini_background'"));
+	if (object.Succeeded())
+		DefaultTexture = object.Object;
+}
 
 void UEquipWindowWidget::NativeConstruct()
 {
@@ -15,26 +27,22 @@ void UEquipWindowWidget::NativeConstruct()
 	if (!equip) return;
 	Equip = equip;
 
-	LoadClass<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_Item.UI_Item_C'"),
-		nullptr, LOAD_None, nullptr);
-	UClass* ItemWidgetClass = FindObject<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_Item.UI_Item_C'"));
 
 	for (int32 i = 0; i < EquipSize; ++i)
 	{
-		UItemWidget* Widget = Cast<UItemWidget>(CreateWidget(this, ItemWidgetClass));
-		ensure(Widget);
+		UEquipItemWidget* Widget =CreateWidget<UEquipItemWidget>(this, EquipItem);
+		if (!Widget) return;
 
-		//Widget->ItemBtnClicked.BindUFunction(this, TEXT("OnItemBtnClicked"));
-
+		Widget->EquipBtnClicked.BindUFunction(this, TEXT("OnItemBtnClicked"));
 		Widget->ItemIndex = i;
-		Widget->ItemBtnClicked.BindUFunction(this, TEXT("OnItemBtnClicked"));
 		Items.Add(Widget);
 		EquipPanel->AddChildToUniformGrid(Widget, 0, i);
 	}
 
 	FlushEquip();
 }
-void UEquipWindowWidget::OnItemBtnClicked(UItemWidget* InWidget)
+
+void UEquipWindowWidget::OnItemBtnClicked(UEquipItemWidget* InWidget)
 {
 	const uint32 Index = InWidget->ItemIndex;
 	FItemData* ItemData = Equip->ItemDatas[Index];
@@ -54,7 +62,7 @@ void UEquipWindowWidget::FlushEquip()
 	{
 		if (Equip->ItemDatas[i] == nullptr)
 		{
-			Items[i]->ItemImage->SetBrushFromTexture(nullptr, false);
+			Items[i]->ItemImage->SetBrushFromTexture(DefaultTexture, false);
 			continue;
 		}
 

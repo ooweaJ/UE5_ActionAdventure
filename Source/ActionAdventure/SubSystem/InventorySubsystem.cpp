@@ -38,8 +38,6 @@ void UInventorySubsystem::MakeInventory()
 	DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
 	Inventory.SetNum(MaxInvenSize, false);
 
-	for(int i = 0; i < 10; i++)
-	AddItem(TEXT("Assassin"));
 }
 
 void UInventorySubsystem::ClearInventory()
@@ -54,13 +52,14 @@ bool UInventorySubsystem::AddItem(const FName& InKey)
 	{
 		return false;
 	}
-
-	return MoveItemToInventory(Data);
+	FItemData* NewItemData = new FItemData(*Data);
+	return MoveItemToInventory(NewItemData);
 }
 
 bool UInventorySubsystem::AddItem(FItemData* InData)
 {
-	return MoveItemToInventory(InData);
+	FItemData* NewItemData = new FItemData(*InData);
+	return MoveItemToInventory(NewItemData);
 }
 
 bool UInventorySubsystem::MoveItemToInventory(FItemData* InItem)
@@ -69,6 +68,7 @@ bool UInventorySubsystem::MoveItemToInventory(FItemData* InItem)
 	{
 		FItemData* ItemData = Inventory[i];
 		if (ItemData == nullptr) { continue; }
+		if (ItemData->ItemClass != InItem->ItemClass) continue;
 
 		if (ItemData->MaxBundleCount > ItemData->CurrentBundleCount)
 		{
@@ -90,7 +90,6 @@ bool UInventorySubsystem::MoveItemToInventory(FItemData* InItem)
 
 	InItem = nullptr;
 
-
 	return bAdded;
 }
 
@@ -105,12 +104,21 @@ void UInventorySubsystem::UseItem(UInventoryWidget* Widget, uint32 InIndex)
 	UEquipComponent* equip = PlayerController->GetPawn()->GetComponentByClass<UEquipComponent>();
 	if (!equip) return;
 
-	bool bcanUse = equip->AddItem(ItemData);
+	bool bcanUse = equip->AddItem(Inventory[InIndex]);
+
 	if (bcanUse)
-		Inventory[InIndex] = nullptr;
+	{
+		--ItemData->CurrentBundleCount;
+
+		if (ItemData->CurrentBundleCount == 0)
+		{
+			++ItemData->CurrentBundleCount;
+			Inventory[InIndex] = nullptr;
+		}
+	}
 	
 
-	Widget->FlushInven();
+	InvenWidget->FlushInven();
 	EquipWidget->FlushEquip();
 
 }

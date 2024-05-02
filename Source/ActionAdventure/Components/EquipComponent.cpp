@@ -30,17 +30,19 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 void UEquipComponent::WeaponL()
 {
 	if(CurrentItem != nullptr)
-	CurrentItem->MouseL();
+		CurrentItem->MouseL();
 }
 
 void UEquipComponent::WeaponR()
 {
-	//CurrentItem->MouseR();
+	if (CurrentItem != nullptr)
+		CurrentItem->MouseR();
 }
 
 void UEquipComponent::OffWeaponR()
 {
-	//CurrentItem->OffMouseR();
+	if (CurrentItem != nullptr)
+		CurrentItem->OffMouseR();
 }
 
 void UEquipComponent::SelectWeapon(int32 WeaponNum)
@@ -67,7 +69,7 @@ bool UEquipComponent::AddItem(FItemData* ItemData)
 {
 	if (!CanIsPool()) return false;
 	AddData(ItemData);
-
+	
 	EquipItem(ItemData->ItemClass);
 	return true;
 }

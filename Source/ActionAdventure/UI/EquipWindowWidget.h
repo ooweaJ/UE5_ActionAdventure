@@ -12,11 +12,14 @@ class ACTIONADVENTURE_API UEquipWindowWidget : public UUserWidget
 	
 	friend class UInventorySubsystem;
 
+public:
+	UEquipWindowWidget(const FObjectInitializer& ObjectInitializer);
+
 protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void OnItemBtnClicked(UItemWidget* InWidget);
+	void OnItemBtnClicked(UEquipItemWidget* InWidget);
 
 	void FlushEquip();
 protected:
@@ -24,11 +27,16 @@ protected:
 	UUniformGridPanel* EquipPanel;
 
 	UPROPERTY()
-	TArray<class UItemWidget*> Items;
+	TArray<class UEquipItemWidget*> Items;
 private:
-	int32 EquipSize = 8; 
+	int32 EquipSize = 7; 
 
 	class UEquipComponent* Equip;
 
 	UInventorySubsystem* InventorySubsystem;
+
+private:
+	TSubclassOf<class UUserWidget> EquipItem;
+
+	UTexture2D* DefaultTexture;
 };

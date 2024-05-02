@@ -30,7 +30,6 @@ void AItem::SetItemData(ACharacter* InOnwerCharacter, const FItemActionData* InD
 	DefaultData = ActionData->Data.GetRow<FActionDataTableRow>(TEXT(""));
 }
 
-// Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
@@ -39,6 +38,7 @@ void AItem::BeginPlay()
 	Status = Cast<UStatusComponent>(OwnerCharacter->GetComponentByClass<UStatusComponent>());
 	Action = Cast<UActionComponent>(OwnerCharacter->GetComponentByClass<UActionComponent>());
 	Attachment->OnAttachmentBeginOverlap.AddDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
+
 }
 
 // Called every frame
