@@ -38,7 +38,7 @@ void UEquipWindowWidget::NativeConstruct()
 		Items.Add(Widget);
 		EquipPanel->AddChildToUniformGrid(Widget, 0, i);
 	}
-
+	
 	FlushEquip();
 }
 

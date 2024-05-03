@@ -1,6 +1,7 @@
 #include "Characters/AI/AICharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BehaviorComponent.h"
 #include "Engine.h"
 #include "Engine/DamageEvents.h"
 
@@ -15,6 +16,7 @@
 
 #include "PaperSpriteComponent.h"
 #include "PaperSprite.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AAICharacter::AAICharacter()
 {
@@ -93,7 +95,8 @@ AAICharacter::AAICharacter()
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	//EquipComponent->SelectWeapon(0);
+
+	EquipComponent->AIRandomWeapon();
 }
 
 void AAICharacter::Tick(float DeltaTime)
@@ -125,6 +128,15 @@ float AAICharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	Hitted(DamageEvent.DamageTypeClass);
 
 	return Damage;
+}
+
+void AAICharacter::SetAttackRange(float Range)
+{
+	ACAIController* controller = Cast<ACAIController>(GetController());
+	if (controller)
+	{
+		controller->SetAttackRange(Range);
+	}
 }
 
 void AAICharacter::Dead()
@@ -166,6 +178,18 @@ void AAICharacter::Hitted(TSubclassOf<UDamageType> Type)
 	default:
 		break;
 	}
+}
+
+void AAICharacter::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection)
+{
+	OutAimStart = GetActorLocation();
+	ACAIController* con = Cast<ACAIController>(GetController());
+	if (!con->GetBehavior()->GetTarget()) return;
+	FVector target = con->GetBehavior()->GetTarget()->GetActorLocation();
+	FVector dir = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), target).Vector();
+	FVector randomdir = UKismetMathLibrary::UKismetMathLibrary::RandomUnitVectorInConeInDegrees(dir, 10.f);
+	OutAimEnd = OutAimStart +(randomdir * 2000.f);
+	OutAimDriection = GetController()->GetControlRotation().Vector();
 }
 
 void AAICharacter::End_Dead()

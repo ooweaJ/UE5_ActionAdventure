@@ -39,6 +39,7 @@ void UInventoryWidget::NativeConstruct()
 			InventoryPanel->AddChildToUniformGrid(Widget, i, k);
 		}
 	}
+	Exitbtn->OnClicked.AddDynamic(this, &ThisClass::Exit);
 	FlushInven();
 }
 
@@ -68,6 +69,11 @@ void UInventoryWidget::FlushInven()
 		else
 			Items[i]->Amount->SetText(FText::FromString(""));
 	}
+}
+
+void UInventoryWidget::Exit()
+{
+	SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UInventoryWidget::OnItemBtnClicked(UItemWidget* InWidget)

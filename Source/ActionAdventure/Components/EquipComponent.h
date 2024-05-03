@@ -5,6 +5,10 @@
 #include "Actors/Item.h"
 #include "EquipComponent.generated.h"
 
+enum EWeapon : uint8
+{
+	None, Assasin, Katana, Rifle, Max
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONADVENTURE_API UEquipComponent : public UActorComponent
@@ -37,6 +41,9 @@ public:
 
 	void EndDead();
 	
+
+	void AIRandomWeapon();
+	void AICombat();
 private:
 	bool CanIsPool();
 
@@ -45,6 +52,7 @@ private:
 	TArray<AItem*> EquipItems;
 	TArray<FItemData*> ItemDatas;
 
+	FName Key[(int32)EWeapon::Max] = { TEXT("Fist"), TEXT("Assassin"), TEXT("Katana"), TEXT("Rifle") };
 
 	AItem* CurrentItem;
 	AItem* DefaultWeapon;

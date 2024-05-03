@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
 #include "InventoryWidget.generated.h"
@@ -23,6 +24,9 @@ protected:
 	void FlushInven();
 
 	UFUNCTION()
+	void Exit();
+
+	UFUNCTION()
 	void OnItemBtnClicked(UItemWidget* InWidget);
 
 protected:
@@ -35,6 +39,9 @@ protected:
 
 	UPROPERTY()
 	TArray<class UItemWidget*> Items;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UButton* Exitbtn;
 
  private:
 	TSubclassOf<class UUserWidget> ItemSlot;

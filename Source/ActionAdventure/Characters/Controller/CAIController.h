@@ -14,7 +14,11 @@ public:
 public:
 	void SetLoactionKey(FVector InLoaction);
 	void SetTargetKey(class ACharacter* InCharacter);
-	
+
+public:
+	FORCEINLINE	void SetAttackRange(float Range) { AttackRange = Range; }
+	FORCEINLINE float GetAttackRange() { return AttackRange; }
+	FORCEINLINE class UBehaviorComponent* GetBehavior() { return Behavior; }
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -42,4 +46,6 @@ private:
 
 	UPROPERTY()
 	class UBlackboardData* BBAsset;
+
+	float AttackRange = 100.f;
 };

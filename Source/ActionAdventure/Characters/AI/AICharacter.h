@@ -22,8 +22,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	void SetAttackRange(float Range);
 	void Dead() override;
 	void Hitted(TSubclassOf<UDamageType> Type) override;
+	virtual void GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection) override;
 
 	UFUNCTION()
 	void End_Dead() override;

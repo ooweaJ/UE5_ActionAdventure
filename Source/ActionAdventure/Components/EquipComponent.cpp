@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "Data/ActionData/ActionDataTableRow.h"
 #include "Actors/Weapon/Attachment.h"
+#include "Characters/Players/CPlayer.h"
 
 UEquipComponent::UEquipComponent()
 {
@@ -15,11 +16,26 @@ UEquipComponent::UEquipComponent()
 void UEquipComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	OwnerCharacter = Cast<ACharacter>(GetOwner());
-	State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
-	UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
 
-	CurrentItem = DefaultWeapon;
+	{
+		OwnerCharacter = Cast<ACharacter>(GetOwner());
+		State = Cast<UStateComponent>(OwnerCharacter->GetComponentByClass<UStateComponent>());
+	}
+
+	if(Cast<ACPlayer>(OwnerCharacter))
+	{
+		UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
+		FItemData* FistData = DataSubsystem->FindItemData("Fist");
+		if (FistData == nullptr) return;
+
+		AItem* Item = Cast<AItem>(OwnerCharacter->GetWorld()->SpawnActorDeferred<AItem>(FistData->ItemClass, OwnerCharacter->GetActorTransform(), OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
+		Item->SetItemData(OwnerCharacter, DataSubsystem->FindActionData(Item->KeyValue));
+		Item->FinishSpawning(OwnerCharacter->GetActorTransform(), true);
+
+		DefaultWeapon = Item;
+		CurrentItem = DefaultWeapon;
+	}
+
 }
 
 void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -98,17 +114,19 @@ void UEquipComponent::UnEquipItem(int32 index)
 	EquipItems[index]->Attachment->Destroy();
 	EquipItems[index]->Destroy();
 	EquipItems[index] = nullptr;
+	CurrentItem = DefaultWeapon;
 }
 
 void UEquipComponent::EndDead()
 {
-	//DefaultWeapon->Attachment->Destroy();
-	//DefaultWeapon->Destroy();
-	//for (AWeapon* Actor : EquipItems)
-	//{
-	//	Actor->Attachment->Destroy();
-	//	Actor->Destroy();
-	//}
+	/*DefaultWeapon->Attachment->Destroy();
+	DefaultWeapon->Destroy();
+	if (EquipItems.Num() == 0) return;
+	for (AItem* Actor : EquipItems)
+	{
+		Actor->Attachment->Destroy();
+		Actor->Destroy();
+	}*/
 }
 
 void UEquipComponent::AddData(FItemData* InData)
@@ -121,6 +139,29 @@ void UEquipComponent::AddData(FItemData* InData)
 			break;
 		}
 	}
+}
+
+void UEquipComponent::AIRandomWeapon()
+{
+	int32 randomint = FMath::RandRange(0, (int32)EWeapon::Max -1);
+
+	UDataSubsystem* DataSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UDataSubsystem>();
+	FItemData* FindData = DataSubsystem->FindItemData(Key[randomint]);
+	if (FindData == nullptr)
+	{
+		return;
+	}
+
+	AItem* Item = Cast<AItem>(OwnerCharacter->GetWorld()->SpawnActorDeferred<AItem>(FindData->ItemClass, OwnerCharacter->GetActorTransform(), OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
+	Item->SetItemData(OwnerCharacter, DataSubsystem->FindActionData(Item->KeyValue));
+	Item->FinishSpawning(OwnerCharacter->GetActorTransform(), true);
+	DefaultWeapon = Item;
+	CurrentItem = DefaultWeapon;
+}
+
+void UEquipComponent::AICombat()
+{
+	CurrentItem->EquipItem();
 }
 
 bool UEquipComponent::CanIsPool()

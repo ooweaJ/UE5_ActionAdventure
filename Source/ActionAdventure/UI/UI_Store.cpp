@@ -39,6 +39,8 @@ void UUI_Store::NativeConstruct()
 
 		ItemDatas[i] = datas[i];
 	}
+	ExitBtn->OnClicked.AddDynamic(this, &ThisClass::Exit);
+
 }
 
 void UUI_Store::OnItemBtnClicked(UStoreItemWidget* InWidget)
@@ -49,4 +51,9 @@ void UUI_Store::OnItemBtnClicked(UStoreItemWidget* InWidget)
 	FItemData* NewItemData =  new FItemData(*ItemDatas[index]);
 	InventorySubsystem->AddItem(NewItemData);
 	InventorySubsystem->InvenWidget->FlushInven();
+}
+
+void UUI_Store::Exit()
+{
+	SetVisibility(ESlateVisibility::Hidden);
 }

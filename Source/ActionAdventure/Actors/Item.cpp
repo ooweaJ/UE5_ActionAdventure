@@ -55,8 +55,13 @@ void AItem::MouseL()
 void AItem::EquipItem()
 {
 	if (!State->IsIdleMode()) return;
+
 	State->SetEquipMode();
-	OwnerCharacter->PlayAnimMontage(ActionData->Equip.AnimMontage);
+
+	if (ActionData->Equip.AnimMontage)
+		OwnerCharacter->PlayAnimMontage(ActionData->Equip.AnimMontage);
+	else
+		State->SetIdleMode();
 }
 
 void AItem::UnEquipItem()

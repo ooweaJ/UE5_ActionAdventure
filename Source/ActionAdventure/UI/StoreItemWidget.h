@@ -22,9 +22,12 @@ public:
 	UFUNCTION()
 	void OnItemBtnClicked();
 
+
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* StoreBtn;
+
+
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* ItemImage;

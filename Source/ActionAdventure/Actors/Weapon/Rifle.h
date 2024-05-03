@@ -25,7 +25,12 @@ public:
 	virtual void BeginAction() override;
 	UFUNCTION()
 	virtual void EndAction() override;
+	UFUNCTION()
+	void EndActionAI();
 	
+
+	void fire(FVector start, FVector end);
+	void AIfire(FVector start, FVector end);
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "CameraShake")
 	TSubclassOf<class UCameraShakeBase> CameraShakeClass;
@@ -49,4 +54,6 @@ private:
 private:
 	float CurrentPitch = -0.1f;
 	bool bFiring;
+
+	USkeletalMeshComponent* Mesh;
 };

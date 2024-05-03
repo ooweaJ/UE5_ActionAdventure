@@ -49,6 +49,7 @@ void UBehaviorComponent::SetActionMode() { ChangeType(EBehaviorType::Action); }
 void UBehaviorComponent::SetPatrolMode(){ ChangeType(EBehaviorType::patrol); }
 void UBehaviorComponent::SetHittedMode(){ ChangeType(EBehaviorType::Hitted); }
 void UBehaviorComponent::SetKnockBackMode(){ ChangeType(EBehaviorType::KnockBack); }
+void UBehaviorComponent::SetEquipMode() { ChangeType(EBehaviorType::Equip);}
 
 void UBehaviorComponent::ChangeType(EBehaviorType InType)
 {

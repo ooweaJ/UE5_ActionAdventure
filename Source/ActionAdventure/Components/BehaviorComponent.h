@@ -8,7 +8,7 @@
 UENUM(BlueprintType)
 enum class EBehaviorType : uint8
 {
-	Wait, patrol, Approach, Action, Hitted, KnockBack
+	Wait, patrol, Approach, Action, Hitted, KnockBack, Equip
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBehaviorTypeChanged, EBehaviorType, ChangeType);
@@ -48,6 +48,7 @@ public:
 	void SetPatrolMode();
 	void SetHittedMode();
 	void SetKnockBackMode();
+	void SetEquipMode();
 
 
 private:
@@ -57,6 +58,8 @@ private:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FBehaviorTypeChanged OnBehaviorTypeChanged;
+	bool bDoOnce;
+
 private:
 	UPROPERTY(EditAnywhere) FName BehaviorKey = "Behavior";
 	UPROPERTY(EditAnywhere) FName TargetKey = "Target";
