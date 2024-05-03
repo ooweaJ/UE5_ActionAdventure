@@ -28,7 +28,7 @@ bool UStateComponent::IsCanCombo()
 	UEquipComponent* equip = OwnerCharacter->GetComponentByClass<UEquipComponent>();
 	if(!equip) return false;
 
-	AMeleeWeapon* weapon = Cast<AMeleeWeapon>(equip->GetCurrentWeapon());
+	AMeleeWeapon* weapon = Cast<AMeleeWeapon>(equip->GetCurrentItem());
 	if (!weapon) return false;
 
 	return weapon->IsCanCombo();

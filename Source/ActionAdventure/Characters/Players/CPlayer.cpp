@@ -9,14 +9,19 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "PaperSpriteComponent.h"
 #include "PaperSprite.h"
+#include "Math/UnrealMathUtility.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 #include "Characters/CAnimInstance.h"
 #include "Components/StatusComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
 #include "Components/EquipComponent.h"
+#include "Components/MontagesComponent.h"
 
 #include "Actors/Weapon/Weapon.h"
 #include "SubSystem/DataSubsystem.h"
@@ -50,7 +55,9 @@ ACPlayer::ACPlayer()
 		ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComponent");
 		EquipComponent = CreateDefaultSubobject<UEquipComponent>("EquipComponent");
 		PaperComponent = CreateDefaultSubobject<UPaperSpriteComponent>("Paper");
+		MontagesComponent = CreateDefaultSubobject<UMontagesComponent>("MontagesComponent");
 	}
+
 
 	PaperComponent->SetupAttachment(RootComponent);
 	PaperComponent->SetRelativeLocation(FVector(0., 0., 240.));
@@ -63,6 +70,18 @@ ACPlayer::ACPlayer()
 		if (!Asset.Succeeded()) return;
 		PaperComponent->SetSprite(Asset.Object);
 	}
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
+	SpringArm->SetupAttachment(RootComponent);
+
+	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
+	Camera->SetupAttachment(SpringArm);
+
+	SpringArm->SetRelativeLocation(FVector(0, 0, 90));
+	SpringArm->TargetArmLength = 300.f;
+	SpringArm->bDoCollisionTest = true;
+	SpringArm->bUsePawnControlRotation = true;
+	
 }
 
 void ACPlayer::BeginPlay()
@@ -85,6 +104,25 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	}
 }
 
+void ACPlayer::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection)
+{
+	OutAimDriection = Camera->GetForwardVector();
+
+	FTransform transform = Camera->GetComponentToWorld();
+	FVector cameraLocation = transform.GetLocation();
+	OutAimStart = cameraLocation + OutAimDriection * SpringArm->TargetArmLength;
+
+	FVector recoilCone = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OutAimDriection, 0.2f);
+
+	OutAimEnd = cameraLocation + recoilCone * 10000;
+}
+
+void ACPlayer::OffFlying()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
 void ACPlayer::OnShift()
 {
 	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetRunSpeed();
@@ -100,6 +138,16 @@ void ACPlayer::OnMouseL()
 	ActionComponent->MouseL();
 }
 
+void ACPlayer::OnMouseR()
+{
+	ActionComponent->MouseR();
+}
+
+void ACPlayer::OffMouseR()
+{
+	ActionComponent->OffMouseR();
+}
+
 void ACPlayer::OnNum1()
 {
 	ActionComponent->Num1();
@@ -111,3 +159,36 @@ void ACPlayer::OnNum2()
 
 }
 
+void ACPlayer::OnNum3()
+{
+	ActionComponent->Num3();
+}
+
+void ACPlayer::Parkour()
+{
+
+}
+
+void ACPlayer::OnAim()
+{
+	SpringArm->TargetArmLength = 0.f;
+	Camera->FieldOfView = 60.f;
+	Camera->SetRelativeLocation(FVector(20, 0, -20));
+}
+
+void ACPlayer::OffAim()
+{
+	SpringArm->TargetArmLength = 300.f;
+	Camera->FieldOfView = 90.f;
+	Camera->SetRelativeLocation(FVector(-20, 0, 20));
+}
+
+void ACPlayer::SetDefault()
+{
+	Interaction = EInteraction::Default;
+}
+
+void ACPlayer::SetStore()
+{
+	Interaction = EInteraction::Store;
+}

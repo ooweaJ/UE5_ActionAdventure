@@ -12,7 +12,7 @@ void UCAnimInstance::NativeBeginPlay()
 
 	ACharacter* character = Cast<ACharacter>(TryGetPawnOwner());
 	if (!IsValid(character)) return;
-	UActionComponent* Action = Cast<UActionComponent>(character->GetComponentByClass(UActionComponent::StaticClass()));
+	Action = Cast<UActionComponent>(character->GetComponentByClass(UActionComponent::StaticClass()));
 	Action->OnActionTypeChanged.AddDynamic(this, &ThisClass::OnActionTypeChanged);
 }
 
@@ -26,6 +26,9 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Speed = character->GetVelocity().Length();
 	Direction = CalculateDirection(character->GetVelocity(), character->GetControlRotation());
 	IsFalling = character->GetCharacterMovement()->IsFalling();
+	Pitch = character->GetBaseAimRotation().Pitch;
+	if(!!Action)
+	IsAiming = Action->IsAiming();
 
 	if (!!MoveComp)
 		Axis = MoveComp->GetLeanAxis();

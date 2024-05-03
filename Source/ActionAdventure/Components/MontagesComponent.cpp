@@ -36,24 +36,35 @@ void UMontagesComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	// ...
 }
 
-void UMontagesComponent::PlayKnockBack()
+float UMontagesComponent::PlayKnockBack()
 {
-	PlayAnimMontage("KnockBack");
+	return PlayAnimMontage("KnockBack");
 }
 
-void UMontagesComponent::PlayAnimMontage(FName Key)
+float UMontagesComponent::PlayGetting()
+{
+	return PlayAnimMontage("Getting");
+}
+
+float UMontagesComponent::PlayVault()
+{
+	return PlayAnimMontage("Vault");
+}
+
+float UMontagesComponent::PlayAnimMontage(FName Key)
 {
 	ACharacter* character = Cast<ACharacter>(GetOwner());
 	FMontageData* data = DataTable->FindRow<FMontageData>(Key, "");
-	if (!data) return;
+	if (!data) return 0.f;
 
 	UStateComponent* state = character->GetComponentByClass<UStateComponent>();
 	UStatusComponent* status = character->GetComponentByClass<UStatusComponent>();
 
-	if (!data->AnimMontage) return;
+	if (!data->AnimMontage) return 0.f;
 	character->StopAnimMontage();
 	state->ChangeType(data->Type);
 	data->bCanMove ? status->SetMove() : status->SetStop();
-	character->PlayAnimMontage(data->AnimMontage, data->PlayRate, data->StartSection);
+	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Black, "hi");
+	return character->PlayAnimMontage(data->AnimMontage, data->PlayRate, data->StartSection);
 }
 

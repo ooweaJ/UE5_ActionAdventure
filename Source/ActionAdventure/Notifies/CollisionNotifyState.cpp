@@ -18,14 +18,14 @@ void UCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimS
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;
-	AMeleeWeapon* MeleeWeapon = Cast<AMeleeWeapon>(Equip->GetCurrentWeapon());
+	AMeleeWeapon* MeleeWeapon = Cast<AMeleeWeapon>(Equip->GetCurrentItem());
 	if (!!MeleeWeapon)
 	{
 		FString collisionName = MeleeWeapon->GetSpecificCollisionName();
-		Equip->GetCurrentWeapon()->GetAttachment()->OnCollisions(collisionName);
+		Equip->GetCurrentItem()->GetAttachment()->OnCollisions(collisionName);
 	}
 	else
-		Equip->GetCurrentWeapon()->GetAttachment()->OnCollisions("");
+		Equip->GetCurrentItem()->GetAttachment()->OnCollisions("");
 }
 
 void UCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -35,5 +35,5 @@ void UCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSeq
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;
-	Equip->GetCurrentWeapon()->GetAttachment()->OffCollisions();
+	Equip->GetCurrentItem()->GetAttachment()->OffCollisions();
 }

@@ -1,33 +1,31 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SubSystem/DataSubsystem.h"
 
 UDataSubsystem::UDataSubsystem()
 {
 	{
-		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/WeaponData.WeaponData'") };
+		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/DT_ItmeActionData.DT_ItmeActionData'") };
 		ensure(Asset.Object);
 		ActionDataTable = Asset.Object;
 	}
 
 	{
-		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/WeaponClassData.WeaponClassData'") };
+		static ConstructorHelpers::FObjectFinder<UDataTable> Asset{ TEXT("/Script/Engine.DataTable'/Game/_dev/Data/DT_ItemData.DT_ItemData'") };
 		ensure(Asset.Object);
-		WeaponDataTable = Asset.Object;
+		ItemDataTable = Asset.Object;
 	}
 }
 
-const FWeaponData* UDataSubsystem::FindActionData(const FName& InKey)
+const FItemActionData* UDataSubsystem::FindActionData(const FName& InKey)
 {
-	FWeaponData* Row = ActionDataTable->FindRow<FWeaponData>(InKey, TEXT(""));
+	FItemActionData* Row = ActionDataTable->FindRow<FItemActionData>(InKey, TEXT(""));
 	ensure(Row);
 	return Row;
 }
 
-const FWeaponDataTableRow* UDataSubsystem::FindWeaponData(const FName& InKey)
+FItemData* UDataSubsystem::FindItemData(const FName& InKey)
 {
-	FWeaponDataTableRow* Row = WeaponDataTable->FindRow<FWeaponDataTableRow>(InKey, TEXT(""));
+	FItemData* Row = ItemDataTable->FindRow<FItemData>(InKey, TEXT(""));
 	ensure(Row);
 	return Row;
 }
+

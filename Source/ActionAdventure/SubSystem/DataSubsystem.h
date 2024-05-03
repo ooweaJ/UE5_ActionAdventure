@@ -18,13 +18,16 @@ class ACTIONADVENTURE_API UDataSubsystem : public UGameInstanceSubsystem
 public:
 	UDataSubsystem();
 
-	const FWeaponData* FindActionData(const FName& InKey);
-	const FWeaponDataTableRow* FindWeaponData(const FName& InKey);
+public:
+	FORCEINLINE UDataTable* GetItemData() { return ItemDataTable; }
+
+	const FItemActionData* FindActionData(const FName& InKey);
+	FItemData* FindItemData(const FName& InKey);
 
 protected:
 	UPROPERTY()
 	UDataTable* ActionDataTable;
-	
+
 	UPROPERTY()
-	UDataTable* WeaponDataTable;
+	UDataTable* ItemDataTable;
 };

@@ -6,9 +6,6 @@
 #include "BehaviorTree/BTService.h"
 #include "BTService_AI.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ACTIONADVENTURE_API UBTService_AI : public UBTService
 {
@@ -19,4 +16,6 @@ public:
 
 protected:
 	void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
+	
 };

@@ -8,6 +8,7 @@ UCLASS()
 class ACTIONADVENTURE_API UTask_Action : public UBTTaskNode
 {
 	GENERATED_BODY()
+
 public:
 	UTask_Action();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

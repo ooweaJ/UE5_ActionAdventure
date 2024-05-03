@@ -37,11 +37,19 @@ void UBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 		behavior->SetPatrolMode();
 		return;
 	}
-
+	
 	controller->K2_SetFocus(target);
+
+	if (behavior->bDoOnce == false)
+	{
+		behavior->bDoOnce = true;
+		behavior->SetEquipMode();
+		return;
+	}
+
 	float distance = aiPawn->GetDistanceTo(target);
 
-	if (distance < 100.f)
+	if (distance < controller->GetAttackRange())
 	{
 		state->SetOffOrient();
 		FVector TargetLocation = target->GetActorLocation();
@@ -54,7 +62,7 @@ void UBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
 		if (DotProduct > 0.8f)
 		{
-			state->SetOnOrient();
+			//state->SetOnOrient();
 			behavior->SetActionMode();
 			return;
 		}

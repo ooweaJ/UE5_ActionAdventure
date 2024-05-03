@@ -7,7 +7,7 @@ FString UBeginActionNotify::GetNotifyName_Implementation() const
 	return "Begin";
 }
 
-void UBeginActionNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UBeginActionNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation);
 	if (MeshComp == nullptr) return;
@@ -15,5 +15,5 @@ void UBeginActionNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;
 
-	Equip->GetCurrentWeapon()->BeginAction();
+	Equip->GetCurrentItem()->BeginAction();
 }

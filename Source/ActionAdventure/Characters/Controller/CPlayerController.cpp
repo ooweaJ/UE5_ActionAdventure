@@ -7,6 +7,7 @@
 #include "Characters/Players/CPlayer.h"
 #include "Data/Input/InPutDataConfig.h"
 #include "Components/StatusComponent.h"
+#include "SubSystem/InventorySubsystem.h"
 
 ACPlayerController::ACPlayerController()
 {
@@ -37,11 +38,33 @@ void ACPlayerController::SetupInputComponent()
 			EnhancedInputComponent->BindAction(InPutDataConfig->Shift, ETriggerEvent::Completed, this, &ThisClass::OffShift);
 			EnhancedInputComponent->BindAction(InPutDataConfig->Jump, ETriggerEvent::Triggered, this, &ThisClass::OnJump);
 			EnhancedInputComponent->BindAction(InPutDataConfig->Jump, ETriggerEvent::Completed, this, &ThisClass::OffJump);
-			EnhancedInputComponent->BindAction(InPutDataConfig->MouseL, ETriggerEvent::Started, this, &ThisClass::OnMouseL);
+			EnhancedInputComponent->BindAction(InPutDataConfig->MouseL, ETriggerEvent::Triggered, this, &ThisClass::OnMouseL);
+			EnhancedInputComponent->BindAction(InPutDataConfig->MouseR, ETriggerEvent::Triggered, this, &ThisClass::OnMouseR);
+			EnhancedInputComponent->BindAction(InPutDataConfig->MouseR, ETriggerEvent::Completed, this, &ThisClass::OffMouseR);
 			EnhancedInputComponent->BindAction(InPutDataConfig->Num1, ETriggerEvent::Started, this, &ThisClass::OnNum1);
 			EnhancedInputComponent->BindAction(InPutDataConfig->Num2, ETriggerEvent::Started, this, &ThisClass::OnNum2);
+			EnhancedInputComponent->BindAction(InPutDataConfig->Num3, ETriggerEvent::Started, this, &ThisClass::OnNum3);
+			EnhancedInputComponent->BindAction(InPutDataConfig->G, ETriggerEvent::Started, this, &ThisClass::OnG);
 		}
 	}
+}
+
+void ACPlayerController::OnPossess(APawn* aPawn)
+{
+	UInventorySubsystem* InventorySubsystem = ULocalPlayer::GetSubsystem<UInventorySubsystem>(GetLocalPlayer());
+	InventorySubsystem->MakeInventory();
+
+	Super::OnPossess(aPawn);
+
+	LoadClass<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_PlayerMain.UI_PlayerMain_C'"),
+		nullptr, LOAD_None, nullptr);
+	UClass* WidgetClass = FindObject<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_PlayerMain.UI_PlayerMain_C'"));
+	MainWidget = CreateWidget<UPlayerMainWidget>(GetWorld(), WidgetClass);
+	MainWidget->AddToViewport();
+}
+
+void ACPlayerController::OnUnPossess()
+{
 }
 
 void ACPlayerController::OnMove(const FInputActionValue& InputActionValue)
@@ -107,6 +130,20 @@ void ACPlayerController::OnMouseL(const FInputActionValue& InputActionValue)
 	player->OnMouseL();
 }
 
+void ACPlayerController::OnMouseR(const FInputActionValue& InputActionValue)
+{
+	ACPlayer* player = Cast<ACPlayer>(GetPawn());
+	if (!player) return;
+	player->OnMouseR();
+}
+
+void ACPlayerController::OffMouseR(const FInputActionValue& InputActionValue)
+{
+	ACPlayer* player = Cast<ACPlayer>(GetPawn());
+	if (!player) return;
+	player->OffMouseR();
+}
+
 void ACPlayerController::OnNum1(const FInputActionValue& InputActionValue)
 {
 	ACPlayer* player = Cast<ACPlayer>(GetPawn());
@@ -119,4 +156,18 @@ void ACPlayerController::OnNum2(const FInputActionValue& InputActionValue)
 	ACPlayer* player = Cast<ACPlayer>(GetPawn());
 	if (!player) return;
 	player->OnNum2();
+}
+
+void ACPlayerController::OnNum3(const FInputActionValue& InputActionValue)
+{
+	ACPlayer* player = Cast<ACPlayer>(GetPawn());
+	if (!player) return;
+	player->OnNum3();
+}
+
+void ACPlayerController::OnG(const FInputActionValue& InputActionValue)
+{
+	ACPlayer* player = Cast<ACPlayer>(GetPawn());
+	if (!player) return;
+	player->Parkour();
 }

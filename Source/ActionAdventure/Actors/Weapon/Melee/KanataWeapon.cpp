@@ -5,5 +5,5 @@
 
 AKanataWeapon::AKanataWeapon()
 {
-	KeyValue = TEXT("Kanata");
+	KeyValue = TEXT("Katana");
 }

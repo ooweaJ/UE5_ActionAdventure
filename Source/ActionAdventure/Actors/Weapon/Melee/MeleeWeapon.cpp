@@ -2,7 +2,6 @@
 #include "GameFramework/Character.h"
 #include "Engine.h"
 #include "AIController.h"
-#include "Engine/DamageEvents.h"
 
 #include "Actors/Weapon/Attachment.h"
 #include "Components/ActionComponent.h"
@@ -53,7 +52,7 @@ void AMeleeWeapon::OnAttachmentEndOverlap(ACharacter* InAttacker, AActor* InCaus
 	Super::OnAttachmentEndOverlap(InAttacker, InCauser, InOtherCharacter);
 }
 
-void AMeleeWeapon::Attack()
+void AMeleeWeapon::MouseL()
 {
 	if (!(DefaultData->ActionDatas.Num() > 0)) return;
 

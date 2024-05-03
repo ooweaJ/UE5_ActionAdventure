@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "Actors/Weapon/DamageType/WeaponDamageType.h"
+#include "Data/Item/ItemData.h"
 #include "ActionDataTableRow.generated.h"
 
 USTRUCT(BlueprintType)
@@ -65,15 +66,4 @@ struct ACTIONADVENTURE_API FActionDataTableRow : public FTableRowBase
 public:
 	UPROPERTY(EditAnywhere)
 	TArray<FActionData> ActionDatas;
-};
-
-
-USTRUCT(BlueprintType)
-struct ACTIONADVENTURE_API FWeaponDataTableRow : public FTableRowBase
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AWeapon> WeaponClass;
 };

@@ -42,10 +42,11 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void PlayKnockBack();
-
+	float PlayKnockBack();
+	float PlayGetting();
+	float PlayVault();
 private:
-	void PlayAnimMontage(FName Key);
+	float PlayAnimMontage(FName Key);
 
 private:
 	UDataTable* DataTable;

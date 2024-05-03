@@ -15,7 +15,7 @@ void UComboNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSeque
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;
-	Cast<AMeleeWeapon>(Equip->GetCurrentWeapon())->OnCanCombo();
+	Cast<AMeleeWeapon>(Equip->GetCurrentItem())->OnCanCombo();
 }
 
 void UComboNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -25,5 +25,5 @@ void UComboNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenc
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;	
-	Cast<AMeleeWeapon>(Equip->GetCurrentWeapon())->OffCanCombo();
+	Cast<AMeleeWeapon>(Equip->GetCurrentItem())->OffCanCombo();
 }

@@ -30,6 +30,8 @@ EBTNodeResult::Type UTask_Action::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 
 void UTask_Action::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
 	AAIController* controller = Cast<AAIController>(OwnerComp.GetOwner());
 
 	AAICharacter* aiPawn = Cast<AAICharacter>(controller->GetPawn());
