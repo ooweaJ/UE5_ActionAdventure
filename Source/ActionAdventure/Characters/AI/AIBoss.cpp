@@ -1,31 +1,61 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Characters/AI/AIBoss.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "PaperSpriteComponent.h"
 
-// Sets default values
+#include "Characters/CAnimInstance.h"
+#include "Characters/Controller/CAIController.h"
+#include "Components/StatusComponent.h"
+#include "Components/StateComponent.h"
+#include "Components/MoveComponent.h"
+#include "Components/EquipComponent.h"
+#include "Components/MontagesComponent.h"
+
 AAIBoss::AAIBoss()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+
+	{
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonAurora/Characters/Heroes/Aurora/Skins/GlacialEmpress/Meshes/Aurora_GlacialEmpress.Aurora_GlacialEmpress'"));
+		if (Asset.Succeeded())
+		{
+			USkeletalMeshComponent* mesh = GetMesh();
+			mesh->SetRelativeLocation(FVector(0, 0, -88));
+			mesh->SetRelativeRotation(FRotator(0, -90, 0));
+			mesh->SetSkeletalMesh(Asset.Object);
+		}
+	}
+
+
+	{
+		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
+		StateComponent = CreateDefaultSubobject<UStateComponent>("StateComponent");
+		MoveComponent = CreateDefaultSubobject<UMoveComponent>("MoveComponent");
+		ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComponent");
+		EquipComponent = CreateDefaultSubobject<UEquipComponent>("Equip");
+		MontagesComponent = CreateDefaultSubobject<UMontagesComponent>("Montage");
+		PaperComponent = CreateDefaultSubobject<UPaperSpriteComponent>("Paper");
+	}
 }
 
-// Called when the game starts or when spawned
 void AAIBoss::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void AAIBoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called to bind functionality to input
 void AAIBoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
