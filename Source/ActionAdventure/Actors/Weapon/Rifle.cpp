@@ -155,6 +155,7 @@ void ARifle::fire(FVector start, FVector end)
 
 	TArray<FActionData> Datas = DefaultData->ActionDatas;
 	OwnerCharacter->PlayAnimMontage(Datas[0].AnimMontage, Datas[0].PlayRate, Datas[0].StartSection);
+	OwnerCharacter->AddControllerPitchInput(CurrentPitch);
 
 	UKismetSystemLibrary::K2_SetTimer(this, "EndAction", 0.15f, false);
 	if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), start, end, objectTypes, true, ignore, EDrawDebugTrace::None, hitResult, true))
@@ -181,8 +182,6 @@ void ARifle::fire(FVector start, FVector end)
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, hitResult.Location, decalRotator, true);
 		}
 	}
-
-	OwnerCharacter->AddControllerPitchInput(CurrentPitch);
 }
 
 void ARifle::AIfire(FVector start, FVector end)
