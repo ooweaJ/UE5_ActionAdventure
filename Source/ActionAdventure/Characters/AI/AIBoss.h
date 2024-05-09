@@ -20,6 +20,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void SetMoveDirection(const FVector Direction);
+
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -42,4 +44,7 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly)
 	class UMontagesComponent* MontagesComponent;
+
+private:
+	FVector MovingDirection;
 };

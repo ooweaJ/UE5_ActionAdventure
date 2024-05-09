@@ -9,6 +9,7 @@
 #include "Components/MoveComponent.h"
 #include "Components/EquipComponent.h"
 #include "Components/MontagesComponent.h"
+#include "Engine.h"
 
 AAIBoss::AAIBoss()
 {
@@ -19,7 +20,8 @@ AAIBoss::AAIBoss()
 	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->SetWalkableFloorAngle(60.f);
 
 	{
 		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonAurora/Characters/Heroes/Aurora/Skins/GlacialEmpress/Meshes/Aurora_GlacialEmpress.Aurora_GlacialEmpress'"));
@@ -53,12 +55,25 @@ void AAIBoss::BeginPlay()
 void AAIBoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (StatusComponent->IsCanMove())
+	{
+		if (MovingDirection != FVector::ZeroVector)
+		{
+			AddMovementInput(MovingDirection);
+		}
+	}
 }
 
 void AAIBoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AAIBoss::SetMoveDirection(const FVector Direction)
+{
+	FVector CurrentPosition = GetActorLocation();
+
+	MovingDirection = (Direction - CurrentPosition).GetSafeNormal();
 }
 

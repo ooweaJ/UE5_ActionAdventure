@@ -15,7 +15,6 @@ public:
 public:
 	void SetLoactionKey(FVector InLoaction);
 	void SetTargetKey(class ACharacter* InCharacter);
-	void MoveToLocation(const FVector Destination);
 
 public:
 	FORCEINLINE	void SetAttackRange(float Range) { AttackRange = Range; }
@@ -51,4 +50,5 @@ private:
 	class UBlackboardData* BBAsset;
 
 	float AttackRange = 100.f;
+	FVector Destination;
 };

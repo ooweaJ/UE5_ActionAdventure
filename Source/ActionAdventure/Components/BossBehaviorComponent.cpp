@@ -29,4 +29,3 @@ ACharacter* UBossBehaviorComponent::GetTarget()
 		return character;
 	return nullptr;
 }
-

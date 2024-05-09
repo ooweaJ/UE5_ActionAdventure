@@ -7,7 +7,7 @@
 UENUM(BlueprintType)
 enum class EBossType : uint8
 {
-	Strafe, Avoid, Melee, 
+	Strafe, Avoid, Melee, Range,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -28,15 +28,6 @@ public:
 	FORCEINLINE void SetBlackBoard(class UBlackboardComponent* InBlackboard) { Blackboard = InBlackboard; }
 	class ACharacter* GetTarget();
 	FVector GetLocation();
-
-	void SetWaitMode();
-	void SetApproachMode();
-	void SetActionMode();
-	void SetPatrolMode();
-	void SetHittedMode();
-	void SetKnockBackMode();
-	void SetEquipMode();
-
 
 private:
 	void ChangeType(EBossType InType);

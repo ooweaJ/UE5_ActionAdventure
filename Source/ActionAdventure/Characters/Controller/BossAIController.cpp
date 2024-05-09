@@ -37,29 +37,18 @@ void ABossAIController::SetTargetKey(ACharacter* InCharacter)
 	Blackboard->SetValueAsObject("Target", InCharacter);
 }
 
-void ABossAIController::MoveToLocation(const FVector Destination)
-{
-	FVector Direction = (Destination - GetPawn()->GetActorLocation()).GetSafeNormal();
-
-	FVector MovementInput = FVector(Direction.X, Direction.Y, 0.0f);
-
-	GetPawn()->AddMovementInput(MovementInput);
-}
-
 void ABossAIController::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	Blackboard->SetValueAsObject("Target", UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-
+	SetLoactionKey(FVector::ZeroVector);
 	
 }
 
 void ABossAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	FVector location = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation();
-	MoveToLocation(location);
 }
 
 void ABossAIController::OnPossess(APawn* InPawn)
