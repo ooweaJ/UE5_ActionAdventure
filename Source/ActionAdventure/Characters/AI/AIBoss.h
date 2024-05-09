@@ -21,6 +21,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetMoveDirection(const FVector Direction);
+	void SetMoveDirection(const AActor* Actor);
 
 public:
 	UPROPERTY(VisibleDefaultsOnly)
@@ -45,6 +46,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UMontagesComponent* MontagesComponent;
 
-private:
+public:
+	UPROPERTY(BlueprintReadOnly)
 	FVector MovingDirection;
 };

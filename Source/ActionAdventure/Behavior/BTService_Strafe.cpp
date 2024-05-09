@@ -27,26 +27,22 @@ void UBTService_Strafe::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 	ACharacter* Target = behavior->GetTarget();
 
-    float distance = aiPawn->GetDistanceTo(Target);
+	float distance = aiPawn->GetDistanceTo(Target);
 
-    FVector TargetLocation = Target->GetActorLocation();
-    FVector AILocation = aiPawn->GetActorLocation();
+	controller->SetFocus(Target);
 
-    // 타겟을 중심으로 한 방향 벡터 계산
-    FVector DirectionToTarget = (AILocation - TargetLocation).GetSafeNormal();
+	FVector AILocation = aiPawn->GetActorLocation();
+	FVector TargetLocation = Target->GetActorLocation();
 
-    // 각도 계산
-    float YawAngle = FMath::DegreesToRadians(GetWorld()->GetTimeSeconds() * 100.f);
+	// AI가 타겟을 향해 향하는 방향 벡터 계산
+	FVector DirectionToTarget = (TargetLocation - AILocation).GetSafeNormal();
 
-    // 원형으로 이동하는 벡터 계산
-    FVector CircleMovement = FVector(FMath::Cos(YawAngle), FMath::Sin(YawAngle), 0.0f) * distance;
+	// 랜덤한 좌우 이동 벡터 생성
+	float RandomOffset = FMath::RandRange(-1.0f, 1.0f); // -1에서 1 사이의 랜덤 값
+	FVector RandomDirection = FVector(DirectionToTarget.Y + RandomOffset, -DirectionToTarget.X, 0.0f);
 
-    // 타겟 중심으로 이동하는 벡터에 회전 벡터를 더하여 이동 방향 설정
-    FVector MoveDirection = (DirectionToTarget * distance) + CircleMovement;
+	// 이동 방향 설정
+	FVector MoveDirection = RandomDirection.GetSafeNormal();
 
-    // 이동 방향 설정
-    MoveDirection.Normalize();
-
-    GEngine->AddOnScreenDebugMessage(1, 1, FColor::Black, "Hi");
     controller->SetLoactionKey(MoveDirection);
 }

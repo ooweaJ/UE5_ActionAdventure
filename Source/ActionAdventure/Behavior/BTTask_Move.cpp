@@ -37,20 +37,12 @@ EBTNodeResult::Type UBTTask_Move::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 	{
 		if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
 		{
-			UObject* KeyValue = MyBlackboard->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
-			AActor* TargetActor = Cast<AActor>(KeyValue);
-			if (TargetActor)
-			{
-				aiPawn->SetMoveDirection(TargetActor->GetActorLocation());
-				return EBTNodeResult::Succeeded;
-			}
+			return EBTNodeResult::InProgress;
 		}
 
 		else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
 		{
-			const FVector TargetLocation = MyBlackboard->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
-			aiPawn->SetMoveDirection(TargetLocation);
-			return EBTNodeResult::Succeeded;
+			return EBTNodeResult::InProgress;
 		}
 
 	}
@@ -59,5 +51,31 @@ EBTNodeResult::Type UBTTask_Move::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 
 void UBTTask_Move::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	Super::ExecuteTask(OwnerComp, NodeMemory);
 
+	ABossAIController* controller = Cast<ABossAIController>(OwnerComp.GetOwner());
+
+	AAIBoss* aiPawn = Cast<AAIBoss>(controller->GetPawn());
+
+	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
+	if (MyBlackboard)
+	{
+		if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
+		{
+			UObject* KeyValue = MyBlackboard->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
+			AActor* TargetActor = Cast<AActor>(KeyValue);
+			if (TargetActor)
+			{
+				aiPawn->SetMoveDirection(TargetActor);
+			}
+		}
+
+		else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
+		{
+			const FVector TargetLocation = MyBlackboard->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
+			aiPawn->SetMoveDirection(TargetLocation);
+
+		}
+
+	}
 }

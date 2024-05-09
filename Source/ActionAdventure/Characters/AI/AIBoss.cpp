@@ -72,8 +72,11 @@ void AAIBoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AAIBoss::SetMoveDirection(const FVector Direction)
 {
-	FVector CurrentPosition = GetActorLocation();
+	MovingDirection = Direction;
+}
 
-	MovingDirection = (Direction - CurrentPosition).GetSafeNormal();
+void AAIBoss::SetMoveDirection(const AActor* Actor)
+{
+	MovingDirection = (Actor->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 }
 
