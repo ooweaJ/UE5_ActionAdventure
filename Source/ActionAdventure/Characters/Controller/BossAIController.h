@@ -13,6 +13,8 @@ public:
 	ABossAIController();
 
 public:
+	class ACharacter* GetTarget();
+
 	void SetLoactionKey(FVector InLoaction);
 	void SetTargetKey(class ACharacter* InCharacter);
 

@@ -27,6 +27,11 @@ ABossAIController::ABossAIController()
 	}
 }
 
+ACharacter* ABossAIController::GetTarget()
+{
+	return Behavior->GetTarget();
+}
+
 void ABossAIController::SetLoactionKey(FVector InLoaction)
 {
 	Blackboard->SetValueAsVector("Location", InLoaction);

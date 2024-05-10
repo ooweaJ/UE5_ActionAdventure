@@ -22,6 +22,13 @@ public:
 
 	void SetMoveDirection(const FVector Direction);
 	void SetMoveDirection(const AActor* Actor);
+	void DiceAction();
+
+public:
+	FORCEINLINE bool IsRange() { return bRangeAttack; }
+
+private:
+	float GetDistanceToTarget();
 
 public:
 	UPROPERTY(VisibleDefaultsOnly)
@@ -49,4 +56,12 @@ public:
 public:
 	UPROPERTY(BlueprintReadOnly)
 	FVector MovingDirection;
+
+private:
+	class ABossAIController* BossController;
+
+private:
+	bool bRangeAttack = true;
+	float MaxRangeCoolTime = 30.f;
+	float RangeCoolTime = 0.f;
 };

@@ -29,3 +29,20 @@ ACharacter* UBossBehaviorComponent::GetTarget()
 		return character;
 	return nullptr;
 }
+
+FVector UBossBehaviorComponent::GetLocation()
+{
+	return FVector();
+}
+
+void UBossBehaviorComponent::SetAction() { ChangeType(EBossType::Action); }
+void UBossBehaviorComponent::SetApproach() { ChangeType(EBossType::Approach); }
+void UBossBehaviorComponent::SetApproachAction() { ChangeType(EBossType::ApproachAction); }
+void UBossBehaviorComponent::SetStrafe() { ChangeType(EBossType::Strafe); }
+void UBossBehaviorComponent::SetStrafeAction() { ChangeType(EBossType::StrafeAction); }
+void UBossBehaviorComponent::SetHitted() { ChangeType(EBossType::Hitted); }
+
+void UBossBehaviorComponent::ChangeType(EBossType InType)
+{
+	Blackboard->SetValueAsEnum(BehaviorKey, (uint8)InType);
+}

@@ -3,7 +3,7 @@
 #include "PaperSpriteComponent.h"
 
 #include "Characters/CAnimInstance.h"
-#include "Characters/Controller/CAIController.h"
+#include "Characters/Controller/BossAIController.h"
 #include "Components/StatusComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
@@ -34,7 +34,6 @@ AAIBoss::AAIBoss()
 		}
 	}
 
-
 	{
 		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
 		StateComponent = CreateDefaultSubobject<UStateComponent>("StateComponent");
@@ -44,17 +43,32 @@ AAIBoss::AAIBoss()
 		MontagesComponent = CreateDefaultSubobject<UMontagesComponent>("Montage");
 		PaperComponent = CreateDefaultSubobject<UPaperSpriteComponent>("Paper");
 	}
+
+	AIControllerClass = ABossAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void AAIBoss::BeginPlay()
 {
 	Super::BeginPlay();
+	BossController = Cast<ABossAIController>(GetController());
 	
 }
 
 void AAIBoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!bRangeAttack)
+	{
+		RangeCoolTime -= DeltaTime;
+		if (RangeCoolTime <= 0.f)
+		{
+			bRangeAttack = true;
+			RangeCoolTime = 0.f;
+		}
+	}
+
 	if (StatusComponent->IsCanMove())
 	{
 		if (MovingDirection != FVector::ZeroVector)
@@ -78,5 +92,34 @@ void AAIBoss::SetMoveDirection(const FVector Direction)
 void AAIBoss::SetMoveDirection(const AActor* Actor)
 {
 	MovingDirection = (Actor->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+}
+
+void AAIBoss::DiceAction()
+{
+	float Distance = GetDistanceToTarget();
+
+	StateComponent->SetActionMode();
+	StatusComponent->SetStop();
+
+	if (Distance > 900.f)
+	{
+		bRangeAttack = false;
+		RangeCoolTime = MaxRangeCoolTime;
+	}
+	else if (300.f < Distance && Distance < 900.f)
+	{
+		
+	}
+	else
+	{
+		
+	}
+}
+
+float AAIBoss::GetDistanceToTarget()
+{
+	ACharacter* Target = BossController->GetTarget();
+	float Distance = GetDistanceTo(Target);
+	return Distance;
 }
 

@@ -7,7 +7,7 @@
 UENUM(BlueprintType)
 enum class EBossType : uint8
 {
-	Strafe, Avoid, Melee, Range,
+	Action, Approach, ApproachAction, Strafe, StrafeAction, Hitted
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -28,6 +28,13 @@ public:
 	FORCEINLINE void SetBlackBoard(class UBlackboardComponent* InBlackboard) { Blackboard = InBlackboard; }
 	class ACharacter* GetTarget();
 	FVector GetLocation();
+
+	void SetAction();
+	void SetApproach();
+	void SetApproachAction();
+	void SetStrafe();
+	void SetStrafeAction();
+	void SetHitted();
 
 private:
 	void ChangeType(EBossType InType);
