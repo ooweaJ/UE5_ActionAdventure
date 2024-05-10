@@ -1,6 +1,7 @@
 #include "Characters/AI/AIBoss.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PaperSpriteComponent.h"
+#include "Engine.h"
 
 #include "Characters/CAnimInstance.h"
 #include "Characters/Controller/BossAIController.h"
@@ -9,7 +10,7 @@
 #include "Components/MoveComponent.h"
 #include "Components/EquipComponent.h"
 #include "Components/MontagesComponent.h"
-#include "Engine.h"
+#include "Actors/Weapon/BossWeapon.h"
 
 AAIBoss::AAIBoss()
 {
@@ -34,6 +35,7 @@ AAIBoss::AAIBoss()
 		}
 	}
 
+
 	{
 		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
 		StateComponent = CreateDefaultSubobject<UStateComponent>("StateComponent");
@@ -52,7 +54,9 @@ void AAIBoss::BeginPlay()
 {
 	Super::BeginPlay();
 	BossController = Cast<ABossAIController>(GetController());
-	
+	EquipComponent->EquipItem(ABossWeapon::StaticClass());
+	EquipComponent->SelectWeapon(0);
+	Weapon = Cast<ABossWeapon>(EquipComponent->GetCurrentItem());
 }
 
 void AAIBoss::Tick(float DeltaTime)

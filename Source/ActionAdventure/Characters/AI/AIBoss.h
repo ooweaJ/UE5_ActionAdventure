@@ -59,6 +59,7 @@ public:
 
 private:
 	class ABossAIController* BossController;
+	class ABossWeapon* Weapon;
 
 private:
 	bool bRangeAttack = true;

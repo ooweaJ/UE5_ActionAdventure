@@ -26,8 +26,12 @@ void AItem::SetItemData(ACharacter* InOnwerCharacter, const FItemActionData* InD
 		Attachment = Actor;
 		Attachment->AttachToComponent(InOnwerCharacter->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), InData->SocketName);
 	}
+}
 
-	DefaultData = ActionData->Data.GetRow<FActionDataTableRow>(TEXT(""));
+FActionDataTableRow* AItem::FindActionDataRow(const FName& Key)
+{
+	FActionDataTableRow* Data = ActionData->Data->FindRow<FActionDataTableRow>(Key,TEXT(""));
+	return Data;
 }
 
 void AItem::BeginPlay()
@@ -38,7 +42,7 @@ void AItem::BeginPlay()
 	Status = Cast<UStatusComponent>(OwnerCharacter->GetComponentByClass<UStatusComponent>());
 	Action = Cast<UActionComponent>(OwnerCharacter->GetComponentByClass<UActionComponent>());
 	Attachment->OnAttachmentBeginOverlap.AddDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
-
+	DefaultData = FindActionDataRow(TEXT("Default"));
 }
 
 // Called every frame

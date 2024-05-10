@@ -12,8 +12,8 @@ struct ACTIONADVENTURE_API FItemActionData : public FTableRowBase
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, meta = (RowType = "/Script/ACTIONADVENTURE.ActionDataTableRow"))
-	FDataTableRowHandle Data;
+	UPROPERTY(EditAnywhere)
+	UDataTable* Data;
 
 	UPROPERTY(EditAnywhere, category = "Attach")
 	TSubclassOf<class AAttachment> Attachment;
@@ -36,6 +36,7 @@ class ACTIONADVENTURE_API AItem : public AActor
 public:	
 	AItem();
 	void SetItemData(class ACharacter* InOnwerCharacter, const FItemActionData* InData);
+	FActionDataTableRow* FindActionDataRow(const FName& Key);
 
 protected:
 	virtual void BeginPlay() override;
