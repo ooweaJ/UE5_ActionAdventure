@@ -56,6 +56,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FString SpecificCollisionName = "None";
+
+	UPROPERTY(EditAnywhere)
+	bool bCanCombo = false;
 };
 
 USTRUCT(BlueprintType)

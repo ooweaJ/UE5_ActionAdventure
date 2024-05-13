@@ -13,7 +13,7 @@ UBossBehaviorComponent::UBossBehaviorComponent()
 void UBossBehaviorComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SetIdle(true);
 }
 
 void UBossBehaviorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -41,6 +41,11 @@ void UBossBehaviorComponent::SetApproachAction() { ChangeType(EBossType::Approac
 void UBossBehaviorComponent::SetStrafe() { ChangeType(EBossType::Strafe); }
 void UBossBehaviorComponent::SetStrafeAction() { ChangeType(EBossType::StrafeAction); }
 void UBossBehaviorComponent::SetHitted() { ChangeType(EBossType::Hitted); }
+
+void UBossBehaviorComponent::SetIdle(bool InIdle)
+{
+	Blackboard->SetValueAsBool(IdleKey, InIdle);
+}
 
 void UBossBehaviorComponent::ChangeType(EBossType InType)
 {

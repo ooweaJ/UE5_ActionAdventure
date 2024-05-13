@@ -28,7 +28,9 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 
 	float distance = aiPawn->GetDistanceTo(Target);
 
-	if (distance > 900.f)
+	if (!behavior->bCanAction) return;
+
+	if (distance > 400.f)
 	{
 		if (aiPawn->IsRange())
 		{
@@ -41,9 +43,11 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 			return;
 		}
 	}
-	else if(distance > 300.f)
+	else if(distance > 200.f)
 	{
+		// 300 이상이기 때문에 Strafe와 ApproachAction이 사용 가능
 		float RandomValue = FMath::FRand();
+		
 		if (RandomValue <= 0.2f)
 		{
 			if (0.5f < FMath::FRand())
@@ -64,6 +68,11 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 			behavior->SetAction();
 			return;
 		}
+	}
+	else
+	{
+		behavior->SetAction();
+		return;
 	}
 	
 }

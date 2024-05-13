@@ -1,18 +1,20 @@
-#include "Behavior/BTTask_BossAction.h"
+#include "Behavior/BTTask_ApproachAttack.h"
 #include "Characters/Controller/BossAIController.h"
 #include "Characters/AI/AIBoss.h"
 #include "Components/BossBehaviorComponent.h"
 #include "Components/StateComponent.h"
+#include "Components/StatusComponent.h"
 
 #include "GameFrameWork/Character.h"
 
-UBTTask_BossAction::UBTTask_BossAction()
+UBTTask_ApproachAttack::UBTTask_ApproachAttack()
 {
-	NodeName = "BossAction";
+	NodeName = "ApproachAttack";
+
 	bNotifyTick = true;
 }
 
-EBTNodeResult::Type UBTTask_BossAction::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_ApproachAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
@@ -23,17 +25,23 @@ EBTNodeResult::Type UBTTask_BossAction::ExecuteTask(UBehaviorTreeComponent& Owne
 	if (!behavior) return EBTNodeResult::Failed;
 
 	AAIBoss* aiPawn = Cast<AAIBoss>(controller->GetPawn());
-	UStateComponent* state = aiPawn->GetComponentByClass<UStateComponent>();
 
+	UStateComponent* state = aiPawn->GetComponentByClass<UStateComponent>();
 	if (!state->IsIdleMode()) return EBTNodeResult::Failed;
 
+
+	UStatusComponent* status = aiPawn->GetComponentByClass<UStatusComponent>();
+
 	behavior->bCanAction = false;
-	aiPawn->DiceAction();
+
+
+	state->SetApproachMode();
+	status->SetSpeed(EWalkSpeedTpye::Run);
 
 	return EBTNodeResult::InProgress;
 }
 
-void UBTTask_BossAction::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+void UBTTask_ApproachAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
@@ -45,10 +53,20 @@ void UBTTask_BossAction::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	AAIBoss* aiPawn = Cast<AAIBoss>(controller->GetPawn());
 	UStateComponent* state = aiPawn->GetComponentByClass<UStateComponent>();
+	UStatusComponent* status = aiPawn->GetComponentByClass<UStatusComponent>();
+
+	float Distance = aiPawn->GetDistanceToTarget();
+	ACharacter* target = behavior->GetTarget();
+	aiPawn->SetMoveDirection(target);
+	if (Distance < 200.f)
+	{
+		aiPawn->ApproachAction();
+	}
 
 	if (state->IsIdleMode())
 	{
 		behavior->bCanAction = true;
+		status->SetSpeed(EWalkSpeedTpye::Walk);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

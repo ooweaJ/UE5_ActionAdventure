@@ -1,15 +1,21 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTas_BossAttack.generated.h"
+#include "BTTask_ApproachAttack.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class ACTIONADVENTURE_API UBTTas_BossAttack : public UBTTaskNode
+class ACTIONADVENTURE_API UBTTask_ApproachAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
+
 public:
-	UBTTas_BossAttack();
+	UBTTask_ApproachAttack();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 

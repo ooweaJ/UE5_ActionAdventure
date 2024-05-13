@@ -35,15 +35,18 @@ public:
 	void SetStrafe();
 	void SetStrafeAction();
 	void SetHitted();
+	void SetIdle(bool InIdle);
 
 private:
 	void ChangeType(EBossType InType);
 	EBossType GetType();
-
+public:
+	bool bCanAction = true;
 private:
 	UPROPERTY(EditAnywhere) FName BehaviorKey = "Behavior";
 	UPROPERTY(EditAnywhere) FName TargetKey = "Target";
 	UPROPERTY(EditAnywhere) FName LocationKey = "Location";
+	UPROPERTY(EditAnywhere) FName IdleKey = "IsIdle";
 
 private:
 	class UBlackboardComponent* Blackboard;

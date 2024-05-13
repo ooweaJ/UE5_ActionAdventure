@@ -102,22 +102,34 @@ void AAIBoss::DiceAction()
 {
 	float Distance = GetDistanceToTarget();
 
-	StateComponent->SetActionMode();
-	StatusComponent->SetStop();
-
 	if (Distance > 900.f)
 	{
 		bRangeAttack = false;
 		RangeCoolTime = MaxRangeCoolTime;
+		Weapon->RangeAttack();
 	}
 	else if (300.f < Distance && Distance < 900.f)
 	{
-		
+		Weapon->MouseL();
 	}
 	else
 	{
-		
+		float RandomValue = FMath::FRand();
+		if (RandomValue < 0.5f)
+		{
+			Weapon->MouseL();
+		}
+		else
+		{
+			Weapon->FakeAttack();
+		}
 	}
+}
+
+void AAIBoss::ApproachAction()
+{
+	Weapon->Approach();
+
 }
 
 float AAIBoss::GetDistanceToTarget()

@@ -23,12 +23,11 @@ public:
 	void SetMoveDirection(const FVector Direction);
 	void SetMoveDirection(const AActor* Actor);
 	void DiceAction();
+	void ApproachAction();
 
+	float GetDistanceToTarget();
 public:
 	FORCEINLINE bool IsRange() { return bRangeAttack; }
-
-private:
-	float GetDistanceToTarget();
 
 public:
 	UPROPERTY(VisibleDefaultsOnly)
@@ -57,6 +56,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FVector MovingDirection;
 
+	bool ApproachEnd = false;
 private:
 	class ABossAIController* BossController;
 	class ABossWeapon* Weapon;

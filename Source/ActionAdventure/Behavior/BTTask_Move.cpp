@@ -67,6 +67,8 @@ void UBTTask_Move::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 			if (TargetActor)
 			{
 				aiPawn->SetMoveDirection(TargetActor);
+				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+
 			}
 		}
 
@@ -74,6 +76,7 @@ void UBTTask_Move::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 		{
 			const FVector TargetLocation = MyBlackboard->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
 			aiPawn->SetMoveDirection(TargetLocation);
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 
 		}
 
