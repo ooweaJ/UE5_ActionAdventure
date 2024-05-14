@@ -16,7 +16,8 @@ public class ActionAdventure : ModuleRules
 			"EnhancedInput",
 			"AIModule",
 			"GameplayTasks",
-            "Paper2D"
+            "Paper2D",
+            "AnimGraphRuntime"
         });
 		PublicIncludePaths.Add(ModuleDirectory);
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

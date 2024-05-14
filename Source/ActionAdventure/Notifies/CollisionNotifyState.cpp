@@ -11,9 +11,9 @@ FString UCollisionNotifyState::GetNotifyName_Implementation() const
 	return "Collision";
 }
 
-void UCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
+void UCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
-	Super::NotifyBegin(MeshComp, Animation,TotalDuration);
+	Super::NotifyBegin(MeshComp, Animation,TotalDuration, EventReference);
 	if (MeshComp == nullptr) return;
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
@@ -28,9 +28,9 @@ void UCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimS
 		Equip->GetCurrentItem()->GetAttachment()->OnCollisions("");
 }
 
-void UCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	Super::NotifyEnd(MeshComp, Animation);
+	Super::NotifyEnd(MeshComp, Animation, EventReference);
 	if (MeshComp == nullptr) return;
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());

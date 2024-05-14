@@ -14,27 +14,35 @@
 ABossWeapon::ABossWeapon()
 {
 	KeyValue = TEXT("Boss");
+
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/_dev/Characters/Boss/Animation/MotionFake/ready/Ready_Montage.Ready_Montage'"));
+		if (Asset.Succeeded())
+			Fake = Asset.Object;
+	}
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/_dev/Characters/Boss/Animation/MotionFake/ready2/Ready2_Montage.Ready2_Montage'"));
+		if (Asset.Succeeded())
+			Fake2 = Asset.Object;
+	}
 }
 
 void ABossWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+	{
+		ApproachData = FindActionDataRow(TEXT("Approach"));
+		SkillData = FindActionDataRow(TEXT("Skill"));
+		ComboData = FindActionDataRow(TEXT("Finish"));
+		MoveData = FindActionDataRow(TEXT("Move"));
+		FakeData = FindActionDataRow(TEXT("Fake"));
+		Fake2Data = FindActionDataRow(TEXT("Fake2"));
+	}
 
-	ApproachData = FindActionDataRow(TEXT("Approach"));
 	Boss = Cast<AAIBoss>(OwnerCharacter);
 	Behavior = OwnerCharacter->GetController()->GetComponentByClass<UBossBehaviorComponent>();
 
-	// AddComboData
-	{
-		TArray<FActionData> Datas = DefaultData->ActionDatas;
-		for (FActionData Data : Datas)
-		{
-			if (Data.bCanCombo == false)
-			{
-				ComboData.Add(Data);
-			}
-		}
-	}
+
 }
 
 void ABossWeapon::MouseL()
@@ -46,12 +54,31 @@ void ABossWeapon::MouseL()
 	int32 Random = FMath::RandRange(0, Datas.Num() - 1);
 
 	bCombo = Datas[Random].bCanCombo;
-	OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
 	Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
+	PreData = Datas[Random];
+	OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
 }
 
 void ABossWeapon::MouseR()
 {
+
+	Boss->ClearFoucsTarget();
+	if (FakeIndex == 0)
+	{
+		TArray<FActionData> Datas = FakeData->ActionDatas;
+		int32 Random = FMath::RandRange(0, Datas.Num() - 1);
+		bCombo = Datas[Random].bCanCombo;
+		Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
+		OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
+	}
+	else
+	{
+		TArray<FActionData> Datas = Fake2Data->ActionDatas;
+		int32 Random = FMath::RandRange(0, Datas.Num() - 1);
+		bCombo = Datas[Random].bCanCombo;
+		Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
+		OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
+	}
 }
 
 void ABossWeapon::OffMouseR()
@@ -61,49 +88,13 @@ void ABossWeapon::OffMouseR()
 void ABossWeapon::BeginAction()
 {
 	if (!bCombo) return;
-	if (Boss->GetDistanceToTarget() > 400.f) return;
+	if (Boss->GetDistanceToTarget() > 300.f) return;
+	TArray<FActionData> Datas = ComboData->ActionDatas;
 
-	ACharacter* Target = Behavior->GetTarget();
-	FVector TargetLocation = Target->GetActorLocation();
-	FVector SelfLocation = Boss->GetActorLocation();
-
-	FVector TargetDirection = (TargetLocation - SelfLocation).GetSafeNormal();
-
-	FVector ForwardDirection = Boss->GetActorForwardVector();
-
-	// 전방 및 일정 각도 내의 방향을 검사합니다.
-	float AngleThreshold = 35.0f; // 일정 각도
-	float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(TargetDirection, ForwardDirection)));
-	if (Angle <= AngleThreshold)
-	{
-		int32 Random = FMath::RandRange(0, ComboData.Num() - 1);
-		OwnerCharacter->PlayAnimMontage(ComboData[Random].AnimMontage, ComboData[Random].PlayRate, ComboData[Random].StartSection);
-		ComboData[Random].bCanMove ? Status->SetMove() : Status->SetStop();
-	}
-	else
-	{
-		// 액터와 캐릭터 사이의 거리를 계산합니다.
-		float DistanceToTarget = FVector::Distance(SelfLocation, TargetLocation);
-
-		// 회전 각도를 계산합니다.
-		float AngleToTarget = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(GetActorForwardVector(), TargetDirection)));
-
-		// 보간 속도를 조정합니다. 회전 각도에 따라서 보간 속도가 변경됩니다.
-		float MinInterpSpeed = 1.0f; // 최소 보간 속도
-		float MaxInterpSpeed = 10.0f; // 최대 보간 속도
-		float MaxAngle = 90.0f; // 최대 회전 각도
-		float InterpSpeed = FMath::Lerp(MinInterpSpeed, MaxInterpSpeed, FMath::Clamp(AngleToTarget / MaxAngle, 0.0f, 1.0f));
-
-		// 액터를 캐릭터를 향하도록 보간하여 회전합니다.
-		FRotator LookAtRotation = FRotationMatrix::MakeFromX(TargetDirection).Rotator();
-		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), LookAtRotation, GetWorld()->GetDeltaSeconds(), InterpSpeed);
-
-		// 회전합니다.
-		SetActorRotation(NewRotation);
-		int32 Random = FMath::RandRange(0, ComboData.Num() - 1);
-		OwnerCharacter->PlayAnimMontage(ComboData[Random].AnimMontage, ComboData[Random].PlayRate, ComboData[Random].StartSection);
-		ComboData[Random].bCanMove ? Status->SetMove() : Status->SetStop();
-	}
+	int32 Random = FMath::RandRange(0, Datas.Num() - 1);
+	Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
+	PreData = Datas[Random];
+	OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
 }
 
 void ABossWeapon::EndAction()
@@ -128,6 +119,40 @@ void ABossWeapon::Approach()
 
 void ABossWeapon::FakeAttack()
 {
+	if (!State->IsIdleMode()) return;
+	State->SetActionMode();
+	Boss->FoucsTarget();
+
+	int RandomValue = FMath::RandRange(0, 1);
+	int RandomValue2 = FMath::RandRange(0, 2);
+	LoopMax = RandomValue2;
+
+	if (RandomValue == 0)
+	{
+		PreLoop = Fake;
+		FakeIndex = 0;
+		OwnerCharacter->PlayAnimMontage(Fake);
+	}
+	else
+	{
+		PreLoop = Fake2;
+		FakeIndex = 1;
+		OwnerCharacter->PlayAnimMontage(Fake2);
+	}
+}
+
+void ABossWeapon::MoveAttack()
+{
+	if (State->IsActionMode() || State->IsHittedMode()) return;
+	State->SetActionMode();
+
+
+	TArray<FActionData> Datas = MoveData->ActionDatas;
+
+	int32 Random = FMath::RandRange(0, Datas.Num() - 1);
+
+	OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
+	Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
 }
 
 void ABossWeapon::RangeAttack()
@@ -136,8 +161,32 @@ void ABossWeapon::RangeAttack()
 	State->SetActionMode();
 
 
-	TArray<FActionData> Datas = DefaultData->ActionDatas;
+	TArray<FActionData> Datas = SkillData->ActionDatas;
 
-	OwnerCharacter->PlayAnimMontage(Datas[0].AnimMontage, Datas[0].PlayRate, Datas[0].StartSection);
+	OwnerCharacter->PlayAnimMontage(Datas[0].AnimMontage, Datas[0].PlayRate);
 	Datas[0].bCanMove ? Status->SetMove() : Status->SetStop();
+}
+
+void ABossWeapon::TargetDotAction()
+{
+	Boss->StopMontage(PreData.AnimMontage);
+}
+
+void ABossWeapon::StrafeAttack()
+{
+	
+}
+
+void ABossWeapon::LoopMotion()
+{
+	if (LoopIndex == LoopMax)
+	{
+		LoopPower = LoopIndex;
+		LoopIndex = 0;
+		return;
+	}
+	LoopIndex++;
+
+	OwnerCharacter->StopAnimMontage();
+	OwnerCharacter->PlayAnimMontage(PreLoop, 1.f, "Loop");
 }

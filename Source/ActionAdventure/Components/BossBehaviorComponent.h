@@ -7,7 +7,7 @@
 UENUM(BlueprintType)
 enum class EBossType : uint8
 {
-	Action, Approach, ApproachAction, Strafe, StrafeAction, Hitted
+	Action, Approach, ApproachAction, Strafe, StrafeAction, Hitted, Avoid
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -35,6 +35,7 @@ public:
 	void SetStrafe();
 	void SetStrafeAction();
 	void SetHitted();
+	void SetAvoid();
 	void SetIdle(bool InIdle);
 
 private:

@@ -26,12 +26,31 @@ public:
 
 	void Approach();
 	void FakeAttack();
-
+	void MoveAttack();
 	void RangeAttack();
+	void TargetDotAction();
+	void StrafeAttack();
+
+	void LoopMotion();
 protected:
 	FActionDataTableRow* ApproachData;
-	TArray<FActionData> ComboData;
-	bool bCombo;
+	FActionDataTableRow* SkillData;
+	FActionDataTableRow* ComboData;
+	FActionDataTableRow* MoveData;
+	FActionDataTableRow* FakeData;
+	FActionDataTableRow* Fake2Data;
+	FActionData PreData;
+
 	class AAIBoss* Boss;
 	class UBossBehaviorComponent* Behavior;
+
+	class UAnimMontage* Fake;
+	class UAnimMontage* Fake2;
+	class UAnimMontage* PreLoop;
+
+	int32 LoopIndex = 0;
+	int32 LoopPower = 0;
+	int32 LoopMax = 0;
+	int32 FakeIndex = 0;
+	bool bCombo;
 };

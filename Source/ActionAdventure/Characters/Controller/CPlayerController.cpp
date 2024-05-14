@@ -56,15 +56,16 @@ void ACPlayerController::OnPossess(APawn* aPawn)
 
 	Super::OnPossess(aPawn);
 
-	LoadClass<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_PlayerMain.UI_PlayerMain_C'"),
+	LoadClass<UClass>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_PlayerMain.UI_PlayerMain_C'"),
 		nullptr, LOAD_None, nullptr);
-	UClass* WidgetClass = FindObject<UClass>(ANY_PACKAGE, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_PlayerMain.UI_PlayerMain_C'"));
+	UClass* WidgetClass = FindObject<UClass>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_PlayerMain.UI_PlayerMain_C'"));
 	MainWidget = CreateWidget<UPlayerMainWidget>(GetWorld(), WidgetClass);
 	MainWidget->AddToViewport();
 }
 
 void ACPlayerController::OnUnPossess()
 {
+	
 }
 
 void ACPlayerController::OnMove(const FInputActionValue& InputActionValue)

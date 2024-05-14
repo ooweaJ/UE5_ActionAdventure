@@ -8,9 +8,9 @@ FString UComboNotifyState::GetNotifyName_Implementation() const
 	return "Combo";
 }
 
-void UComboNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
+void UComboNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
-	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
+	Super::NotifyBegin(MeshComp, Animation, TotalDuration,EventReference);
 	if (MeshComp == nullptr) return;
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
@@ -18,9 +18,9 @@ void UComboNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSeque
 	Cast<AMeleeWeapon>(Equip->GetCurrentItem())->OnCanCombo();
 }
 
-void UComboNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UComboNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	Super::NotifyEnd(MeshComp, Animation);
+	Super::NotifyEnd(MeshComp, Animation,EventReference);
 	if (MeshComp == nullptr) return;
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());

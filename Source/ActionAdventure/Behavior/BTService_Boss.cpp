@@ -30,7 +30,7 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 
 	if (!behavior->bCanAction) return;
 
-	if (distance > 400.f)
+	if (distance > 600.f)
 	{
 		if (aiPawn->IsRange())
 		{
@@ -43,25 +43,40 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 			return;
 		}
 	}
-	else if(distance > 200.f)
+	
+	FVector AILocation = aiPawn->GetActorLocation();
+	FVector TargetLocation = Target->GetActorLocation();
+	FVector DirectionToTarget = (TargetLocation - AILocation).GetSafeNormal();
+	FVector AIForwardVector = aiPawn->GetActorForwardVector();
+
+	float DotProduct = FVector::DotProduct(DirectionToTarget, AIForwardVector);
+	if (DotProduct > 0.5)
 	{
-		// 300 이상이기 때문에 Strafe와 ApproachAction이 사용 가능
-		float RandomValue = FMath::FRand();
-		
-		if (RandomValue <= 0.2f)
+		if (distance > 200.f)
 		{
-			if (0.5f < FMath::FRand())
+			// 300 이상이기 때문에 Strafe와 ApproachAction이 사용 가능
+			float RandomValue = FMath::FRand();
+
+			if (RandomValue <= 0.2f)
 			{
-				behavior->SetStrafe();
+				if (0.5f < FMath::FRand())
+				{
+					behavior->SetStrafe();
+					return;
+				}
+				behavior->SetStrafeAction();
 				return;
 			}
-			behavior->SetStrafeAction();
-			return;
-		}
-		else if (RandomValue > 0.2f && RandomValue <= 0.6f)
-		{
-			behavior->SetApproachAction();
-			return;
+			else if (RandomValue > 0.2f && RandomValue <= 0.6f)
+			{
+				behavior->SetApproachAction();
+				return;
+			}
+			else
+			{
+				behavior->SetAction();
+				return;
+			}
 		}
 		else
 		{
@@ -71,8 +86,10 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	}
 	else
 	{
-		behavior->SetAction();
+		behavior->SetAvoid();
 		return;
 	}
+
+	
 	
 }
