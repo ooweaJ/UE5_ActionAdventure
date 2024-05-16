@@ -35,6 +35,16 @@ FVector UBossBehaviorComponent::GetLocation()
 	return FVector();
 }
 
+bool UBossBehaviorComponent::IsStrafe()
+{
+	return GetType() == EBossType::Strafe;
+}
+
+bool UBossBehaviorComponent::IsStrafeAction()
+{
+	return GetType() == EBossType::StrafeAction;
+}
+
 void UBossBehaviorComponent::SetAction() { ChangeType(EBossType::Action); }
 void UBossBehaviorComponent::SetApproach() { ChangeType(EBossType::Approach); }
 void UBossBehaviorComponent::SetApproachAction() { ChangeType(EBossType::ApproachAction); }
@@ -47,4 +57,9 @@ void UBossBehaviorComponent::SetIdle(bool InIdle) { Blackboard->SetValueAsBool(I
 void UBossBehaviorComponent::ChangeType(EBossType InType)
 {
 	Blackboard->SetValueAsEnum(BehaviorKey, (uint8)InType);
+}
+
+EBossType UBossBehaviorComponent::GetType()
+{
+	return (EBossType)Blackboard->GetValueAsEnum(BehaviorKey);
 }

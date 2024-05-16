@@ -24,10 +24,15 @@ public:
 	void SetMoveDirection(const AActor* Actor);
 	void DiceAction();
 	void ApproachAction();
+	void Avoid();
+	void AvoidTarget();
+	void MoveAlongPath(TArray<FVector> PathPoints, int32 CurrentPointIndex);
+	void StrafeAttack();
 
 	float GetDistanceToTarget();
 public:
 	FORCEINLINE bool IsRange() { return bRangeAttack; }
+	FORCEINLINE bool IsAvoid() { return bAvoid; }
 
 	void RotateToTarget();
 	bool IsTargetInFront();
@@ -61,6 +66,7 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly)
 	class UMontagesComponent* MontagesComponent;
+	class UAnimMontage* CastMontage;
 
 	class UBossBehaviorComponent* Behavior;
 public:
@@ -69,6 +75,8 @@ public:
 
 	bool ApproachEnd = false;
 	bool bTargetRotation = false;
+
+	int32 StrafeAttackConunt = 3;
 private:
 	class ABossAIController* BossController;
 	class ABossWeapon* Weapon;
@@ -78,9 +86,14 @@ private:
 	float MaxRangeCoolTime = 30.f;
 	float RangeCoolTime = 0.f;
 
+	bool bAvoid = true;
+	float MaxAvoidCollTime = 8.f;
+	float AvoidCollTime = 0.f;
+
 private:
 	FVector TargetLocation;
 
 	FTimerHandle TimerHandle;
+
 
 };

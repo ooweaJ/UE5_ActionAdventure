@@ -51,6 +51,11 @@ float UMontagesComponent::PlayVault()
 	return PlayAnimMontage("Vault");
 }
 
+void UMontagesComponent::PlayBossAvoid()
+{
+	PlayAnimMontage("BossAvoid");
+}
+
 float UMontagesComponent::PlayAnimMontage(FName Key)
 {
 	ACharacter* character = Cast<ACharacter>(GetOwner());
@@ -64,7 +69,6 @@ float UMontagesComponent::PlayAnimMontage(FName Key)
 	character->StopAnimMontage();
 	state->ChangeType(data->Type);
 	data->bCanMove ? status->SetMove() : status->SetStop();
-	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Black, "hi");
 	return character->PlayAnimMontage(data->AnimMontage, data->PlayRate, data->StartSection);
 }
 

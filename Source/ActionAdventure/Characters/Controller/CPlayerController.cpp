@@ -44,7 +44,7 @@ void ACPlayerController::SetupInputComponent()
 			EnhancedInputComponent->BindAction(InPutDataConfig->Num1, ETriggerEvent::Started, this, &ThisClass::OnNum1);
 			EnhancedInputComponent->BindAction(InPutDataConfig->Num2, ETriggerEvent::Started, this, &ThisClass::OnNum2);
 			EnhancedInputComponent->BindAction(InPutDataConfig->Num3, ETriggerEvent::Started, this, &ThisClass::OnNum3);
-			EnhancedInputComponent->BindAction(InPutDataConfig->G, ETriggerEvent::Started, this, &ThisClass::OnG);
+			EnhancedInputComponent->BindAction(InPutDataConfig->T, ETriggerEvent::Started, this, &ThisClass::OnT);
 		}
 	}
 }
@@ -171,4 +171,11 @@ void ACPlayerController::OnG(const FInputActionValue& InputActionValue)
 	ACPlayer* player = Cast<ACPlayer>(GetPawn());
 	if (!player) return;
 	player->Parkour();
+}
+
+void ACPlayerController::OnT(const FInputActionValue& InputActionValue)
+{
+	ACPlayer* player = Cast<ACPlayer>(GetPawn());
+	if (!player) return;
+	player->OnT();
 }

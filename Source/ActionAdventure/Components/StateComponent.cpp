@@ -64,6 +64,12 @@ void UStateComponent::SetApproachMode()
 	ChangeType(EStateType::Approach);
 }
 
+void UStateComponent::SetAvoidMode()
+{
+	ChangeType(EStateType::Avoid);
+
+}
+
 void UStateComponent::SetOnOrient()
 {
 	OwnerCharacter->bUseControllerRotationYaw = false;

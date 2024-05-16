@@ -81,12 +81,12 @@ void UBTTask_Strafe::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 
 	if (MotionTime >= 3.f)
 	{
-		behavior->bCanAction = true;
 		action->OffAim();
 		status->SetSpeed(EWalkSpeedTpye::Walk);
 		state->SetOnOrient();
 		controller->ClearFocus(EAIFocusPriority::Gameplay);
-
+		behavior->bCanAction = true;
+		aiPawn->StrafeAttackConunt = 3;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

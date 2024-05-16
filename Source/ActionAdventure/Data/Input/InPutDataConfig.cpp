@@ -70,4 +70,10 @@ UInPutDataConfig::UInPutDataConfig()
 		check(Asset.Succeeded());
 		G = Asset.Object;
 	}
+	{
+		static ConstructorHelpers::FObjectFinder<UInputAction> Asset
+		{ TEXT("/Script/EnhancedInput.InputAction'/Game/_dev/Characters/Players/Input/IA_T.IA_T'") };
+		check(Asset.Succeeded());
+		T = Asset.Object;
+	}
 }

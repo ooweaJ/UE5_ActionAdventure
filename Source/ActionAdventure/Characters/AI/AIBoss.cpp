@@ -4,6 +4,7 @@
 #include "Engine.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Characters/CAnimInstance.h"
 #include "Characters/Controller/BossAIController.h"
@@ -38,6 +39,11 @@ AAIBoss::AAIBoss()
 		}
 	}
 
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/ParagonAurora/Characters/Heroes/Aurora/Animations/Cast_Montage.Cast_Montage'"));
+		if (Asset.Succeeded())
+			CastMontage = Asset.Object;
+	}
 
 	{
 		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
@@ -82,6 +88,17 @@ void AAIBoss::Tick(float DeltaTime)
 		{
 			bRangeAttack = true;
 			RangeCoolTime = 0.f;
+		}
+	}
+
+
+	if (!bAvoid)
+	{
+		AvoidCollTime -= DeltaTime;
+		if (AvoidCollTime <= 0.f)
+		{
+			bAvoid = true;
+			AvoidCollTime = 0.f;
 		}
 	}
 
@@ -155,6 +172,92 @@ void AAIBoss::ApproachAction()
 
 }
 
+void AAIBoss::Avoid()
+{
+	MontagesComponent->PlayBossAvoid();
+}
+
+
+
+
+void AAIBoss::AvoidTarget()
+{
+	ACharacter* Target = BossController->GetTarget();
+	if (!Target) return;
+
+	// 타겟 및 보스 위치 가져오기
+	FVector TargetLocation2 = Target->GetActorLocation();
+	FVector BossLocation = GetActorLocation();
+
+	// 보스가 타겟으로부터 멀어지는 방향 계산
+	FVector AvoidDirection = (BossLocation - TargetLocation2).GetSafeNormal();
+
+	// 멀어지는 방향으로 500 유닛 떨어진 위치 계산
+	FVector EndPos = BossLocation + (AvoidDirection * 600);
+
+	// 발사 속도 계산
+	FVector LaunchVelocity;
+	bool bHaveValidSolution = UGameplayStatics::SuggestProjectileVelocity_CustomArc(GetWorld(), LaunchVelocity, BossLocation, EndPos, 0.f, 0.45f);
+
+	if (bHaveValidSolution)
+	{
+		// 예측 경로 설정
+		FPredictProjectilePathParams Params;
+		Params.StartLocation = BossLocation;
+		Params.LaunchVelocity = LaunchVelocity;
+		Params.ProjectileRadius = 10.f;
+		Params.MaxSimTime = 3.f;
+		Params.bTraceWithCollision = true;
+		Params.ActorsToIgnore.Add(this);
+		Params.DrawDebugType = EDrawDebugTrace::None;
+
+		// 예측 경로 결과
+		FPredictProjectilePathResult Result;
+		UGameplayStatics::PredictProjectilePath(GetWorld(), Params, Result);
+
+		// 경로 데이터 저장
+		TArray<FVector> PathPoints;
+		for (const FPredictProjectilePathPointData& PointData : Result.PathData)
+		{
+			PathPoints.Add(PointData.Location);
+	
+		}
+
+		// 타이머를 사용하여 보스의 위치를 업데이트
+		if (PathPoints.Num() > 0)
+		{
+			GetWorldTimerManager().SetTimerForNextTick([this, PathPoints]() {
+				MoveAlongPath(PathPoints, 0);
+				});
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No valid solution for projectile velocity."));
+	}
+}
+
+void AAIBoss::MoveAlongPath(TArray<FVector> PathPoints, int32 CurrentPointIndex)
+{
+	if (CurrentPointIndex < PathPoints.Num())
+	{
+		SetActorLocation(PathPoints[CurrentPointIndex], true);
+
+		GetWorldTimerManager().SetTimerForNextTick([this, PathPoints, CurrentPointIndex]() {
+			MoveAlongPath(PathPoints, CurrentPointIndex + 1);
+			});
+	}
+}
+
+void AAIBoss::StrafeAttack()
+{
+	if (!StateComponent->IsIdleMode()) return;
+	if (StrafeAttackConunt == 0) return;
+	--StrafeAttackConunt;
+	StateComponent->SetActionMode();
+	PlayAnimMontage(CastMontage);
+}
+
 float AAIBoss::GetDistanceToTarget()
 {
 	ACharacter* Target = BossController->GetTarget();
@@ -226,7 +329,7 @@ void AAIBoss::RotateToTarget()
 	FQuat CurrentQuat = CurrentRotation.Quaternion();
 	FQuat TargetQuat = FRotator(CurrentRotation.Pitch, TargetRotation.Yaw, CurrentRotation.Roll).Quaternion();
 
-	FQuat NewQuat = FMath::QInterpTo(CurrentQuat, TargetQuat, GetWorld()->GetDeltaSeconds(), 16.f);
+	FQuat NewQuat = FMath::QInterpTo(CurrentQuat, TargetQuat, GetWorld()->GetDeltaSeconds(), 8.f);
 
 	FRotator NewRotation = NewQuat.Rotator();
 	SetActorRotation(NewRotation);

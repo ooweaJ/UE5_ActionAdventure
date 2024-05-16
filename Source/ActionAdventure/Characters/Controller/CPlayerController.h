@@ -38,6 +38,7 @@ protected:
 	void OnNum2(const FInputActionValue& InputActionValue);
 	void OnNum3(const FInputActionValue& InputActionValue);
 	void OnG(const FInputActionValue& InputActionValue);
+	void OnT(const FInputActionValue& InputActionValue);
 
 
 public:

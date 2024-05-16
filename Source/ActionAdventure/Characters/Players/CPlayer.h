@@ -51,6 +51,7 @@ public:
 	void OnNum2();
 	void OnNum3();
 	void Parkour();
+	void OnT();
 
 	void OnAim();
 	void OffAim();

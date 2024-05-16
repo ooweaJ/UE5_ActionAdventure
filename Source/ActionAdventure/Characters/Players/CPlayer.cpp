@@ -169,6 +169,38 @@ void ACPlayer::Parkour()
 
 }
 
+void ACPlayer::OnT()
+{
+	FHitResult OutHit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this); // 자신의 캐릭터를 무시할 수 있도록 설정합니다.
+
+	bool bHit = GetWorld()->SweepSingleByObjectType(
+		OutHit,
+		GetActorLocation(),
+		GetActorLocation() + GetActorForwardVector() * 100.f, // 예시로 캐릭터의 전방으로 100 단위만큼 레이를 발사합니다.
+		FQuat::Identity,
+		FCollisionObjectQueryParams::AllDynamicObjects, // 모든 동적 객체를 대상으로 쿼리를 수행합니다.
+		FCollisionShape::MakeSphere(50.f), // 반지름 50의 구체 형태의 스피어 트레이스를 수행합니다.
+		Params
+	);
+
+	if (bHit)
+	{
+		// 충돌한 액터의 정보를 확인합니다.
+		AActor* HitActor = OutHit.GetActor();
+		if (HitActor && HitActor->IsA(APawn::StaticClass()))
+		{
+			// 충돌한 액터가 폰일 경우 처리합니다.
+			APawn* HitPawn = Cast<APawn>(HitActor);
+			if (HitPawn)
+			{
+				// 폰에 대한 추가적인 처리를 수행합니다.
+			}
+		}
+	}
+}
+
 void ACPlayer::OnAim()
 {
 	SpringArm->TargetArmLength = 0.f;

@@ -163,8 +163,8 @@ void ABossWeapon::RangeAttack()
 
 	TArray<FActionData> Datas = SkillData->ActionDatas;
 
-	OwnerCharacter->PlayAnimMontage(Datas[0].AnimMontage, Datas[0].PlayRate);
 	Datas[0].bCanMove ? Status->SetMove() : Status->SetStop();
+	OwnerCharacter->PlayAnimMontage(Datas[0].AnimMontage, Datas[0].PlayRate);
 }
 
 void ABossWeapon::TargetDotAction()

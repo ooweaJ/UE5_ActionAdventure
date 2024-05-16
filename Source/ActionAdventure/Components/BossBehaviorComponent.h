@@ -29,6 +29,9 @@ public:
 	class ACharacter* GetTarget();
 	FVector GetLocation();
 
+	bool IsStrafe();
+	bool IsStrafeAction();
+
 	void SetAction();
 	void SetApproach();
 	void SetApproachAction();
