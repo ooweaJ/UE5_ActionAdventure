@@ -21,7 +21,7 @@ void UANS_MoveToTarget::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSeque
                 // Calculate direction from AI to target
                 FVector DirectionToTarget = (TargetPawn->GetActorLocation() - OwnerCharacter->GetActorLocation()).GetSafeNormal();
                 // Calculate offset target location in front of the target
-                TargetLocationOffset = TargetPawn->GetActorLocation() - DirectionToTarget * 100.0f;
+                TargetLocationOffset = TargetPawn->GetActorLocation() - DirectionToTarget * 50.0f;
 
                 StartLocation = OwnerCharacter->GetActorLocation();
                 MoveDuration = TotalDuration;

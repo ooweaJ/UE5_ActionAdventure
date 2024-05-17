@@ -22,6 +22,7 @@ void AItem::SetItemData(ACharacter* InOnwerCharacter, const FItemActionData* InD
 	{
 		FTransform DefaultTransform;
 		AAttachment* Actor = InOnwerCharacter->GetWorld()->SpawnActorDeferred<AAttachment>(InData->Attachment, DefaultTransform, InOnwerCharacter, InOnwerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		Actor->SetOwnerCharacter(InOnwerCharacter);
 		Actor->FinishSpawning(DefaultTransform, true);
 		Attachment = Actor;
 		Attachment->AttachToComponent(InOnwerCharacter->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), InData->SocketName);

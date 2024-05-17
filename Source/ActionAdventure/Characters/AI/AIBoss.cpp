@@ -319,6 +319,11 @@ void AAIBoss::ResumeMontage(UAnimMontage* InMontage)
 	}
 }
 
+ABossAIController* AAIBoss::GetBossController()
+{
+	return BossController;
+}
+
 void AAIBoss::RotateToTarget()
 {
 	FVector AILocation = GetActorLocation();

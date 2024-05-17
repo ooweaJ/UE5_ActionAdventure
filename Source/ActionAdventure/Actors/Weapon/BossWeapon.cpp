@@ -10,6 +10,8 @@
 #include "Components/BossBehaviorComponent.h"
 #include "Actors/Weapon/DamageType/WeaponDamageType.h"
 #include "Characters/AI/AIBoss.h"
+#include "Characters/Controller/BossAIController.h"
+#include "Actors/Weapon/BossProJectile.h"
 
 ABossWeapon::ABossWeapon()
 {
@@ -24,6 +26,11 @@ ABossWeapon::ABossWeapon()
 		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/_dev/Characters/Boss/Animation/MotionFake/ready2/Ready2_Montage.Ready2_Montage'"));
 		if (Asset.Succeeded())
 			Fake2 = Asset.Object;
+	}
+	{
+		ConstructorHelpers::FClassFinder<ABossProJectile> Class(TEXT("/Script/Engine.Blueprint'/Game/_dev/Actors/Weapon/BossSpawn.BossSpawn_C'"));
+		if (Class.Succeeded())
+			Projectile = Class.Class;
 	}
 }
 
@@ -45,8 +52,41 @@ void ABossWeapon::BeginPlay()
 
 }
 
+void ABossWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
+{
+	//Effect
+	UParticleSystem* hitEffect = PreData.Effect;
+	if (!!hitEffect)
+	{
+		FTransform transform = PreData.EffectTransform;
+		transform.AddToTranslation(InOtherCharacter->GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitEffect, transform);
+	}
+
+	FDamageEvent de;
+	de.DamageTypeClass = PreData.DamageType;
+	InOtherCharacter->TakeDamage(PreData.Power, de, InAttacker->GetController(), InCauser);
+
+	if (!Cast<APlayerController>(InAttacker->GetController())) return;
+
+	//Camera Shake
+	TSubclassOf<UCameraShakeBase> shake = PreData.ShakeClass;
+	if (!!shake)
+	{
+		APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		controller->PlayerCameraManager->StartCameraShake(shake);
+	}
+
+}
+
+void ABossWeapon::OnAttachmentEndOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
+{
+
+}
+
 void ABossWeapon::MouseL()
 {
+	// 보스기본 공격
 	if (!State->IsIdleMode()) return;
 	State->SetActionMode();
 
@@ -54,30 +94,31 @@ void ABossWeapon::MouseL()
 	int32 Random = FMath::RandRange(0, Datas.Num() - 1);
 
 	bCombo = Datas[Random].bCanCombo;
-	Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
-	PreData = Datas[Random];
-	OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
+
+	MontageData(Datas[Random]);
 }
 
 void ABossWeapon::MouseR()
 {
+	// 보스의 페이크 공격 2종류
 
 	Boss->ClearFoucsTarget();
+
 	if (FakeIndex == 0)
 	{
 		TArray<FActionData> Datas = FakeData->ActionDatas;
 		int32 Random = FMath::RandRange(0, Datas.Num() - 1);
+
 		bCombo = Datas[Random].bCanCombo;
-		Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
-		OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
+		MontageData(Datas[Random]);
 	}
 	else
 	{
 		TArray<FActionData> Datas = Fake2Data->ActionDatas;
 		int32 Random = FMath::RandRange(0, Datas.Num() - 1);
+
 		bCombo = Datas[Random].bCanCombo;
-		Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
-		OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
+		MontageData(Datas[Random]);
 	}
 }
 
@@ -89,18 +130,16 @@ void ABossWeapon::BeginAction()
 {
 	if (!bCombo) return;
 	if (Boss->GetDistanceToTarget() > 300.f) return;
-	TArray<FActionData> Datas = ComboData->ActionDatas;
 
+	TArray<FActionData> Datas = ComboData->ActionDatas;
 	int32 Random = FMath::RandRange(0, Datas.Num() - 1);
-	Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
-	PreData = Datas[Random];
-	OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
+
+	MontageData(Datas[Random]);
 }
 
 void ABossWeapon::EndAction()
 {
 	Super::EndAction();
-	UBossBehaviorComponent* behavior = OwnerCharacter->GetController()->GetComponentByClass<UBossBehaviorComponent>();
 }
 
 void ABossWeapon::Approach()
@@ -108,13 +147,10 @@ void ABossWeapon::Approach()
 	if (State->IsActionMode() || State->IsHittedMode()) return;
 	State->SetActionMode();
 
-
 	TArray<FActionData> Datas = ApproachData->ActionDatas;
-
 	int32 Random = FMath::RandRange(0, Datas.Num() - 1);
 
-	OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
-	Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
+	MontageData(Datas[Random]);
 }
 
 void ABossWeapon::FakeAttack()
@@ -146,13 +182,10 @@ void ABossWeapon::MoveAttack()
 	if (State->IsActionMode() || State->IsHittedMode()) return;
 	State->SetActionMode();
 
-
 	TArray<FActionData> Datas = MoveData->ActionDatas;
-
 	int32 Random = FMath::RandRange(0, Datas.Num() - 1);
 
-	OwnerCharacter->PlayAnimMontage(Datas[Random].AnimMontage, Datas[Random].PlayRate, Datas[Random].StartSection);
-	Datas[Random].bCanMove ? Status->SetMove() : Status->SetStop();
+	MontageData(Datas[Random]);
 }
 
 void ABossWeapon::RangeAttack()
@@ -163,8 +196,7 @@ void ABossWeapon::RangeAttack()
 
 	TArray<FActionData> Datas = SkillData->ActionDatas;
 
-	Datas[0].bCanMove ? Status->SetMove() : Status->SetStop();
-	OwnerCharacter->PlayAnimMontage(Datas[0].AnimMontage, Datas[0].PlayRate);
+	MontageData(Datas[0]);
 }
 
 void ABossWeapon::TargetDotAction()
@@ -174,7 +206,12 @@ void ABossWeapon::TargetDotAction()
 
 void ABossWeapon::StrafeAttack()
 {
-	
+	FTransform Transform;
+	FVector Location = OwnerCharacter->GetMesh()->GetSocketLocation("Sword_Tip");
+	Transform.SetLocation(Location);
+	ABossProJectile* Actor = OwnerCharacter->GetWorld()->SpawnActorDeferred<ABossProJectile>(Projectile, Transform, OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	Actor->SetTarget(Boss->GetBossController()->GetTarget());
+	Actor->FinishSpawning(Transform, true);
 }
 
 void ABossWeapon::LoopMotion()

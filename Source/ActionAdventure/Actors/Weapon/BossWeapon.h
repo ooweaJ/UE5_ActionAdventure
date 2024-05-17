@@ -16,6 +16,10 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	virtual void OnAttachmentBeginOverlap(class ACharacter* InAttacker, class AActor* InCauser, class ACharacter* InOtherCharacter) override;
+	virtual void OnAttachmentEndOverlap(class ACharacter* InAttacker, class AActor* InCauser, class ACharacter* InOtherCharacter) override;
+
+public:
 	virtual void MouseL();
 	virtual void MouseR();
 
@@ -39,7 +43,6 @@ protected:
 	FActionDataTableRow* MoveData;
 	FActionDataTableRow* FakeData;
 	FActionDataTableRow* Fake2Data;
-	FActionData PreData;
 
 	class AAIBoss* Boss;
 	class UBossBehaviorComponent* Behavior;
@@ -53,4 +56,6 @@ protected:
 	int32 LoopMax = 0;
 	int32 FakeIndex = 0;
 	bool bCombo;
+
+	TSubclassOf<class ABossProJectile> Projectile;
 };

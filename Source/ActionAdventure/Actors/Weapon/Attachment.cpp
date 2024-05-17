@@ -9,10 +9,15 @@ AAttachment::AAttachment()
 	SetRootComponent(Scene);
 }
 
+void AAttachment::SetOwnerCharacter(ACharacter* InOwnerCharacter)
+{
+	OwnerCharacter = InOwnerCharacter;
+}
+
 void AAttachment::BeginPlay()
 {
 	Super::BeginPlay();
-	OwnerCharacter = Cast<ACharacter>(GetOwner());
+
 	GetComponents<UShapeComponent>(ShapeComponents);
 	for (UShapeComponent* shape : ShapeComponents)
 	{
@@ -76,4 +81,9 @@ void AAttachment::OffCollisions()
 {
 	for (UShapeComponent* shape : ShapeComponents)
 		shape->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AAttachment::AttachToCollision(USceneComponent* InComponent, FName InSocketName)
+{
+	InComponent->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), InSocketName);
 }

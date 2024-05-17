@@ -60,6 +60,8 @@ public:
 	void SetDefault();
 	void SetStore();
 
+private:
+	void FocusTarget();
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -91,4 +93,7 @@ public:
 public:
 	UPROPERTY(BlueprintReadOnly)
 	EInteraction Interaction;
+
+private:
+	AActor* TargetActor;
 };

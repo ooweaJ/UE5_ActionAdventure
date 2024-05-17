@@ -18,14 +18,14 @@ void UCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimS
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;
-	AMeleeWeapon* MeleeWeapon = Cast<AMeleeWeapon>(Equip->GetCurrentItem());
-	if (!!MeleeWeapon)
+	AWeapon* Weapon = Cast<AWeapon>(Equip->GetCurrentItem());
+	if (!!Weapon)
 	{
-		FString collisionName = MeleeWeapon->GetSpecificCollisionName();
+		FString collisionName = Weapon->GetSpecificCollisionName();
 		Equip->GetCurrentItem()->GetAttachment()->OnCollisions(collisionName);
 	}
 	else
-		Equip->GetCurrentItem()->GetAttachment()->OnCollisions("");
+		Equip->GetCurrentItem()->GetAttachment()->OnCollisions();
 }
 
 void UCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)

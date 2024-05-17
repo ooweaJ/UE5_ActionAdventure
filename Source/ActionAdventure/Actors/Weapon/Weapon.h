@@ -13,10 +13,13 @@ class ACTIONADVENTURE_API AWeapon : public AItem
 public:	
 	AWeapon();
 
+	FORCEINLINE FString GetSpecificCollisionName() { return PreData.SpecificCollisionName; }
 protected:
 	virtual void BeginPlay() override;
-
+	void MontageData(const FActionData& InData);
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	FActionData PreData;
 };

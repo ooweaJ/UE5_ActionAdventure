@@ -33,6 +33,8 @@ public:
 public:
 	FORCEINLINE bool IsRange() { return bRangeAttack; }
 	FORCEINLINE bool IsAvoid() { return bAvoid; }
+	
+	class ABossAIController* GetBossController();
 
 	void RotateToTarget();
 	bool IsTargetInFront();

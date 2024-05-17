@@ -16,15 +16,12 @@ class ACTIONADVENTURE_API AAttachment : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AAttachment();
-
+	void SetOwnerCharacter(ACharacter* InOwnerCharacter);
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEquip();
@@ -32,8 +29,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnUnequip();
 
-	void OnCollisions(FString InCollisionName);
+	void OnCollisions(FString InCollisionName = "None");
 	void OffCollisions();
+
+	UFUNCTION(BlueprintCallable)
+	void AttachToCollision(class USceneComponent* InComponent, FName InSocketName);
 private:
 	UFUNCTION()
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
