@@ -1,21 +1,28 @@
 #include "Actors/Weapon/BossProJectile.h"
 #include "Components/SphereComponent.h"
+#include "NiagaraComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Engine.h"
+#include "Actors/Weapon/DamageType/WeaponDamageType.h"
+#include "Engine/DamageEvents.h"
 
 ABossProJectile::ABossProJectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	SetRootComponent(Scene);
 
-	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
-	ThrowParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Throw"));
-	Projectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
+	{
+		Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+		SetRootComponent(Scene);
+		Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+		ThrowParticle = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Throw"));
+		Projectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
+	}
 
 	Sphere->SetupAttachment(Scene);
 	ThrowParticle->SetupAttachment(Sphere);
@@ -25,7 +32,6 @@ ABossProJectile::ABossProJectile()
 	Projectile->ProjectileGravityScale = 0.f;
 	Projectile->bSweepCollision = true;
 
-	InitialLifeSpan = 10.f;
 }
 
 void ABossProJectile::SetTarget(AActor* TargetActor)
@@ -36,6 +42,7 @@ void ABossProJectile::SetTarget(AActor* TargetActor)
 void ABossProJectile::BeginPlay()
 {
 	Super::BeginPlay();
+	InitialLifeSpan = 10.f;
 
 	if (Target)
 	{
@@ -55,19 +62,16 @@ void ABossProJectile::Tick(float DeltaTime)
 	FVector Direction = (TargetLocation - GetActorLocation()).GetSafeNormal();
 	float dotValue = FVector::DotProduct(TargetDirection, Direction);
 	float Distance = GetDistanceTo(Target);
-
+	{
+		FVector NewVelocity = Projectile->Velocity.GetSafeNormal();
+		FRotator NewRotation = NewVelocity.Rotation();
+		SetActorRotation(NewRotation);
+	}
 	if (bReturnToTarget)
 	{
-	/*	if (dotValue > 0.9)
-		{
-			bReturnToTarget = false;
-			Projectile->Velocity = TargetDirection * ProjectileSpeed;
-		}*/
-
 		FVector LookDirection = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation).Vector().GetSafeNormal();
-		FVector ReDirection = UKismetMathLibrary::VInterpTo(GetActorForwardVector(), LookDirection, DeltaTime, 0.1f);
+		FVector ReDirection = UKismetMathLibrary::VInterpTo(Projectile->Velocity.GetSafeNormal(), LookDirection, DeltaTime, 3.f);
 
-		// 프로젝타일을 새로운 방향으로 이동합니다.
 		Projectile->Velocity = ReDirection * ProjectileSpeed;
 	}
 
@@ -86,12 +90,12 @@ void ABossProJectile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCom
 	{
 		if (!!ImpactParticle)
 		{
-			FTransform transform = ImpactParticleTransform;
-			transform.AddToTranslation(SweepResult.Location);
-			transform.SetRotation(FQuat(SweepResult.ImpactNormal.Rotation()));
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, transform);
+			FVector location = Char->GetActorLocation();
+			FRotator Rotation = Projectile->Velocity.GetSafeNormal().Rotation();
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactParticle, location, Rotation);
+			FDamageEvent DamageEvent;
+			Char->TakeDamage(10.f, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
 		}
 	}
-
 }
 

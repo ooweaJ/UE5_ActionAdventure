@@ -5,6 +5,7 @@
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/WidgetComponent.h"
 
 #include "Characters/CAnimInstance.h"
 #include "Characters/Controller/BossAIController.h"
@@ -15,6 +16,7 @@
 #include "Components/MontagesComponent.h"
 #include "Components/BossBehaviorComponent.h"
 #include "Actors/Weapon/BossWeapon.h"
+#include "Actors/BossRange.h"
 
 AAIBoss::AAIBoss()
 {
@@ -37,8 +39,13 @@ AAIBoss::AAIBoss()
 			mesh->SetRelativeRotation(FRotator(0, -90, 0));
 			mesh->SetSkeletalMesh(Asset.Object);
 		}
-	}
 
+	}
+	{
+		ConstructorHelpers::FClassFinder<ABossRange> Class(TEXT("/Script/Engine.Blueprint'/Game/_dev/Actors/Weapon/BP_AttackCircle.BP_AttackCircle_C'"));
+		if (Class.Succeeded())
+			RangeSpawn = Class.Class;
+	}
 	{
 		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/ParagonAurora/Characters/Heroes/Aurora/Animations/Cast_Montage.Cast_Montage'"));
 		if (Asset.Succeeded())
@@ -53,8 +60,10 @@ AAIBoss::AAIBoss()
 		EquipComponent = CreateDefaultSubobject<UEquipComponent>("Equip");
 		MontagesComponent = CreateDefaultSubobject<UMontagesComponent>("Montage");
 		PaperComponent = CreateDefaultSubobject<UPaperSpriteComponent>("Paper");
+		TargetingWidget = CreateDefaultSubobject<UWidgetComponent>("Targeting");
 	}
 
+	TargetingWidget->SetupAttachment(RootComponent);
 	AIControllerClass = ABossAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
@@ -62,6 +71,8 @@ AAIBoss::AAIBoss()
 void AAIBoss::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TargetingWidget->SetVisibility(false);
 	{
 		BossController = Cast<ABossAIController>(GetController());
 		Behavior = BossController->GetComponentByClass<UBossBehaviorComponent>();
@@ -178,8 +189,6 @@ void AAIBoss::Avoid()
 }
 
 
-
-
 void AAIBoss::AvoidTarget()
 {
 	ACharacter* Target = BossController->GetTarget();
@@ -258,6 +267,19 @@ void AAIBoss::StrafeAttack()
 	PlayAnimMontage(CastMontage);
 }
 
+void AAIBoss::RangeAttack()
+{
+	FTransform Transform;
+	Transform.SetLocation(BossController->GetTarget()->GetActorLocation());
+
+	FActorSpawnParameters param;
+	param.Owner = this;
+	param.Instigator = this;
+	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	GetWorld()->SpawnActor<ABossRange>(RangeSpawn, Transform, param);
+}
+
 float AAIBoss::GetDistanceToTarget()
 {
 	ACharacter* Target = BossController->GetTarget();
@@ -289,6 +311,16 @@ void AAIBoss::ClearFoucsTarget()
 	BossController->ClearFocus(EAIFocusPriority::Gameplay);
 }
 
+void AAIBoss::OnTarget()
+{
+	TargetingWidget->SetVisibility(true);
+}
+
+void AAIBoss::OffTarget()
+{
+	TargetingWidget->SetVisibility(false);
+}
+
 void AAIBoss::StopMontage(UAnimMontage* InMontage)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -317,6 +349,19 @@ void AAIBoss::ResumeMontage(UAnimMontage* InMontage)
 		AnimInstance->Montage_SetPlayRate(InMontage, 1.f);
 
 	}
+}
+
+FRotator AAIBoss::GetTargetRotation()
+{
+	ACharacter* Target = BossController->GetTarget();
+	if (!Target) return FRotator();
+
+	FVector targetlocation = Target->GetActorLocation();
+	FVector AILocation = GetActorLocation();
+
+	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(AILocation, targetlocation);
+
+	return TargetRotation;
 }
 
 ABossAIController* AAIBoss::GetBossController()

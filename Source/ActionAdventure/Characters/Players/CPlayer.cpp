@@ -178,6 +178,7 @@ void ACPlayer::OnT()
 {
 	if (TargetActor)
 	{
+		(Cast<AAIBoss>(TargetActor))->OffTarget();
 		TargetActor = nullptr;
 		StateComponent->SetOnOrient();
 		return;
@@ -240,12 +241,14 @@ void ACPlayer::SetStore()
 
 void ACPlayer::FocusTarget()
 {
-	FVector Location = GetActorLocation();
+	FVector Location = Camera->GetComponentLocation();
 	FVector TargetLocation = TargetActor->GetActorLocation();
 	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(Location, TargetLocation);
 
 	FQuat TargetQuat = TargetRotation.Quaternion();
 	FRotator NewRotation = TargetQuat.Rotator();
-	
+
+	(Cast<AAIBoss>(TargetActor))->OnTarget();
+
 	GetController()->SetControlRotation(NewRotation);
 }

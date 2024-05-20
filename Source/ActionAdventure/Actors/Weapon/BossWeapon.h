@@ -32,7 +32,7 @@ public:
 	void FakeAttack();
 	void MoveAttack();
 	void RangeAttack();
-	void TargetDotAction();
+	void SlowAction();
 	void StrafeAttack();
 
 	void LoopMotion();
@@ -46,6 +46,7 @@ protected:
 
 	class AAIBoss* Boss;
 	class UBossBehaviorComponent* Behavior;
+	class UNiagaraSystem* SpawnCast;
 
 	class UAnimMontage* Fake;
 	class UAnimMontage* Fake2;
@@ -58,4 +59,5 @@ protected:
 	bool bCombo;
 
 	TSubclassOf<class ABossProJectile> Projectile;
+
 };

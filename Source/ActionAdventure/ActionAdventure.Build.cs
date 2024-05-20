@@ -17,7 +17,8 @@ public class ActionAdventure : ModuleRules
 			"AIModule",
 			"GameplayTasks",
             "Paper2D",
-            "AnimGraphRuntime"
+            "AnimGraphRuntime",
+            "Niagara"
         });
 		PublicIncludePaths.Add(ModuleDirectory);
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

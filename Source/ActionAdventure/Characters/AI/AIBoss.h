@@ -28,20 +28,25 @@ public:
 	void AvoidTarget();
 	void MoveAlongPath(TArray<FVector> PathPoints, int32 CurrentPointIndex);
 	void StrafeAttack();
+	void RangeAttack();
 
 	float GetDistanceToTarget();
 public:
 	FORCEINLINE bool IsRange() { return bRangeAttack; }
 	FORCEINLINE bool IsAvoid() { return bAvoid; }
+	FRotator GetTargetRotation();
 	
 	class ABossAIController* GetBossController();
 
-	void RotateToTarget();
 	bool IsTargetInFront();
+	void RotateToTarget();
 	void TargetRotation();
 
 	void FoucsTarget();
 	void ClearFoucsTarget();
+	void OnTarget();
+	void OffTarget();
+	
 
 	void StopMontage(class UAnimMontage* InMontage);
 	UFUNCTION()
@@ -68,6 +73,10 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly)
 	class UMontagesComponent* MontagesComponent;
+
+	UPROPERTY(EditAnywhere)
+	class UWidgetComponent* TargetingWidget;
+
 	class UAnimMontage* CastMontage;
 
 	class UBossBehaviorComponent* Behavior;
@@ -97,5 +106,5 @@ private:
 
 	FTimerHandle TimerHandle;
 
-
+	TSubclassOf<class ABossRange> RangeSpawn;
 };

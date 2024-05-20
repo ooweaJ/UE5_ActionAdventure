@@ -24,17 +24,14 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	class UParticleSystem* ImpactParticle;
-
-	UPROPERTY(EditDefaultsOnly)
-	FTransform ImpactParticleTransform;
+	class UNiagaraSystem* ImpactParticle;
 
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 	class USphereComponent* Sphere;
 
-	UPROPERTY(EditAnywhere)
-	class UParticleSystemComponent* ThrowParticle;
+	UPROPERTY(EditDefaultsOnly)
+	class UNiagaraComponent* ThrowParticle;
 
 	UPROPERTY(VisibleDefaultsOnly)
 	class UProjectileMovementComponent* Projectile;

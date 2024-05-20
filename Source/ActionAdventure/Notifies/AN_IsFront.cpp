@@ -5,7 +5,7 @@
 
 FString UAN_IsFront::GetNotifyName_Implementation() const
 {
-	return "IsFront";
+	return "SlowAction";
 }
 
 void UAN_IsFront::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
@@ -19,5 +19,5 @@ void UAN_IsFront::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* An
 	ABossWeapon* Weapon = Cast<ABossWeapon>(Equip->GetCurrentItem());
 	if (Weapon == nullptr) return;
 
-	Weapon->TargetDotAction();
+	Weapon->SlowAction();
 }

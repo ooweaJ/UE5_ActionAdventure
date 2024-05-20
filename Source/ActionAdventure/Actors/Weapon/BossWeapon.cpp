@@ -12,6 +12,9 @@
 #include "Characters/AI/AIBoss.h"
 #include "Characters/Controller/BossAIController.h"
 #include "Actors/Weapon/BossProJectile.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
 
 ABossWeapon::ABossWeapon()
 {
@@ -31,6 +34,11 @@ ABossWeapon::ABossWeapon()
 		ConstructorHelpers::FClassFinder<ABossProJectile> Class(TEXT("/Script/Engine.Blueprint'/Game/_dev/Actors/Weapon/BossSpawn.BossSpawn_C'"));
 		if (Class.Succeeded())
 			Projectile = Class.Class;
+	}
+	{
+		ConstructorHelpers::FObjectFinder<UNiagaraSystem> Asset(TEXT("/Script/Niagara.NiagaraSystem'/Game/sA_Megapack_v1/sA_SkillSet_1/Fx/NiagaraSystems/NS_Cast.NS_Cast'"));
+		if (Asset.Succeeded())
+			SpawnCast = Asset.Object;
 	}
 }
 
@@ -199,7 +207,7 @@ void ABossWeapon::RangeAttack()
 	MontageData(Datas[0]);
 }
 
-void ABossWeapon::TargetDotAction()
+void ABossWeapon::SlowAction()
 {
 	Boss->StopMontage(PreData.AnimMontage);
 }
@@ -207,11 +215,21 @@ void ABossWeapon::TargetDotAction()
 void ABossWeapon::StrafeAttack()
 {
 	FTransform Transform;
-	FVector Location = OwnerCharacter->GetMesh()->GetSocketLocation("Sword_Tip");
+	FVector Location = OwnerCharacter->GetMesh()->GetSocketLocation("Sword_Mid");
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SpawnCast, Location, Boss->GetTargetRotation());
+
 	Transform.SetLocation(Location);
-	ABossProJectile* Actor = OwnerCharacter->GetWorld()->SpawnActorDeferred<ABossProJectile>(Projectile, Transform, OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-	Actor->SetTarget(Boss->GetBossController()->GetTarget());
-	Actor->FinishSpawning(Transform, true);
+	Transform.SetRotation(Boss->GetTargetRotation().Quaternion());
+
+	FTimerHandle TimerHandle;
+	float DelayInSeconds = 1.0f;
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Transform]()
+		{
+			ABossProJectile* Actor = OwnerCharacter->GetWorld()->SpawnActorDeferred<ABossProJectile>(Projectile, Transform, OwnerCharacter, OwnerCharacter, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			Actor->SetTarget(Boss->GetBossController()->GetTarget());
+			Actor->FinishSpawning(Transform, true);
+		}, DelayInSeconds, false);
 }
 
 void ABossWeapon::LoopMotion()
