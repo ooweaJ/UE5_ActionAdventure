@@ -18,7 +18,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	void SetMoveDirection(const FVector Direction);
 	void SetMoveDirection(const AActor* Actor);
@@ -34,6 +34,8 @@ public:
 public:
 	FORCEINLINE bool IsRange() { return bRangeAttack; }
 	FORCEINLINE bool IsAvoid() { return bAvoid; }
+	FORCEINLINE bool IsPage2() { return Page2; }
+
 	FRotator GetTargetRotation();
 	
 	class ABossAIController* GetBossController();
@@ -47,10 +49,13 @@ public:
 	void OnTarget();
 	void OffTarget();
 	
-
 	void StopMontage(class UAnimMontage* InMontage);
+
 	UFUNCTION()
 	void ResumeMontage(class UAnimMontage* InMontage);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Page2Start();
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -91,7 +96,7 @@ public:
 private:
 	class ABossAIController* BossController;
 	class ABossWeapon* Weapon;
-
+	class UUI_UserStatus* BossHPBar;
 private:
 	bool bRangeAttack = true;
 	float MaxRangeCoolTime = 30.f;
@@ -107,4 +112,8 @@ private:
 	FTimerHandle TimerHandle;
 
 	TSubclassOf<class ABossRange> RangeSpawn;
+	class ACharacter* Attacker;
+
+	bool Page2;
+	float Damage;
 };

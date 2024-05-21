@@ -9,6 +9,7 @@
 
 #include "Characters/CAnimInstance.h"
 #include "Characters/Controller/BossAIController.h"
+#include "Characters/Controller/CPlayerController.h"
 #include "Components/StatusComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
@@ -17,6 +18,7 @@
 #include "Components/BossBehaviorComponent.h"
 #include "Actors/Weapon/BossWeapon.h"
 #include "Actors/BossRange.h"
+#include "UI/UI_UserStatus.h"
 
 AAIBoss::AAIBoss()
 {
@@ -82,6 +84,14 @@ void AAIBoss::BeginPlay()
 		EquipComponent->SelectWeapon(0);
 		Weapon = Cast<ABossWeapon>(EquipComponent->GetCurrentItem());
 	}
+	{
+		ACPlayerController* playercon = Cast<ACPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (playercon)
+		{
+			BossHPBar = playercon->MainWidget->GetBossHPBar();
+			BossHPBar->SetHP(StatusComponent->GetHealth(),StatusComponent->GetMaxHealth());
+		}
+	}
 }
 
 void AAIBoss::Tick(float DeltaTime)
@@ -122,10 +132,30 @@ void AAIBoss::Tick(float DeltaTime)
 	}
 }
 
-void AAIBoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+float AAIBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Attacker = Cast<ACharacter>(EventInstigator->GetPawn());
 
+	StatusComponent->DecreaseHealth(Damage);
+	BossHPBar->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+
+	if (StatusComponent->GetHealth() <= 0.f)
+	{
+		if (Page2)
+		{
+			StateComponent->SetDeadMode();
+			return Damage;
+		}
+
+		Page2 = true;
+		Page2Start();
+		StatusComponent->Set2Page();
+		BossHPBar->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+		return Damage;
+	}
+
+	return Damage;
 }
 
 void AAIBoss::SetMoveDirection(const FVector Direction)
@@ -141,39 +171,46 @@ void AAIBoss::SetMoveDirection(const AActor* Actor)
 void AAIBoss::DiceAction()
 {
 	float Distance = GetDistanceToTarget();
-	if (Distance > 900.f)
+
+	if (Page2)
 	{
-		bRangeAttack = false;
-		RangeCoolTime = MaxRangeCoolTime;
-		Weapon->RangeAttack();
-	}
-	else if (300.f < Distance && Distance < 600.f)
-	{
-		float RandomValue = FMath::FRand();
-		if (RandomValue < 0.45f)
+		if (Distance > 900.f)
 		{
-			Weapon->FakeAttack();
+			bRangeAttack = false;
+			RangeCoolTime = MaxRangeCoolTime;
+			Weapon->RangeAttack();
 		}
-		else if(RandomValue < 0.9f && RandomValue >= 0.45f)
+		else if (300.f < Distance && Distance < 600.f)
 		{
-			Weapon->MoveAttack();
+			float RandomValue = FMath::FRand();
+			if (RandomValue < 6.5f)
+			{
+				Weapon->FakeAttack();
+			}
+			else
+			{
+				Weapon->MoveAttack();
+			}
 		}
 		else
 		{
-			Weapon->MouseL();
+			float RandomValue = FMath::FRand();
+			if (RandomValue < 0.5f)
+			{
+				Weapon->MouseL();
+			}
+			else
+			{
+				Weapon->FakeAttack();
+			}
 		}
 	}
 	else
 	{
-		float RandomValue = FMath::FRand();
-		if (RandomValue < 0.4f)
-		{
-			Weapon->MouseL();
-		}
+		if (Distance > 300.f)
+			Weapon->MoveAttack();
 		else
-		{
-			Weapon->FakeAttack();
-		}
+			Weapon->MouseL();
 	}
 }
 

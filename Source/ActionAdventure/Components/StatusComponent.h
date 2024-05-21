@@ -30,6 +30,8 @@ public:
 	FORCEINLINE float GetMaxHealth() { return MaxHealth; }
 	FORCEINLINE float GetHealth() { return Health; }
 
+	void Set2Page();
+
 	void SetMove();
 	void SetStop();
 

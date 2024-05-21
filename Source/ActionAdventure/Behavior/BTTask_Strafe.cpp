@@ -55,6 +55,32 @@ EBTNodeResult::Type UBTTask_Strafe::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	return EBTNodeResult::InProgress;
 }
 
+EBTNodeResult::Type UBTTask_Strafe::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	Super::ExecuteTask(OwnerComp, NodeMemory);
+
+	ABossAIController* controller = Cast<ABossAIController>(OwnerComp.GetOwner());
+	if (!controller) return EBTNodeResult::Failed;
+
+	UBossBehaviorComponent* behavior = controller->GetComponentByClass<UBossBehaviorComponent>();
+	if (!behavior) return EBTNodeResult::Failed;
+
+	AAIBoss* aiPawn = Cast<AAIBoss>(controller->GetPawn());
+
+	UStateComponent* state = aiPawn->GetComponentByClass<UStateComponent>();
+
+	UStatusComponent* status = aiPawn->GetComponentByClass<UStatusComponent>();
+	UActionComponent* action = aiPawn->GetComponentByClass<UActionComponent>();
+
+	ACharacter* Target = behavior->GetTarget();
+	action->OffAim();
+	status->SetSpeed(EWalkSpeedTpye::Walk);
+	state->SetOnOrient();
+	controller->ClearFocus(EAIFocusPriority::Gameplay);
+
+	return EBTNodeResult::Succeeded;
+}
+
 void UBTTask_Strafe::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);

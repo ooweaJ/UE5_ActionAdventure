@@ -30,8 +30,9 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection);
 	virtual void Hitted(TSubclassOf<UDamageType> Type) {}
 	virtual void Dead() {}
@@ -96,4 +97,8 @@ public:
 
 private:
 	AActor* TargetActor;
+
+	class ACharacter* Attacker;
+	class UUI_UserStatus* UserStatus;
+	float Damage;
 };

@@ -12,6 +12,12 @@ void UStatusComponent::BeginPlay()
 	Health = MaxHealth;
 }
 
+void UStatusComponent::Set2Page()
+{
+	MaxHealth = 300.f;
+	Health = MaxHealth;
+}
+
 void UStatusComponent::SetMove()
 {
 	bCanMove = true;

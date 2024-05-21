@@ -18,6 +18,7 @@
 
 #include "Characters/CAnimInstance.h"
 #include "Characters/AI/AIBoss.h"
+#include "Characters/Controller/CPlayerController.h"
 #include "Components/StatusComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
@@ -26,6 +27,7 @@
 
 #include "Actors/Weapon/Weapon.h"
 #include "SubSystem/DataSubsystem.h"
+#include "UI/UI_UserStatus.h"
 
 ACPlayer::ACPlayer()
 {
@@ -89,6 +91,12 @@ void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ACPlayerController* Playercon = Cast<ACPlayerController>(GetController());
+	if (Playercon)
+	{
+		UserStatus = Playercon->MainWidget->GetPlayerStatus();
+		UserStatus->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+	}
 }
 
 void ACPlayer::Tick(float DeltaTime)
@@ -107,6 +115,26 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) 
 	{
 	}
+}
+
+float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Attacker = Cast<ACharacter>(EventInstigator->GetPawn());
+
+	StatusComponent->DecreaseHealth(Damage);
+	UserStatus->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+
+	if (StatusComponent->GetHealth() <= 0.f)
+	{
+		StateComponent->SetDeadMode();
+		Dead();
+		return Damage;
+	}
+
+	Hitted(DamageEvent.DamageTypeClass);
+
+	return Damage;
 }
 
 void ACPlayer::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection)

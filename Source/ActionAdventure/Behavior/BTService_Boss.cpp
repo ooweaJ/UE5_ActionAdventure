@@ -49,17 +49,20 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 
 	if (!behavior->bCanAction) return;
 
-	if (distance > 1000.f)
+	if (aiPawn->IsPage2())
 	{
-		if (aiPawn->IsRange())
+		if (distance > 1000.f)
 		{
-			behavior->SetAction();
-			return;
-		}
-		else
-		{
-			behavior->SetApproach();
-			return;
+			if (aiPawn->IsRange())
+			{
+				behavior->SetAction();
+				return;
+			}
+			else
+			{
+				behavior->SetApproach();
+				return;
+			}
 		}
 	}
 	
@@ -77,32 +80,59 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 			return;
 		}
 
-		else if (distance > 250.f)
+		else if (distance > 350.f)
 		{
-			// 300 이상이기 때문에 Strafe와 ApproachAction이 사용 가능
 			float RandomValue = FMath::FRand();
 
-			if (RandomValue <= 0.2f)
+			if (aiPawn->IsPage2())
 			{
-				if (0.5f < FMath::FRand())
+
+				if (RandomValue <= 0.2f)
+				{
+					if (0.5f < FMath::FRand())
+					{
+						behavior->SetStrafe();
+						return;
+					}
+
+					behavior->SetStrafeAction();
+					return;
+				}
+
+				else if (RandomValue > 0.2f && RandomValue <= 0.6f)
+				{
+					behavior->SetApproachAction();
+					return;
+				}
+
+				else
+				{
+					behavior->SetAction();
+					return;
+				}
+			}
+
+			else
+			{
+				if (RandomValue <= 0.2f)
 				{
 					behavior->SetStrafe();
 					return;
 				}
 
-				behavior->SetStrafeAction();
-				return;
+				else if (RandomValue > 0.2f && RandomValue <= 0.6f)
+				{
+					behavior->SetApproachAction();
+					return;
+				}
+
+				else
+				{
+					behavior->SetAction();
+					return;
+				}
 			}
-			else if (RandomValue > 0.2f && RandomValue <= 0.6f)
-			{
-				behavior->SetApproachAction();
-				return;
-			}
-			else
-			{
-				behavior->SetAction();
-				return;
-			}
+
 		}
 		else
 		{
@@ -115,6 +145,11 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 		if (distance < 500.f)
 		{
 			behavior->SetAvoid();
+			return;
+		}
+		else
+		{
+			behavior->SetApproach();
 			return;
 		}
 	}
