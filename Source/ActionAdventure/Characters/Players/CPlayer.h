@@ -61,6 +61,11 @@ public:
 	void SetDefault();
 	void SetStore();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void BossSkill();
+	UFUNCTION(BlueprintImplementableEvent)
+	void BossSkillEnd();
+
 private:
 	void FocusTarget();
 public:

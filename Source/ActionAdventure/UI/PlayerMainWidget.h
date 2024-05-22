@@ -12,6 +12,8 @@ class ACTIONADVENTURE_API UPlayerMainWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeConstruct() override;
+
 	FORCEINLINE UUI_UserStatus* GetBossHPBar() { return BossHPBar; }
 	FORCEINLINE UUI_UserStatus* GetPlayerStatus() { return UserStatus; }
 

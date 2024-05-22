@@ -15,4 +15,8 @@ public:
 protected:
 	void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
+private:
+	bool bDoOnce = true;
+	bool bDoOnce2 = true;
+
 };

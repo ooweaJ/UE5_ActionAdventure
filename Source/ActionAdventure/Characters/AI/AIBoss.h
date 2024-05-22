@@ -35,6 +35,7 @@ public:
 	FORCEINLINE bool IsRange() { return bRangeAttack; }
 	FORCEINLINE bool IsAvoid() { return bAvoid; }
 	FORCEINLINE bool IsPage2() { return Page2; }
+	FORCEINLINE bool IsLastAttack() { return bLastAttack; }
 
 	FRotator GetTargetRotation();
 	
@@ -48,14 +49,18 @@ public:
 	void ClearFoucsTarget();
 	void OnTarget();
 	void OffTarget();
-	
+	UFUNCTION(BlueprintNativeEvent)
+	void LastAttack();
+	virtual void LastAttack_Implementation();
+
 	void StopMontage(class UAnimMontage* InMontage);
 
 	UFUNCTION()
 	void ResumeMontage(class UAnimMontage* InMontage);
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void Page2Start();
+	virtual void Page2Start_Implementation();
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -83,6 +88,7 @@ public:
 	class UWidgetComponent* TargetingWidget;
 
 	class UAnimMontage* CastMontage;
+	class UAnimMontage* Page2Montage;
 
 	class UBossBehaviorComponent* Behavior;
 public:
@@ -105,6 +111,10 @@ private:
 	bool bAvoid = true;
 	float MaxAvoidCollTime = 8.f;
 	float AvoidCollTime = 0.f;
+
+	bool bLastAttack = false;
+	float MaxLastAttackCollTime = 10.f;
+	float LastAttackdCollTime = 0.f;
 
 private:
 	FVector TargetLocation;

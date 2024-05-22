@@ -53,6 +53,11 @@ AAIBoss::AAIBoss()
 		if (Asset.Succeeded())
 			CastMontage = Asset.Object;
 	}
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/ParagonAurora/Characters/Heroes/Aurora/Animations/Emote_Slice_Montage.Emote_Slice_Montage'"));
+		if (Asset.Succeeded())
+			Page2Montage = Asset.Object;
+	}
 
 	{
 		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
@@ -90,6 +95,7 @@ void AAIBoss::BeginPlay()
 		{
 			BossHPBar = playercon->MainWidget->GetBossHPBar();
 			BossHPBar->SetHP(StatusComponent->GetHealth(),StatusComponent->GetMaxHealth());
+			BossHPBar->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 }
@@ -97,6 +103,21 @@ void AAIBoss::BeginPlay()
 void AAIBoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (Page2)
+	{
+		if (bLastAttack == false)
+		{
+
+			LastAttackdCollTime += DeltaTime;
+
+			if (LastAttackdCollTime >= MaxLastAttackCollTime)
+			{
+				bLastAttack = true;
+			}
+		}
+	}
+
 	if (bTargetRotation)
 	{
 		TargetRotation();
@@ -358,6 +379,48 @@ void AAIBoss::OffTarget()
 	TargetingWidget->SetVisibility(false);
 }
 
+void AAIBoss::LastAttack_Implementation()
+{
+	StateComponent->SetActionMode();
+	// 스피어 트레이스의 시작 위치 설정 (예: 현재 액터의 위치)
+	FVector Start = GetActorLocation();
+
+	// 스피어 트레이스를 끝낼 위치 설정 (예: 앞으로 어느 거리까지)
+	FVector End = Start + (GetActorForwardVector() * 5000.f);
+
+	// 스피어 트레이스에 대한 히트 결과를 저장할 배열
+	TArray<FHitResult> HitResults;
+
+	// 스피어 트레이스 캐스트 실행
+	UKismetSystemLibrary::SphereTraceMulti(
+		this,
+		Start,
+		End,
+		5000.f,
+		UEngineTypes::ConvertToTraceType(ECC_Pawn), // 스피어 트레이스에 사용할 콜리전 채널
+		false, // 단순히 트레이스만 실행할 것인지 여부
+		TArray<AActor*>(), // 무시할 액터 배열
+		EDrawDebugTrace::ForDuration, // 디버그를 위한 옵션
+		HitResults,
+		true // 충돌 여부를 반환할 것인지 여부
+	);
+
+	// 히트 결과 배열을 반복하면서 처리
+	for (const FHitResult& HitResult : HitResults)
+	{
+		// 히트한 액터가 ACPlayer인지 확인
+		if (HitResult.GetActor()->IsA<ACPlayer>())
+		{
+			// ACPlayer 객체를 찾았음
+			ACPlayer* CPlayer = Cast<ACPlayer>(HitResult.GetActor());
+			if (CPlayer)
+			{
+				CPlayer->BossSkill();
+			}
+		}
+	}
+}
+
 void AAIBoss::StopMontage(UAnimMontage* InMontage)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -386,6 +449,13 @@ void AAIBoss::ResumeMontage(UAnimMontage* InMontage)
 		AnimInstance->Montage_SetPlayRate(InMontage, 1.f);
 
 	}
+}
+
+void AAIBoss::Page2Start_Implementation()
+{
+	StateComponent->SetActionMode();
+	StatusComponent->SetStop();
+	PlayAnimMontage(Page2Montage);
 }
 
 FRotator AAIBoss::GetTargetRotation()

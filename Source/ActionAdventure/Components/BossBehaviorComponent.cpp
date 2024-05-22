@@ -53,6 +53,8 @@ void UBossBehaviorComponent::SetStrafeAction() { ChangeType(EBossType::StrafeAct
 void UBossBehaviorComponent::SetHitted() { ChangeType(EBossType::Hitted); }
 void UBossBehaviorComponent::SetAvoid() { ChangeType(EBossType::Avoid); }
 void UBossBehaviorComponent::SetIdle(bool InIdle) { Blackboard->SetValueAsBool(IdleKey, InIdle); }
+void UBossBehaviorComponent::SetPage2(){ChangeType(EBossType::Page2);}
+void UBossBehaviorComponent::SetLastAttack() { ChangeType(EBossType::LastAttack); }
 
 void UBossBehaviorComponent::ChangeType(EBossType InType)
 {

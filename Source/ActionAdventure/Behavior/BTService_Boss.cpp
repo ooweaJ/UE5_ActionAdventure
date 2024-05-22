@@ -27,6 +27,24 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	ACharacter* Target = behavior->GetTarget();
 
 	float distance = aiPawn->GetDistanceTo(Target);
+	if (bDoOnce2)
+	{
+		if (aiPawn->IsLastAttack())
+		{
+			bDoOnce2 = false;
+			behavior->SetLastAttack();
+			return;
+		}
+	}
+	if (bDoOnce)
+	{
+		if (aiPawn->IsPage2())
+		{
+			bDoOnce = false;
+			behavior->SetPage2();
+			return;
+		}
+	}
 
 	if (behavior->IsStrafe())
 	{
