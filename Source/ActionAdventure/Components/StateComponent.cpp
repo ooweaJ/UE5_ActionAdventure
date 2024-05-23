@@ -70,6 +70,11 @@ void UStateComponent::SetAvoidMode()
 
 }
 
+void UStateComponent::SetRollMode()
+{
+	ChangeType(EStateType::Roll);
+}
+
 void UStateComponent::SetOnOrient()
 {
 	OwnerCharacter->bUseControllerRotationYaw = false;

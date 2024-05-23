@@ -57,15 +57,21 @@ public:
 	void OnAim();
 	void OffAim();
 
+	bool IsComBat();
 public:
 	void SetDefault();
 	void SetStore();
+	void OnRoll();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void BossSkill();
-	UFUNCTION(BlueprintImplementableEvent)
+	virtual void BossSkill_Implementation();
+	UFUNCTION(BlueprintNativeEvent)
 	void BossSkillEnd();
+	virtual void BossSkillEnd_Implementation();
 
+	UFUNCTION(BlueprintCallable)
+	void DetachWeapon();
 private:
 	void FocusTarget();
 public:

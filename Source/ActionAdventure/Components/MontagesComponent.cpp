@@ -56,6 +56,11 @@ void UMontagesComponent::PlayBossAvoid()
 	PlayAnimMontage("BossAvoid");
 }
 
+void UMontagesComponent::PlayRoll()
+{
+	PlayAnimMontage("Roll");
+}
+
 float UMontagesComponent::PlayAnimMontage(FName Key)
 {
 	ACharacter* character = Cast<ACharacter>(GetOwner());

@@ -61,6 +61,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void Page2Start();
 	virtual void Page2Start_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+	void OnMainWidget();
+
+	UFUNCTION(BlueprintCallable)
+	void OffMainWidget();
 public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UStatusComponent* StatusComponent;
@@ -103,8 +109,9 @@ private:
 	class ABossAIController* BossController;
 	class ABossWeapon* Weapon;
 	class UUI_UserStatus* BossHPBar;
+	class UPlayerMainWidget* MainWidget;
 private:
-	bool bRangeAttack = true;
+	bool bRangeAttack = false;
 	float MaxRangeCoolTime = 30.f;
 	float RangeCoolTime = 0.f;
 

@@ -26,6 +26,7 @@
 #include "Components/MontagesComponent.h"
 
 #include "Actors/Weapon/Weapon.h"
+#include "Actors/Weapon/Attachment.h"
 #include "SubSystem/DataSubsystem.h"
 #include "UI/UI_UserStatus.h"
 
@@ -208,7 +209,6 @@ void ACPlayer::OnT()
 	{
 		(Cast<AAIBoss>(TargetActor))->OffTarget();
 		TargetActor = nullptr;
-		StateComponent->SetOnOrient();
 		return;
 	}
 
@@ -230,7 +230,6 @@ void ACPlayer::OnT()
 
 	if (bIsHit)
 	{
-		StateComponent->SetOffOrient();
 		for (auto& Hit : HitResults)
 		{
 			AActor* HitActor = Hit.GetActor();
@@ -257,6 +256,11 @@ void ACPlayer::OffAim()
 	Camera->SetRelativeLocation(FVector(-20, 0, 20));
 }
 
+bool ACPlayer::IsComBat()
+{
+	return EquipComponent->HasWeapon();
+}
+
 void ACPlayer::SetDefault()
 {
 	Interaction = EInteraction::Default;
@@ -265,6 +269,36 @@ void ACPlayer::SetDefault()
 void ACPlayer::SetStore()
 {
 	Interaction = EInteraction::Store;
+}
+
+void ACPlayer::OnRoll()
+{
+	if (!StateComponent->IsIdleMode()) return;
+
+	FVector Velocity = GetVelocity(); 
+
+	if (!Velocity.IsNearlyZero()) 
+	{
+		FRotator TargetRotation = Velocity.Rotation(); 
+		SetActorRotation(TargetRotation); 
+	}
+	MontagesComponent->PlayRoll();
+}
+
+void ACPlayer::BossSkill_Implementation()
+{
+	DetachWeapon();
+}
+
+void ACPlayer::BossSkillEnd_Implementation()
+{
+}
+
+void ACPlayer::DetachWeapon()
+{
+	AItem* Item = EquipComponent->GetCurrentItem();
+	Item->Attachment->OnDetach();
+	Item->Attachment->DetachRootComponentFromParent();
 }
 
 void ACPlayer::FocusTarget()

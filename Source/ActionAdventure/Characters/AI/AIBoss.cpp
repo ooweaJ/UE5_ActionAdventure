@@ -19,6 +19,7 @@
 #include "Actors/Weapon/BossWeapon.h"
 #include "Actors/BossRange.h"
 #include "UI/UI_UserStatus.h"
+#include "UI/PlayerMainWidget.h"
 
 AAIBoss::AAIBoss()
 {
@@ -93,6 +94,7 @@ void AAIBoss::BeginPlay()
 		ACPlayerController* playercon = Cast<ACPlayerController>(GetWorld()->GetFirstPlayerController());
 		if (playercon)
 		{
+			MainWidget = playercon->MainWidget;
 			BossHPBar = playercon->MainWidget->GetBossHPBar();
 			BossHPBar->SetHP(StatusComponent->GetHealth(),StatusComponent->GetMaxHealth());
 			BossHPBar->SetVisibility(ESlateVisibility::Visible);
@@ -114,6 +116,7 @@ void AAIBoss::Tick(float DeltaTime)
 			if (LastAttackdCollTime >= MaxLastAttackCollTime)
 			{
 				bLastAttack = true;
+				LastAttack();
 			}
 		}
 	}
@@ -123,15 +126,15 @@ void AAIBoss::Tick(float DeltaTime)
 		TargetRotation();
 	}
 
-	if (!bRangeAttack)
-	{
-		RangeCoolTime -= DeltaTime;
-		if (RangeCoolTime <= 0.f)
-		{
-			bRangeAttack = true;
-			RangeCoolTime = 0.f;
-		}
-	}
+	//if (!bRangeAttack)
+	//{
+	//	RangeCoolTime -= DeltaTime;
+	//	if (RangeCoolTime <= 0.f)
+	//	{
+	//		bRangeAttack = true;
+	//		RangeCoolTime = 0.f;
+	//	}
+	//}
 
 
 	if (!bAvoid)
@@ -382,27 +385,24 @@ void AAIBoss::OffTarget()
 void AAIBoss::LastAttack_Implementation()
 {
 	StateComponent->SetActionMode();
-	// 스피어 트레이스의 시작 위치 설정 (예: 현재 액터의 위치)
+
 	FVector Start = GetActorLocation();
-
-	// 스피어 트레이스를 끝낼 위치 설정 (예: 앞으로 어느 거리까지)
 	FVector End = Start + (GetActorForwardVector() * 5000.f);
+	FVector SetPlayer = Start + (GetActorForwardVector() * 300.f);
 
-	// 스피어 트레이스에 대한 히트 결과를 저장할 배열
 	TArray<FHitResult> HitResults;
 
-	// 스피어 트레이스 캐스트 실행
 	UKismetSystemLibrary::SphereTraceMulti(
 		this,
 		Start,
 		End,
-		5000.f,
-		UEngineTypes::ConvertToTraceType(ECC_Pawn), // 스피어 트레이스에 사용할 콜리전 채널
-		false, // 단순히 트레이스만 실행할 것인지 여부
-		TArray<AActor*>(), // 무시할 액터 배열
-		EDrawDebugTrace::ForDuration, // 디버그를 위한 옵션
+		5000.f,                                                                                                     
+		UEngineTypes::ConvertToTraceType(ECC_Pawn), 
+		false, 
+		TArray<AActor*>(), 
+		EDrawDebugTrace::None, 
 		HitResults,
-		true // 충돌 여부를 반환할 것인지 여부
+		true 
 	);
 
 	// 히트 결과 배열을 반복하면서 처리
@@ -415,6 +415,8 @@ void AAIBoss::LastAttack_Implementation()
 			ACPlayer* CPlayer = Cast<ACPlayer>(HitResult.GetActor());
 			if (CPlayer)
 			{
+				CPlayer->SetActorLocation(SetPlayer);
+				CPlayer->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(SetPlayer, Start));
 				CPlayer->BossSkill();
 			}
 		}
@@ -456,6 +458,16 @@ void AAIBoss::Page2Start_Implementation()
 	StateComponent->SetActionMode();
 	StatusComponent->SetStop();
 	PlayAnimMontage(Page2Montage);
+}
+
+void AAIBoss::OnMainWidget()
+{
+	MainWidget->SetVisibility(ESlateVisibility::Visible);
+}
+
+void AAIBoss::OffMainWidget()
+{
+	MainWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 FRotator AAIBoss::GetTargetRotation()

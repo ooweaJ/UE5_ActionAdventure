@@ -3,6 +3,7 @@
 #include "Characters/AI/AIBoss.h"
 #include "Components/BossBehaviorComponent.h"
 #include "Components/StateComponent.h"
+#include "Components/StatusComponent.h"
 
 #include "GameFrameWork/Character.h"
 
@@ -24,10 +25,12 @@ EBTNodeResult::Type UBTTask_LastAttack::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	AAIBoss* aiPawn = Cast<AAIBoss>(controller->GetPawn());
 	UStateComponent* state = aiPawn->GetComponentByClass<UStateComponent>();
+	UStatusComponent* status = aiPawn->GetComponentByClass<UStatusComponent>();
 
+
+	status->SetStop();
+	state->SetActionMode();
 	behavior->bCanAction = false;
-
-	aiPawn->LastAttack();
 
 	return EBTNodeResult::InProgress;
 }
@@ -45,9 +48,9 @@ void UBTTask_LastAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	AAIBoss* aiPawn = Cast<AAIBoss>(controller->GetPawn());
 	UStateComponent* state = aiPawn->GetComponentByClass<UStateComponent>();
 
-	if (state->IsIdleMode())
-	{
-		behavior->bCanAction = true;
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
+	//if (state->IsIdleMode())
+	//{
+	//	behavior->bCanAction = true;
+	//	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	//}
 }

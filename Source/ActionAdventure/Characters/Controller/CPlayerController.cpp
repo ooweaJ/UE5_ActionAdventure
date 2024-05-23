@@ -114,7 +114,10 @@ void ACPlayerController::OnJump(const FInputActionValue& InputActionValue)
 {
 	ACPlayer* player = Cast<ACPlayer>(GetPawn());
 	if (!player) return;
-	player->Jump();
+	if (player->IsComBat())
+		player->OnRoll();
+	else
+		player->Jump();
 }
 
 void ACPlayerController::OffJump(const FInputActionValue& InputActionValue)

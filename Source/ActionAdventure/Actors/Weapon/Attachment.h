@@ -29,6 +29,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnUnequip();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDetach();
+
 	void OnCollisions(FString InCollisionName = "None");
 	void OffCollisions();
 

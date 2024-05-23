@@ -14,6 +14,7 @@ UBTService_Boss::UBTService_Boss()
 void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
+	if (!bDoOnce2) return;
 
 	ABossAIController* controller = Cast<ABossAIController>(OwnerComp.GetOwner());
 	if (!controller) return;

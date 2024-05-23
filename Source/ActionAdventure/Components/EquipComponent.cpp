@@ -43,6 +43,11 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+bool UEquipComponent::HasWeapon()
+{
+	return CurrentItem != DefaultWeapon;
+}
+
 void UEquipComponent::WeaponL()
 {
 	if(CurrentItem != nullptr)

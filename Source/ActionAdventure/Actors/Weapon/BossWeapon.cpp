@@ -62,6 +62,9 @@ void ABossWeapon::BeginPlay()
 
 void ABossWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
 {
+	UStateComponent* state = InOtherCharacter->GetComponentByClass<UStateComponent>();
+	if (state->IsRollMode()) return;
+
 	//Effect
 	UParticleSystem* hitEffect = PreData.Effect;
 	if (!!hitEffect)
@@ -71,6 +74,7 @@ void ABossWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCau
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitEffect, transform);
 	}
 
+	
 	FDamageEvent de;
 	de.DamageTypeClass = PreData.DamageType;
 	InOtherCharacter->TakeDamage(PreData.Power, de, InAttacker->GetController(), InCauser);
