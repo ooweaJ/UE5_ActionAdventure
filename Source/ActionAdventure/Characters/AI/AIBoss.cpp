@@ -16,6 +16,7 @@
 #include "Components/EquipComponent.h"
 #include "Components/MontagesComponent.h"
 #include "Components/BossBehaviorComponent.h"
+#include "Components/DissolveComponent.h"
 #include "Actors/Weapon/BossWeapon.h"
 #include "Actors/BossRange.h"
 #include "UI/UI_UserStatus.h"
@@ -69,6 +70,7 @@ AAIBoss::AAIBoss()
 		MontagesComponent = CreateDefaultSubobject<UMontagesComponent>("Montage");
 		PaperComponent = CreateDefaultSubobject<UPaperSpriteComponent>("Paper");
 		TargetingWidget = CreateDefaultSubobject<UWidgetComponent>("Targeting");
+		DissolveComponent = CreateDefaultSubobject<UDissolveComponent>("Dessolve");
 	}
 
 	TargetingWidget->SetupAttachment(RootComponent);
@@ -79,7 +81,7 @@ AAIBoss::AAIBoss()
 void AAIBoss::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	TargetingWidget->SetVisibility(false);
 	{
 		BossController = Cast<ABossAIController>(GetController());
@@ -96,6 +98,7 @@ void AAIBoss::BeginPlay()
 		{
 			MainWidget = playercon->MainWidget;
 			BossHPBar = playercon->MainWidget->GetBossHPBar();
+			BossSkillBar = playercon->MainWidget->GetBossSkillBar();
 			BossHPBar->SetHP(StatusComponent->GetHealth(),StatusComponent->GetMaxHealth());
 			BossHPBar->SetVisibility(ESlateVisibility::Visible);
 		}
@@ -112,7 +115,7 @@ void AAIBoss::Tick(float DeltaTime)
 		{
 
 			LastAttackdCollTime += DeltaTime;
-
+			BossSkillBar->SetHP(LastAttackdCollTime, MaxLastAttackCollTime);
 			if (LastAttackdCollTime >= MaxLastAttackCollTime)
 			{
 				bLastAttack = true;
@@ -126,15 +129,15 @@ void AAIBoss::Tick(float DeltaTime)
 		TargetRotation();
 	}
 
-	//if (!bRangeAttack)
-	//{
-	//	RangeCoolTime -= DeltaTime;
-	//	if (RangeCoolTime <= 0.f)
-	//	{
-	//		bRangeAttack = true;
-	//		RangeCoolTime = 0.f;
-	//	}
-	//}
+	if (!bRangeAttack)
+	{
+		RangeCoolTime -= DeltaTime;
+		if (RangeCoolTime <= 0.f)
+		{
+			bRangeAttack = true;
+			RangeCoolTime = 0.f;
+		}
+	}
 
 
 	if (!bAvoid)
@@ -168,6 +171,8 @@ float AAIBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	{
 		if (Page2)
 		{
+			StatusComponent->SetStop();
+			StopAnimMontage();
 			StateComponent->SetDeadMode();
 			return Damage;
 		}
@@ -176,6 +181,8 @@ float AAIBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		Page2Start();
 		StatusComponent->Set2Page();
 		BossHPBar->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+		BossSkillBar->SetVisibility(ESlateVisibility::Visible);
+		BossSkillBar->SetHP(LastAttackdCollTime, MaxLastAttackCollTime);
 		return Damage;
 	}
 
@@ -341,6 +348,16 @@ void AAIBoss::RangeAttack()
 	GetWorld()->SpawnActor<ABossRange>(RangeSpawn, Transform, param);
 }
 
+
+void AAIBoss::Dead_Implementation()
+{
+}
+
+void AAIBoss::DeadDissolve()
+{
+	DissolveComponent->Play();
+}
+
 float AAIBoss::GetDistanceToTarget()
 {
 	ACharacter* Target = BossController->GetTarget();
@@ -387,39 +404,14 @@ void AAIBoss::LastAttack_Implementation()
 	StateComponent->SetActionMode();
 
 	FVector Start = GetActorLocation();
-	FVector End = Start + (GetActorForwardVector() * 5000.f);
 	FVector SetPlayer = Start + (GetActorForwardVector() * 300.f);
-
-	TArray<FHitResult> HitResults;
-
-	UKismetSystemLibrary::SphereTraceMulti(
-		this,
-		Start,
-		End,
-		5000.f,                                                                                                     
-		UEngineTypes::ConvertToTraceType(ECC_Pawn), 
-		false, 
-		TArray<AActor*>(), 
-		EDrawDebugTrace::None, 
-		HitResults,
-		true 
-	);
-
-	// 히트 결과 배열을 반복하면서 처리
-	for (const FHitResult& HitResult : HitResults)
+	ACPlayer* CPlayer = Cast<ACPlayer>(BossController->GetTarget());
+	if (CPlayer)
 	{
-		// 히트한 액터가 ACPlayer인지 확인
-		if (HitResult.GetActor()->IsA<ACPlayer>())
-		{
-			// ACPlayer 객체를 찾았음
-			ACPlayer* CPlayer = Cast<ACPlayer>(HitResult.GetActor());
-			if (CPlayer)
-			{
-				CPlayer->SetActorLocation(SetPlayer);
-				CPlayer->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(SetPlayer, Start));
-				CPlayer->BossSkill();
-			}
-		}
+		Player = CPlayer;
+		CPlayer->SetActorLocation(SetPlayer);
+		CPlayer->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(SetPlayer, Start));
+		CPlayer->BossSkill();
 	}
 }
 

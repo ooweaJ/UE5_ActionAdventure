@@ -27,5 +27,4 @@ private:
 	bool bCanCombo;
 	bool bSucceed;
 
-	TArray<class ACharacter*> HittedCharacters;
 };

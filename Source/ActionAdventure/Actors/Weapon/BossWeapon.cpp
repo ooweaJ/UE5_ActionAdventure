@@ -57,11 +57,16 @@ void ABossWeapon::BeginPlay()
 	Boss = Cast<AAIBoss>(OwnerCharacter);
 	Behavior = OwnerCharacter->GetController()->GetComponentByClass<UBossBehaviorComponent>();
 
-
 }
 
 void ABossWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCauser, ACharacter* InOtherCharacter)
 {
+
+	int32 hittedCharactersNum = HittedCharacters.Num();
+	HittedCharacters.AddUnique(InOtherCharacter);
+
+	if (hittedCharactersNum >= HittedCharacters.Num()) return;
+
 	UStateComponent* state = InOtherCharacter->GetComponentByClass<UStateComponent>();
 	if (state->IsRollMode()) return;
 

@@ -15,6 +15,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Characters/CAnimInstance.h"
 #include "Characters/AI/AIBoss.h"
@@ -50,7 +51,18 @@ ACPlayer::ACPlayer()
 		mesh->SetRelativeLocation(FVector(0, 0, -88));
 		mesh->SetRelativeRotation(FRotator(0, -90, 0));
 	}
-
+	{
+		ConstructorHelpers::FObjectFinder<UCurveFloat> Asset(TEXT("/Script/Engine.CurveFloat'/Game/_dev/CameraLerp.CameraLerp'"));
+		if (Asset.Succeeded())
+			Curve = Asset.Object;
+	}
+	{
+		ConstructorHelpers::FClassFinder<UUserWidget> Class(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_Dead.UI_Dead_C'"));
+		if (Class.Succeeded())
+		{
+			DeadClass = Class.Class;
+		}
+	}
 	// Create ActorComponents
 	{
 		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
@@ -92,6 +104,12 @@ void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	{
+		TimelineFloat.BindUFunction(this, "Zooming");
+		Timeline.AddInterpFloat(Curve, TimelineFloat);
+		Timeline.SetPlayRate(200.f);
+	}
+
 	ACPlayerController* Playercon = Cast<ACPlayerController>(GetController());
 	if (Playercon)
 	{
@@ -103,6 +121,9 @@ void ACPlayer::BeginPlay()
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	Timeline.TickTimeline(DeltaTime);
+
 	if (TargetActor)
 	{
 		FocusTarget();
@@ -151,15 +172,34 @@ void ACPlayer::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& Out
 	OutAimEnd = cameraLocation + recoilCone * 10000;
 }
 
+void ACPlayer::Dead()
+{
+	UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), DeadClass);
+	widget->AddToViewport();
+	UKismetSystemLibrary::K2_SetTimer(this, "End_Dead", 3.f, false);
+}
+
+void ACPlayer::End_Dead()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), "BossMap");
+}
+
 void ACPlayer::OffFlying()
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
+void ACPlayer::Zooming(float Infloat)
+{
+	float ViewSize = FMath::Lerp(90.f, 60.f, Infloat);
+	Camera->FieldOfView = ViewSize;
+}
+
 void ACPlayer::OnShift()
 {
 	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetRunSpeed();
+	
 }
 
 void ACPlayer::OffShift()
@@ -244,16 +284,14 @@ void ACPlayer::OnT()
 
 void ACPlayer::OnAim()
 {
-	SpringArm->TargetArmLength = 0.f;
-	Camera->FieldOfView = 60.f;
-	Camera->SetRelativeLocation(FVector(20, 0, -20));
+	Cast<ACPlayerController>(GetController())->MainWidget->OnAim();
+	Timeline.PlayFromStart();
 }
 
 void ACPlayer::OffAim()
 {
-	SpringArm->TargetArmLength = 300.f;
-	Camera->FieldOfView = 90.f;
-	Camera->SetRelativeLocation(FVector(-20, 0, 20));
+	Cast<ACPlayerController>(GetController())->MainWidget->OffAim();
+	Timeline.ReverseFromEnd();
 }
 
 bool ACPlayer::IsComBat()
@@ -292,6 +330,9 @@ void ACPlayer::BossSkill_Implementation()
 
 void ACPlayer::BossSkillEnd_Implementation()
 {
+	StatusComponent->DecreaseHealth(StatusComponent->GetMaxHealth());
+	UserStatus->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+	Dead();
 }
 
 void ACPlayer::DetachWeapon()

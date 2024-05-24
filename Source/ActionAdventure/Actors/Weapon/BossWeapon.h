@@ -59,5 +59,4 @@ protected:
 	bool bCombo;
 
 	TSubclassOf<class ABossProJectile> Projectile;
-
 };

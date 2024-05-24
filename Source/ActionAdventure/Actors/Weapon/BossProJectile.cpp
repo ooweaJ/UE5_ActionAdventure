@@ -95,6 +95,7 @@ void ABossProJectile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCom
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactParticle, location, Rotation);
 			FDamageEvent DamageEvent;
 			Char->TakeDamage(10.f, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			Destroy();
 		}
 	}
 }

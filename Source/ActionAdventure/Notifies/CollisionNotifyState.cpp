@@ -36,4 +36,10 @@ void UCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSeq
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());
 	if (Equip == nullptr) return;
 	Equip->GetCurrentItem()->GetAttachment()->OffCollisions();
+
+	AWeapon* Weapon = Cast<AWeapon>(Equip->GetCurrentItem());
+	if (!!Weapon)
+	{	
+		Weapon->ClearHittedCharacters();
+	}
 }

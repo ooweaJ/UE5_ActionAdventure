@@ -28,6 +28,13 @@ void UBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	ACharacter* Target = behavior->GetTarget();
 
 	float distance = aiPawn->GetDistanceTo(Target);
+
+	if (state->IsDeadMode())
+	{
+		behavior->SetDead();
+		return;
+	}
+
 	if (bDoOnce2)
 	{
 		if (aiPawn->IsLastAttack())

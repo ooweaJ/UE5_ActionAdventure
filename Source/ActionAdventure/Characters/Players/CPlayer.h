@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/CharacterInterface.h"
+#include "Components/TimelineComponent.h"
 #include "CPlayer.generated.h"
 
 class USpringArmComponent;
@@ -35,13 +36,17 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection);
 	virtual void Hitted(TSubclassOf<UDamageType> Type) {}
-	virtual void Dead() {}
-	virtual void End_Dead() {}
+	virtual void Dead();
+
+	UFUNCTION()
+	virtual void End_Dead();
 
 private:
 	UFUNCTION()
 	void OffFlying();
 
+	UFUNCTION()
+	void Zooming(float Infloat);
 public:
 	void OnShift();
 	void OffShift();
@@ -66,7 +71,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void BossSkill();
 	virtual void BossSkill_Implementation();
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
 	void BossSkillEnd();
 	virtual void BossSkillEnd_Implementation();
 
@@ -112,4 +117,9 @@ private:
 	class ACharacter* Attacker;
 	class UUI_UserStatus* UserStatus;
 	float Damage;
+	TSubclassOf<UUserWidget> DeadClass;
+	class UCurveFloat* Curve;
+
+	FTimeline Timeline;
+	FOnTimelineFloat TimelineFloat;
 };

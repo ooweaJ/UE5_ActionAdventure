@@ -7,7 +7,7 @@
 UENUM(BlueprintType)
 enum class EBossType : uint8
 {
-	Action, Approach, ApproachAction, Strafe, StrafeAction, Hitted, Avoid, Page2, LastAttack
+	Action, Approach, ApproachAction, Strafe, StrafeAction, Hitted, Avoid, Page2, LastAttack, BossDead
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -42,6 +42,7 @@ public:
 	void SetIdle(bool InIdle);
 	void SetPage2();
 	void SetLastAttack();
+	void SetDead();
 
 private:
 	void ChangeType(EBossType InType);

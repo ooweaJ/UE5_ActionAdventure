@@ -4,4 +4,5 @@ void UPlayerMainWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	BossHPBar->SetVisibility(ESlateVisibility::Hidden);
+	BossSkillBar->SetVisibility(ESlateVisibility::Hidden);
 }

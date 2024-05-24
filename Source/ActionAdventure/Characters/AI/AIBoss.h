@@ -29,6 +29,11 @@ public:
 	void MoveAlongPath(TArray<FVector> PathPoints, int32 CurrentPointIndex);
 	void StrafeAttack();
 	void RangeAttack();
+	void DeadDissolve();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Dead();
+	virtual void Dead_Implementation();
 
 	float GetDistanceToTarget();
 public:
@@ -90,6 +95,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class UMontagesComponent* MontagesComponent;
 
+	UPROPERTY(VisibleDefaultsOnly)
+	class UDissolveComponent* DissolveComponent;
+
 	UPROPERTY(EditAnywhere)
 	class UWidgetComponent* TargetingWidget;
 
@@ -105,10 +113,13 @@ public:
 	bool bTargetRotation = false;
 
 	int32 StrafeAttackConunt = 3;
+
+	class ACPlayer* Player;
 private:
 	class ABossAIController* BossController;
 	class ABossWeapon* Weapon;
 	class UUI_UserStatus* BossHPBar;
+	class UUI_UserStatus* BossSkillBar;
 	class UPlayerMainWidget* MainWidget;
 private:
 	bool bRangeAttack = false;
@@ -120,7 +131,8 @@ private:
 	float AvoidCollTime = 0.f;
 
 	bool bLastAttack = false;
-	float MaxLastAttackCollTime = 10.f;
+	UPROPERTY(EditAnywhere)
+	float MaxLastAttackCollTime = 60.f;
 	float LastAttackdCollTime = 0.f;
 
 private:
@@ -130,7 +142,7 @@ private:
 
 	TSubclassOf<class ABossRange> RangeSpawn;
 	class ACharacter* Attacker;
-
+	
 	bool Page2;
 	float Damage;
 };

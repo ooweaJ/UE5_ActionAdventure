@@ -55,6 +55,7 @@ void UBossBehaviorComponent::SetAvoid() { ChangeType(EBossType::Avoid); }
 void UBossBehaviorComponent::SetIdle(bool InIdle) { Blackboard->SetValueAsBool(IdleKey, InIdle); }
 void UBossBehaviorComponent::SetPage2(){ChangeType(EBossType::Page2);}
 void UBossBehaviorComponent::SetLastAttack() { ChangeType(EBossType::LastAttack); }
+void UBossBehaviorComponent::SetDead(){	ChangeType(EBossType::BossDead);}
 
 void UBossBehaviorComponent::ChangeType(EBossType InType)
 {

@@ -13,6 +13,11 @@ void AMeleeWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCa
 {
 	Super::OnAttachmentBeginOverlap(InAttacker, InCauser, InOtherCharacter);
 
+	int32 hittedCharactersNum = HittedCharacters.Num();
+	HittedCharacters.AddUnique(InOtherCharacter);
+
+	if (hittedCharactersNum == HittedCharacters.Num()) return;
+
 	TArray<FActionData> Datas = DefaultData->ActionDatas;
 
 	//Effect
