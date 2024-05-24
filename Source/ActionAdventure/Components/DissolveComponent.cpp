@@ -67,9 +67,11 @@ void UDissolveComponent::OnStartTimeline(float Output)
 	// 메시에 적용된 머티리얼의 개수를 출력합니다.
 	int32 NumMaterials = Materials.Num();
 
+	if (character == nullptr) return;
 	// 모든 머티리얼에 대해 반복문을 돌며 작업을 수행할 수 있습니다.
 	for (int32 Index = 0; Index < NumMaterials; ++Index)
 	{
+		if (character->GetMesh() == nullptr) return;
 		character->GetMesh()->SetMaterial(Index, DynamicMaterial);
 	}
 

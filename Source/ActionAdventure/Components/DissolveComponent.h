@@ -38,6 +38,7 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float PlayRate = 0.2f;
 private:
+	UPROPERTY()
 	class UMaterialInstanceDynamic* DynamicMaterial;
 
 	FTimeline Timeline;

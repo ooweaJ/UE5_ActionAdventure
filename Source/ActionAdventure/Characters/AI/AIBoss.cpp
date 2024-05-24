@@ -56,9 +56,9 @@ AAIBoss::AAIBoss()
 			CastMontage = Asset.Object;
 	}
 	{
-		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/ParagonAurora/Characters/Heroes/Aurora/Animations/Emote_Slice_Montage.Emote_Slice_Montage'"));
+	/*	ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/ParagonAurora/Characters/Heroes/Aurora/Animations/Emote_Slice_Montage.Emote_Slice_Montage'"));
 		if (Asset.Succeeded())
-			Page2Montage = Asset.Object;
+			Page2Montage = Asset.Object;*/
 	}
 
 	{
@@ -172,7 +172,6 @@ float AAIBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		if (Page2)
 		{
 			StatusComponent->SetStop();
-			StopAnimMontage();
 			StateComponent->SetDeadMode();
 			return Damage;
 		}
@@ -351,6 +350,11 @@ void AAIBoss::RangeAttack()
 
 void AAIBoss::Dead_Implementation()
 {
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//GetMesh()->GlobalAnimRateScale = 0.f;
+	//GetMesh()->SetSimulatePhysics(true);
+	//GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	DeadDissolve();
 }
 
 void AAIBoss::DeadDissolve()
@@ -415,6 +419,17 @@ void AAIBoss::LastAttack_Implementation()
 	}
 }
 
+void AAIBoss::DeadStop(UAnimMontage* InMontage)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	//MovingDirection = FVector::ZeroVector;
+
+	if (AnimInstance && InMontage)
+	{
+		AnimInstance->Montage_SetPlayRate(InMontage, 0.0f);
+	}
+}
+
 void AAIBoss::StopMontage(UAnimMontage* InMontage)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -449,7 +464,6 @@ void AAIBoss::Page2Start_Implementation()
 {
 	StateComponent->SetActionMode();
 	StatusComponent->SetStop();
-	PlayAnimMontage(Page2Montage);
 }
 
 void AAIBoss::OnMainWidget()

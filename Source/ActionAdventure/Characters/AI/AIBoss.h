@@ -58,6 +58,8 @@ public:
 	void LastAttack();
 	virtual void LastAttack_Implementation();
 
+	UFUNCTION(BlueprintCallable)
+	void DeadStop(class UAnimMontage* InMontage);
 	void StopMontage(class UAnimMontage* InMontage);
 
 	UFUNCTION()
