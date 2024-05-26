@@ -26,6 +26,12 @@ void UBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
 	ACharacter* target = behavior->GetTarget();
 
+	if (state->IsDeadMode())
+	{
+		behavior->SetWaitMode();
+		return;
+	}
+
 	if (state->IsKnockBackMode())
 	{
 		behavior->SetKnockBackMode();
@@ -69,8 +75,10 @@ void UBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 	}
 	else
 	{
-		behavior->SetApproachMode();
-		return;
+		{
+			behavior->SetApproachMode();
+			return;
+		}
 	}
 
 }

@@ -76,6 +76,7 @@ void ABossWeapon::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InCau
 	{
 		FTransform transform = PreData.EffectTransform;
 		transform.AddToTranslation(InOtherCharacter->GetActorLocation());
+		transform.SetScale3D(FVector(0.5, 0.5, 0.5));
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitEffect, transform);
 	}
 
