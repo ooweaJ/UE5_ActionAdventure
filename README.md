@@ -17,3 +17,5 @@
 ### https://github.com/ooweaJ/UE5_ActionAdventure/pull/3 AI시스템, 공격 상호작용
 
 ### https://github.com/ooweaJ/UE5_ActionAdventure/pull/4 인벤토리, 상점, 장비창, 라이플
+
+### https://github.com/ooweaJ/UE5_ActionAdventure/pull/5 보스맵, 보스
