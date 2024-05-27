@@ -1,7 +1,7 @@
 # UE5_ActionAdventure
 
-C++ 90%로 제작한 포트폴리오 목적으로 만든 어드벤처 게임 프로젝트입니다.
-
+대부분 C++로 제작한 포트폴리오 목적으로 만든 어드벤처 게임 프로젝트입니다.
+액션 어드벤처 게임 GTA와 비슷한 도시맵과 액션 RPG 게임 엘든링과 비슷한 보스맵으로 제작했습니다.
 
 - 엔진 : Unreal Engine 5.3
 - 에디터 : Microsoft Visual Studio Community 2022
