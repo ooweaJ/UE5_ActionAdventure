@@ -4,6 +4,7 @@
 - 엔진 : Unreal Engine 5.3
 - 에디터 : Microsoft Visual Studio Community 2022
 
+https://youtu.be/2DOq-WEH1xI?si=avRWskQZbJ_ONT3v
 
 # 기술 설명서
 
