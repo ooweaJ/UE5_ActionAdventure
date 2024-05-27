@@ -10,6 +10,8 @@
 
 # 기술 설명서
 
+### 현재 기술 설명서를 제작을 완료 못했습니다. Pull requests 정보에 어느 정도 내용이 있습니다 양해 부탁드립니다.
+
 ### https://github.com/ooweaJ/UE5_ActionAdventure/pull/1 메인 월드, 날씨 시스템
 
 ### https://github.com/ooweaJ/UE5_ActionAdventure/pull/2 캐릭터, 무기, 데이터 관리
