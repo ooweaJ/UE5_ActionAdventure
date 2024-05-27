@@ -7,7 +7,7 @@
 UENUM(BlueprintType)
 enum class EWalkSpeedTpye : uint8
 {
-	Sneak, Walk, Run, Max
+	Sneak, Walk, Run, HighRun ,Max
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -30,6 +30,8 @@ public:
 	FORCEINLINE float GetMaxHealth() { return MaxHealth; }
 	FORCEINLINE float GetHealth() { return Health; }
 
+	void Set2Page();
+
 	void SetMove();
 	void SetStop();
 
@@ -41,8 +43,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float MaxHealth = 100.f;
 
-	UPROPERTY(EditAnywhere, Category = "Speed")
-	float Speed[(int32)EWalkSpeedTpye::Max] = { 200, 400, 900 };
+	float Speed[(int32)EWalkSpeedTpye::Max] = { 200, 300, 900, 1200 };
 
 private:
 	float Health;

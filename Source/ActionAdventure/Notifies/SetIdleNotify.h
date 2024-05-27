@@ -16,5 +16,6 @@ class ACTIONADVENTURE_API USetIdleNotify : public UAnimNotify
 
 public:
 	FString GetNotifyName_Implementation() const override;
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
+
 };

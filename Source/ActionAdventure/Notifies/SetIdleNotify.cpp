@@ -7,9 +7,9 @@ FString USetIdleNotify::GetNotifyName_Implementation() const
 	return "SetIdle";
 }
 
-void USetIdleNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void USetIdleNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	Super::Notify(MeshComp, Animation);
+	Super::Notify(MeshComp, Animation, EventReference);
 
 	if (MeshComp == nullptr) return;
 

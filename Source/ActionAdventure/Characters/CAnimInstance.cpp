@@ -1,6 +1,7 @@
 #include "Characters/CAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "KismetAnimationLibrary.h"
 
 #include "Components/MoveComponent.h"
 #include "Components/ActionComponent.h"
@@ -22,9 +23,8 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	ACharacter* character = Cast<ACharacter>(TryGetPawnOwner());
 	if (!IsValid(character)) return;
-
 	Speed = character->GetVelocity().Length();
-	Direction = CalculateDirection(character->GetVelocity(), character->GetControlRotation());
+	Direction = UKismetAnimationLibrary::CalculateDirection(character->GetVelocity(), character->GetControlRotation());
 	IsFalling = character->GetCharacterMovement()->IsFalling();
 	Pitch = character->GetBaseAimRotation().Pitch;
 	if(!!Action)

@@ -9,7 +9,7 @@ FString UBeginActionNotify::GetNotifyName_Implementation() const
 
 void UBeginActionNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	Super::Notify(MeshComp, Animation);
+	Super::Notify(MeshComp, Animation, EventReference);
 	if (MeshComp == nullptr) return;
 
 	UEquipComponent* Equip = Cast<UEquipComponent>(MeshComp->GetOwner()->GetComponentByClass<UEquipComponent>());

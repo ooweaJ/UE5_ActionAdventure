@@ -45,6 +45,9 @@ public:
 	float PlayKnockBack();
 	float PlayGetting();
 	float PlayVault();
+	void PlayBossAvoid();
+	void PlayRoll();
+
 private:
 	float PlayAnimMontage(FName Key);
 

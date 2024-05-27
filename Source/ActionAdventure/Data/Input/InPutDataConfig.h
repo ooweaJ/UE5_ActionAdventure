@@ -29,4 +29,5 @@ public:
 	UInputAction* Num2 = nullptr;
 	UInputAction* Num3 = nullptr;
 	UInputAction* G = nullptr;
+	UInputAction* T = nullptr;
 };

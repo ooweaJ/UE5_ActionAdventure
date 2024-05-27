@@ -59,6 +59,22 @@ void UStateComponent::SetDeadMode()
 	ChangeType(EStateType::Dead);
 }
 
+void UStateComponent::SetApproachMode()
+{
+	ChangeType(EStateType::Approach);
+}
+
+void UStateComponent::SetAvoidMode()
+{
+	ChangeType(EStateType::Avoid);
+
+}
+
+void UStateComponent::SetRollMode()
+{
+	ChangeType(EStateType::Roll);
+}
+
 void UStateComponent::SetOnOrient()
 {
 	OwnerCharacter->bUseControllerRotationYaw = false;

@@ -15,8 +15,11 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Characters/CAnimInstance.h"
+#include "Characters/AI/AIBoss.h"
+#include "Characters/Controller/CPlayerController.h"
 #include "Components/StatusComponent.h"
 #include "Components/StateComponent.h"
 #include "Components/MoveComponent.h"
@@ -24,7 +27,9 @@
 #include "Components/MontagesComponent.h"
 
 #include "Actors/Weapon/Weapon.h"
+#include "Actors/Weapon/Attachment.h"
 #include "SubSystem/DataSubsystem.h"
+#include "UI/UI_UserStatus.h"
 
 ACPlayer::ACPlayer()
 {
@@ -46,7 +51,18 @@ ACPlayer::ACPlayer()
 		mesh->SetRelativeLocation(FVector(0, 0, -88));
 		mesh->SetRelativeRotation(FRotator(0, -90, 0));
 	}
-
+	{
+		ConstructorHelpers::FObjectFinder<UCurveFloat> Asset(TEXT("/Script/Engine.CurveFloat'/Game/_dev/CameraLerp.CameraLerp'"));
+		if (Asset.Succeeded())
+			Curve = Asset.Object;
+	}
+	{
+		ConstructorHelpers::FClassFinder<UUserWidget> Class(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/_dev/UI/UI_Dead.UI_Dead_C'"));
+		if (Class.Succeeded())
+		{
+			DeadClass = Class.Class;
+		}
+	}
 	// Create ActorComponents
 	{
 		StatusComponent = CreateDefaultSubobject<UStatusComponent>("StatusComponent");
@@ -88,11 +104,30 @@ void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	{
+		TimelineFloat.BindUFunction(this, "Zooming");
+		Timeline.AddInterpFloat(Curve, TimelineFloat);
+		Timeline.SetPlayRate(200.f);
+	}
+
+	ACPlayerController* Playercon = Cast<ACPlayerController>(GetController());
+	if (Playercon)
+	{
+		UserStatus = Playercon->MainWidget->GetPlayerStatus();
+		UserStatus->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+	}
 }
 
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	Timeline.TickTimeline(DeltaTime);
+
+	if (TargetActor)
+	{
+		FocusTarget();
+	}
 }
 
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -102,6 +137,26 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) 
 	{
 	}
+}
+
+float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Attacker = Cast<ACharacter>(EventInstigator->GetPawn());
+
+	StatusComponent->DecreaseHealth(Damage);
+	UserStatus->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+
+	if (StatusComponent->GetHealth() <= 0.f)
+	{
+		StateComponent->SetDeadMode();
+		Dead();
+		return Damage;
+	}
+
+	Hitted(DamageEvent.DamageTypeClass);
+
+	return Damage;
 }
 
 void ACPlayer::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDriection)
@@ -117,15 +172,34 @@ void ACPlayer::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& Out
 	OutAimEnd = cameraLocation + recoilCone * 10000;
 }
 
+void ACPlayer::Dead()
+{
+	UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), DeadClass);
+	widget->AddToViewport();
+	UKismetSystemLibrary::K2_SetTimer(this, "End_Dead", 3.f, false);
+}
+
+void ACPlayer::End_Dead()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), "BossMap");
+}
+
 void ACPlayer::OffFlying()
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
+void ACPlayer::Zooming(float Infloat)
+{
+	float ViewSize = FMath::Lerp(90.f, 60.f, Infloat);
+	Camera->FieldOfView = ViewSize;
+}
+
 void ACPlayer::OnShift()
 {
 	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetRunSpeed();
+	
 }
 
 void ACPlayer::OffShift()
@@ -169,18 +243,60 @@ void ACPlayer::Parkour()
 
 }
 
+void ACPlayer::OnT()
+{
+	if (TargetActor)
+	{
+		(Cast<AAIBoss>(TargetActor))->OffTarget();
+		TargetActor = nullptr;
+		return;
+	}
+
+	FVector StartLocation = GetActorLocation();
+	FVector EndLocation = StartLocation;
+
+	TArray<FHitResult> HitResults;
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(5000.f);
+
+	// 스피어 트레이스 수행
+	bool bIsHit = GetWorld()->SweepMultiByChannel(
+		HitResults,
+		StartLocation,
+		EndLocation,
+		FQuat::Identity,
+		ECC_Pawn, // Pawn 채널에서 탐색
+		Sphere
+	);
+
+	if (bIsHit)
+	{
+		for (auto& Hit : HitResults)
+		{
+			AActor* HitActor = Hit.GetActor();
+			if (HitActor && HitActor->IsA(AAIBoss::StaticClass()))
+			{
+				TargetActor = HitActor;
+			}
+		}
+	}
+}
+
+
 void ACPlayer::OnAim()
 {
-	SpringArm->TargetArmLength = 0.f;
-	Camera->FieldOfView = 60.f;
-	Camera->SetRelativeLocation(FVector(20, 0, -20));
+	Cast<ACPlayerController>(GetController())->MainWidget->OnAim();
+	Timeline.PlayFromStart();
 }
 
 void ACPlayer::OffAim()
 {
-	SpringArm->TargetArmLength = 300.f;
-	Camera->FieldOfView = 90.f;
-	Camera->SetRelativeLocation(FVector(-20, 0, 20));
+	Cast<ACPlayerController>(GetController())->MainWidget->OffAim();
+	Timeline.ReverseFromEnd();
+}
+
+bool ACPlayer::IsComBat()
+{
+	return EquipComponent->HasWeapon();
 }
 
 void ACPlayer::SetDefault()
@@ -191,4 +307,51 @@ void ACPlayer::SetDefault()
 void ACPlayer::SetStore()
 {
 	Interaction = EInteraction::Store;
+}
+
+void ACPlayer::OnRoll()
+{
+	if (!StateComponent->IsIdleMode()) return;
+
+	FVector Velocity = GetVelocity(); 
+
+	if (!Velocity.IsNearlyZero()) 
+	{
+		FRotator TargetRotation = Velocity.Rotation(); 
+		SetActorRotation(TargetRotation); 
+	}
+	MontagesComponent->PlayRoll();
+}
+
+void ACPlayer::BossSkill_Implementation()
+{
+	DetachWeapon();
+}
+
+void ACPlayer::BossSkillEnd_Implementation()
+{
+	StatusComponent->DecreaseHealth(StatusComponent->GetMaxHealth());
+	UserStatus->SetHP(StatusComponent->GetHealth(), StatusComponent->GetMaxHealth());
+	Dead();
+}
+
+void ACPlayer::DetachWeapon()
+{
+	AItem* Item = EquipComponent->GetCurrentItem();
+	Item->Attachment->OnDetach();
+	Item->Attachment->DetachRootComponentFromParent();
+}
+
+void ACPlayer::FocusTarget()
+{
+	FVector Location = Camera->GetComponentLocation();
+	FVector TargetLocation = TargetActor->GetActorLocation();
+	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(Location, TargetLocation);
+
+	FQuat TargetQuat = TargetRotation.Quaternion();
+	FRotator NewRotation = TargetQuat.Rotator();
+
+	(Cast<AAIBoss>(TargetActor))->OnTarget();
+
+	GetController()->SetControlRotation(NewRotation);
 }

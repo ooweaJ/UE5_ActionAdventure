@@ -43,6 +43,11 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+bool UEquipComponent::HasWeapon()
+{
+	return CurrentItem != DefaultWeapon;
+}
+
 void UEquipComponent::WeaponL()
 {
 	if(CurrentItem != nullptr)
@@ -119,14 +124,8 @@ void UEquipComponent::UnEquipItem(int32 index)
 
 void UEquipComponent::EndDead()
 {
-	/*DefaultWeapon->Attachment->Destroy();
-	DefaultWeapon->Destroy();
-	if (EquipItems.Num() == 0) return;
-	for (AItem* Actor : EquipItems)
-	{
-		Actor->Attachment->Destroy();
-		Actor->Destroy();
-	}*/
+	CurrentItem->Attachment->Destroy();
+	CurrentItem->Destroy();
 }
 
 void UEquipComponent::AddData(FItemData* InData)
