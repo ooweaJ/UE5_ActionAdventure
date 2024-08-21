@@ -8,10 +8,6 @@
 - 에디터 : Microsoft Visual Studio Community 2022
 - 소개 영상 : https://youtu.be/2DOq-WEH1xI?si=avRWskQZbJ_ONT3v
 
-# 기술 설명서
-
-### ※ Pull requests 정보는 젼부가 아닙니다. 차후 기술 설명서를 추가할 예정입니다.
-
 ### https://github.com/ooweaJ/UE5_ActionAdventure/pull/1 메인 월드, 날씨 시스템
 
 ### https://github.com/ooweaJ/UE5_ActionAdventure/pull/2 캐릭터, 무기, 데이터 관리
