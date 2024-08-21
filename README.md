@@ -8,6 +8,8 @@
 - 에디터 : Microsoft Visual Studio Community 2022
 - 소개 영상 : https://youtu.be/2DOq-WEH1xI?si=avRWskQZbJ_ONT3v
 
+## 소스코드는 dev 브런치를 이용해 주세요
+
 ### https://github.com/ooweaJ/UE5_ActionAdventure/pull/1 메인 월드, 날씨 시스템
 
 ### https://github.com/ooweaJ/UE5_ActionAdventure/pull/2 캐릭터, 무기, 데이터 관리
